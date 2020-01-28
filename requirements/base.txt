@@ -1,0 +1,16 @@
+# Base requirements
+
+# Attrs, helpful for removing boilerplate.
+# attrs
+
+# Easy logging.
+logzero
+
+# Functionaly programming tools.
+# toolz
+
+# HTTP requests for humans.
+# requests
+
+# Useful progress display.
+tqdm

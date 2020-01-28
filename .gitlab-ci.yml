@@ -1,0 +1,18 @@
+image: python:3.6
+
+variables:
+  DEBIAN_FRONTEND: noninteractive
+
+before_script:
+  - pip3 install -r requirements/test_black.txt
+
+all_tests:
+  script:
+    - pytest --disable-pytest-warnings
+    - coverage report
+    - black -l 100 --check .
+    - flake8 .
+    - python setup.py check
+    - mypy varfish_cli
+    - cd docs_manual && make clean html
+  when: on_success
