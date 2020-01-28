@@ -10,7 +10,7 @@ import toml
 from logzero import logger
 
 from varfish_cli import __version__
-from .common import run_nocmd, Config
+from .common import run_nocmd, CommonConfig
 from .case import setup_argparse as setup_argparse_case
 from .case import run as run_case
 
@@ -94,7 +94,7 @@ def main(argv=None):
         logger.info("Could not find any of the global configuration files %s.", config_paths)
 
     # Merge configuration from command line/environment args and configuration file.
-    config = Config.create(args, toml_config)
+    config = CommonConfig.create(args, toml_config)
 
     # Handle the actual command line.
     cmds = {None: run_nocmd, "case": run_case}

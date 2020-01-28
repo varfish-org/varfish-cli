@@ -4,7 +4,7 @@ import attr
 
 
 @attr.s(frozen=True, auto_attribs=True)
-class Config:
+class CommonConfig:
     """Common configuration for all commands."""
 
     #: API key to use for VarFish.
@@ -16,7 +16,7 @@ class Config:
     @staticmethod
     def create(args, toml_config=None):
         toml_config = toml_config or {}
-        return Config(
+        return CommonConfig(
             varfish_api_key=(
                 args.varfish_api_key or toml_config.get("global", {})["varfish_api_key"]
             ),
