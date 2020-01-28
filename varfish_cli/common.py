@@ -1,7 +1,7 @@
 """Shared code."""
 
 
-def run_nocmd(_, parser, subparser=None):  # pragma: no cover
+def run_nocmd(_config, _args, parser, subparser=None):  # pragma: no cover
     """No command given, print help and ``exit(1)``."""
     if subparser:
         subparser.print_help()

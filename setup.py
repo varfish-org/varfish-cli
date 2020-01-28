@@ -23,10 +23,10 @@ def parse_requirements(path):
     return requirements
 
 
-with open("README.md") as readme_file:
+with open("README.rst") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.md") as history_file:
+with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
 test_requirements = parse_requirements("requirements/test.txt")
@@ -46,12 +46,11 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
     ],
-    # entry_points={"console_scripts": ("varfish-cli = varfish_cli.__main__:main",)},
-    description="CUBI Python Boilerplate contains all the boilerplate you need to create a Python package for CUBI.",
+    entry_points={"console_scripts": ("varfish-cli = varfish_cli.__main__:main",)},
+    description="Command line interface client for VarFish Server.",
     install_requires=install_requirements,
     license="MIT license",
     long_description=readme + "\n\n" + history,
-    # long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="varfish_cli",
     name="varfish_cli",

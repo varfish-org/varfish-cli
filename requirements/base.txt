@@ -1,16 +1,19 @@
 # Base requirements
 
 # Attrs, helpful for removing boilerplate.
-# attrs
+attrs
 
 # Easy logging.
 logzero
 
+# Compact, round-tripable configuration format.
+toml
+
 # Functionaly programming tools.
-# toolz
+toolz
 
 # HTTP requests for humans.
-# requests
+requests
 
 # Useful progress display.
 tqdm
