@@ -7,8 +7,8 @@ import uuid
 import attr
 from logzero import logger
 
+import varfish_cli.api.case
 from .common import run_nocmd, Config
-from . import api
 
 
 def setup_argparse(parser: argparse.ArgumentParser) -> None:
@@ -57,7 +57,7 @@ def run_list(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     logger.info("Configuration: %s", config)
     logger.info("Listing cases")
     base_config = config.case_config.global_config
-    res = api.case_list(
+    res = varfish_cli.api.case.case_list(
         server_url=base_config.varfish_server_url,
         api_key=base_config.varfish_api_key,
         project_uuid=config.project_uuid,

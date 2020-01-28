@@ -1,6 +1,6 @@
-.PHONY: default black flake8 mypy test test-v test-vv
+.PHONY: default black flake8 mypy test test-v test-vv coverage_html
 
-default: black flake8 mypy test
+default: black flake8 mypy test coverage_html
 
 black:
 	black -l 100 .
