@@ -6,40 +6,16 @@ import os
 import sys
 
 import logzero
-import attr
 import toml
 from logzero import logger
 
 from varfish_cli import __version__
-from .common import run_nocmd
-from .subcommand import setup_argparse as setup_argparse_subcommand
-from .subcommand import run as run_subcommand
+from .common import run_nocmd, Config
+from .case import setup_argparse as setup_argparse_case
+from .case import run as run_case
 
 #: Paths to search the global configuration in.
 GLOBAL_CONFIG_PATHS = ("~/.varfishrc.toml",)
-
-
-@attr.s(frozen=True, auto_attribs=True)
-class Config:
-    """Common configuration for all commands."""
-
-    #: API key to use for VarFish.
-    varfish_api_key: str = attr.ib(repr=lambda value: repr(value[:4] + (len(value) - 4) * "*"))
-
-    #: Base URL to VarFish server.
-    varfish_server_url: str
-
-    @classmethod
-    def create(cls, args, toml_config=None):
-        toml_config = toml_config or {}
-        return Config(
-            varfish_api_key=(
-                args.varfish_api_key or toml_config.get("global", {})["varfish_api_key"]
-            ),
-            varfish_server_url=(
-                args.varfish_server_url or toml_config.get("global", {})["varfish_server_url"]
-            ),
-        )
 
 
 def setup_argparse_only():  # pragma: nocover
@@ -77,7 +53,7 @@ def setup_argparse():
     # Add sub parsers for each argument.
     subparsers = parser.add_subparsers(dest="cmd")
 
-    setup_argparse_subcommand(subparsers.add_parser("subcommand", help="Subcommand description."))
+    setup_argparse_case(subparsers.add_parser("case", help="Work with cases."))
 
     return parser, subparsers
 
@@ -89,6 +65,18 @@ def main(argv=None):
 
     # Actually parse command line arguments.
     args = parser.parse_args(argv)
+
+    # Setup logging incl. verbosity.
+    if args.verbose:  # pragma: no cover
+        level = logging.DEBUG
+    else:
+        # Remove module name and line number if not running in debug mode.s
+        formatter = logzero.LogFormatter(
+            fmt="%(color)s[%(levelname)1.1s %(asctime)s]%(end_color)s %(message)s"
+        )
+        logzero.formatter(formatter)
+        level = logging.INFO
+    logzero.loglevel(level=level)
 
     # Load configuration, if any.
     if args.config:
@@ -108,19 +96,12 @@ def main(argv=None):
     # Merge configuration from command line/environment args and configuration file.
     config = Config.create(args, toml_config)
 
-    # Setup logging verbosity.
-    if args.verbose:  # pragma: no cover
-        level = logging.DEBUG
-    else:
-        level = logging.INFO
-    logzero.loglevel(level=level)
-
     # Handle the actual command line.
-    cmds = {None: run_nocmd, "subcommand": run_subcommand}
+    cmds = {None: run_nocmd, "case": run_case}
 
-    logger.info("Configuration: %s", config)
-
-    res = cmds[args.cmd](config, args, parser, subparsers.choices[args.cmd] if args.cmd else None)
+    res = cmds[args.cmd](
+        config, toml_config, args, parser, subparsers.choices[args.cmd] if args.cmd else None
+    )
     if not res:
         logger.info("All done. Have a nice day!")
     else:  # pragma: nocover
