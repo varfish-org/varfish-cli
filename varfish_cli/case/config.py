@@ -3,6 +3,8 @@
 import attr
 import uuid
 
+import typing
+
 from ..common import CommonConfig
 
 
@@ -33,3 +35,43 @@ class CaseListConfig:
     def create(args, case_config, toml_config=None):
         # toml_config = toml_config or {}
         return CaseListConfig(case_config=case_config, project_uuid=args.project_uuid)
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseListImportInfoConfig:
+    """Configuration for the ``varfish-cli case list-import-info`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the case to pull.
+    project_uuid: uuid.UUID
+
+    #: Optionally, owner to query for.
+    owner: typing.Optional[str] = None
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        # toml_config = toml_config or {}
+        return CaseListImportInfoConfig(case_config=case_config, project_uuid=args.project_uuid, owner=args.owner)
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseCreateImportInfoConfig:
+    """Configuration for the ``varfish-cli case create-import-info`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the case to pull.
+    project_uuid: uuid.UUID
+
+    #: Path to files to import.
+    paths: typing.List[str]
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        # toml_config = toml_config or {}
+        return CaseCreateImportInfoConfig(
+            case_config=case_config, project_uuid=args.project_uuid, paths=args.paths
+        )

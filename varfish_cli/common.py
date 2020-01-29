@@ -7,6 +7,9 @@ import attr
 class CommonConfig:
     """Common configuration for all commands."""
 
+    #: Verbose mode activated
+    verbose: bool
+
     #: API key to use for VarFish.
     varfish_api_key: str = attr.ib(repr=lambda value: repr(value[:4] + (len(value) - 4) * "*"))
 
@@ -17,6 +20,7 @@ class CommonConfig:
     def create(args, toml_config=None):
         toml_config = toml_config or {}
         return CommonConfig(
+            verbose=args.verbose,
             varfish_api_key=(
                 args.varfish_api_key or toml_config.get("global", {})["varfish_api_key"]
             ),
