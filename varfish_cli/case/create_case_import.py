@@ -323,7 +323,7 @@ class CaseImporter:
         """Create case if necessary."""
 
         def strip_suffix(x):
-            for pattern in REMOVE_SUFFIX_RES:
+            for pattern in [self.create_config.strip_family_regex] + list(REMOVE_SUFFIX_RES):
                 x = re.sub(pattern, "", x)
             return x
 
@@ -553,6 +553,11 @@ class CaseImporter:
 
 def setup_argparse(parser):
     parser.add_argument("--hidden-cmd", dest="case_cmd", default=run, help=argparse.SUPPRESS)
+    parser.add_argument(
+        "--strip-family-regex",
+        default="^FAM_",
+        help="Regular expression to process family name with.",
+    )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(
         "paths",

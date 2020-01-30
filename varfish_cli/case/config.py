@@ -53,7 +53,9 @@ class CaseListImportInfoConfig:
     @staticmethod
     def create(args, case_config, toml_config=None):
         # toml_config = toml_config or {}
-        return CaseListImportInfoConfig(case_config=case_config, project_uuid=args.project_uuid, owner=args.owner)
+        return CaseListImportInfoConfig(
+            case_config=case_config, project_uuid=args.project_uuid, owner=args.owner
+        )
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -69,9 +71,15 @@ class CaseCreateImportInfoConfig:
     #: Path to files to import.
     paths: typing.List[str]
 
+    #: Regular expression to use for modifying family.
+    strip_family_regex: str
+
     @staticmethod
-    def create(args, case_config, toml_config=None):
+    def create(args, case_config, strip_family_regex, toml_config=None):
         # toml_config = toml_config or {}
         return CaseCreateImportInfoConfig(
-            case_config=case_config, project_uuid=args.project_uuid, paths=args.paths
+            case_config=case_config,
+            project_uuid=args.project_uuid,
+            paths=args.paths,
+            strip_family_regex=args.strip_family_regex,
         )
