@@ -415,6 +415,8 @@ class CaseImporter:
                     )
                 )
 
+        case_name += self.create_config.case_name_suffix
+
         return case_name, pedigree
 
     def _load_dict_col(self, genotype_file, column):
@@ -557,6 +559,12 @@ def setup_argparse(parser):
         "--strip-family-regex",
         default="^FAM_",
         help="Regular expression to process family name with.",
+    )
+    parser.add_argument(
+        "--case-name-suffix",
+        type=str,
+        default="case_name_suffix",
+        help="Suffix to append to case name.",
     )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(

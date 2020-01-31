@@ -65,6 +65,9 @@ class CaseCreateImportInfoConfig:
     #: Case configuration.
     case_config: CaseConfig
 
+    #: Suffix to append to the case name.
+    case_name_suffix: str
+
     #: UUID of the case to pull.
     project_uuid: uuid.UUID
 
@@ -82,4 +85,5 @@ class CaseCreateImportInfoConfig:
             project_uuid=args.project_uuid,
             paths=args.paths,
             strip_family_regex=args.strip_family_regex,
+            case_name_suffix=args.case_name_suffix,
         )
