@@ -3,6 +3,12 @@ History
 =======
 
 ------
+v0.2.1
+------
+
+- Fixing package (`MANIFEST.in`).
+
+------
 v0.2.0
 ------
 
