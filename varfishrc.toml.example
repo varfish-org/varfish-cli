@@ -4,5 +4,5 @@
 varfish_server_url = https://varfish.bihealth.org/
 
 # API key to use for VarFish API.
-varfish_api_key = XXX
+varfish_api_token = XXX
 

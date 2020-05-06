@@ -11,7 +11,7 @@ class CommonConfig:
     verbose: bool
 
     #: API key to use for VarFish.
-    varfish_api_key: str = attr.ib(repr=lambda value: repr(value[:4] + (len(value) - 4) * "*"))
+    varfish_api_token: str = attr.ib(repr=lambda value: repr(value[:4] + (len(value) - 4) * "*"))
 
     #: Base URL to VarFish server.
     varfish_server_url: str
@@ -21,8 +21,8 @@ class CommonConfig:
         toml_config = toml_config or {}
         return CommonConfig(
             verbose=args.verbose,
-            varfish_api_key=(
-                args.varfish_api_key or toml_config.get("global", {})["varfish_api_key"]
+            varfish_api_token=(
+                args.varfish_api_token or toml_config.get("global", {})["varfish_api_token"]
             ),
             varfish_server_url=(
                 args.varfish_server_url or toml_config.get("global", {})["varfish_server_url"]

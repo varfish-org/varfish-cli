@@ -26,7 +26,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     base_config = config.case_config.global_config
     res = api.case_import_info_list(
         server_url=base_config.varfish_server_url,
-        api_key=base_config.varfish_api_key,
+        api_key=base_config.varfish_api_token,
         project_uuid=config.project_uuid,
         owner=config.owner,
     )

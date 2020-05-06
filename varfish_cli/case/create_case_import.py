@@ -346,7 +346,7 @@ class CaseImporter:
 
         for case_info in api.case_import_info_list(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_key,
+            api_key=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
         ):
             if strip_suffix(case_info.name) == name:
@@ -355,7 +355,7 @@ class CaseImporter:
         else:  # found no match
             return api.case_import_info_create(
                 server_url=self.global_config.varfish_server_url,
-                api_key=self.global_config.varfish_api_key,
+                api_key=self.global_config.varfish_api_token,
                 project_uuid=self.create_config.project_uuid,
                 data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
             )
@@ -376,13 +376,16 @@ class CaseImporter:
         """Check bam_qc."""
         with_gts = {m.name for m in self.pedigree if m.has_gt_entries}
         seen_in_bam_qc = set()
+        if not self.paths_bam_qc:
+            logger.debug("No BAM QC found, not checking.")
+            return
         for path in self.paths_bam_qc:
             logger.debug("Checking BAM QC vs. pedigree samples for %s", path.path)
             stats = self._load_dict_col(path.path, "bam_stats")
             seen_in_bam_qc |= stats.keys()
         if with_gts != seen_in_bam_qc:
             raise InconsistentSamplesDataException(
-                "Inconsistencies in %s vs. %s (exclusive %s vs. %s) "
+                "Inconsistencies in %s vs. %s (%s {gts only} vs. %s {bam qc only}) "
                 % (
                     self.path_ped,
                     [p.path for p in self.paths_bam_qc],
@@ -447,7 +450,7 @@ class CaseImporter:
         md5 = self._load_md5(path + ".md5")
         for file_obj in api_list_func(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_key,
+            api_key=self.global_config.varfish_api_token,
             **{func_uuid_arg: uuid_value},
         ):
             if file_obj.md5 == md5:
@@ -458,7 +461,7 @@ class CaseImporter:
             with open(path, "rb") as handle:
                 api_create_func(
                     server_url=self.global_config.varfish_server_url,
-                    api_key=self.global_config.varfish_api_key,
+                    api_key=self.global_config.varfish_api_token,
                     **{func_uuid_arg: uuid_value},
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
@@ -527,7 +530,7 @@ class CaseImporter:
 
         for case_info in api.variant_set_import_info_list(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_key,
+            api_key=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
         ):
             if case_info.variant_type == variant_type:
@@ -535,7 +538,7 @@ class CaseImporter:
         else:  # found no match
             return api.variant_set_import_info_create(
                 server_url=self.global_config.varfish_server_url,
-                api_key=self.global_config.varfish_api_key,
+                api_key=self.global_config.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 data=models.VariantSetImportInfo(
                     genomebuild=GenomeBuild.GRCH37, variant_type=variant_type
@@ -546,7 +549,7 @@ class CaseImporter:
         """Submit the case import."""
         return api.case_import_info_update(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_key,
+            api_key=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
             data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
@@ -561,10 +564,7 @@ def setup_argparse(parser):
         help="Regular expression to process family name with.",
     )
     parser.add_argument(
-        "--case-name-suffix",
-        type=str,
-        default="case_name_suffix",
-        help="Suffix to append to case name.",
+        "--case-name-suffix", type=str, default="", help="Suffix to append to case name."
     )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(

@@ -80,6 +80,8 @@ class CaseImportState(Enum):
     IMPORTED = "imported"
     #: Previously in database but not any more.
     EVICTED = "evicted"
+    #: Failed import.
+    FAILED = "failed"
 
 
 @attr.s(frozen=True, auto_attribs=True)

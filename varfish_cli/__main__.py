@@ -45,9 +45,9 @@ def setup_argparse():
         help="VarFish server URL key to use, defaults to env VARFISH_SERVER_URL.",
     )
     group.add_argument(
-        "--varfish-api-key",
-        default=os.environ.get("VARFISH_API_KEY", None),
-        help="VarFish API key to use, defaults to env VARFISH_API_KEY.",
+        "--varfish-api-token",
+        default=os.environ.get("VARFISH_API_TOKEN", None),
+        help="VarFish API token to use, defaults to env VARFISH_API_TOKEN.",
     )
 
     # Add sub parsers for each argument.

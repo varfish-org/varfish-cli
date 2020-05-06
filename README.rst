@@ -18,6 +18,6 @@ Installation
 
     # URL to VarFish server.
     varfish_url = https://varfish.example.com/
-    # API key to use for VarFish API.
-    varfish_api_key = "XXX"
+    # API token to use for VarFish API.
+    varfish_api_token = "XXX"
     EOF
