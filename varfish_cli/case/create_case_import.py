@@ -251,10 +251,7 @@ class CaseImporter:
         self.pedigree: typing.List[PedigreeMember] = None
 
     def _log_exception(self, e):
-        if self.global_config.verbose:
-            logger.exception(e)
-        else:
-            logger.error("%s", e)
+        logger.exception(e, exc_info=self.global_config.verbose)
 
     def run(self):
         logger.info("Starting new case import ...")
@@ -346,16 +343,26 @@ class CaseImporter:
 
         for case_info in api.case_import_info_list(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_token,
+            api_token=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
         ):
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
+                if self.create_config.resubmit and case_info.state == CaseImportState.SUBMITTED:
+                    logger.info("Case is submitted and --resubmit given, marking as draft.")
+                    case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
+                    api.case_import_info_update(
+                        server_url=self.global_config.varfish_server_url,
+                        api_token=self.global_config.varfish_api_token,
+                        project_uuid=self.create_config.project_uuid,
+                        case_import_info_uuid=case_info.sodar_uuid,
+                        data=case_info,
+                    )
                 return case_info
         else:  # found no match
             return api.case_import_info_create(
                 server_url=self.global_config.varfish_server_url,
-                api_key=self.global_config.varfish_api_token,
+                api_token=self.global_config.varfish_api_token,
                 project_uuid=self.create_config.project_uuid,
                 data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
             )
@@ -450,7 +457,7 @@ class CaseImporter:
         md5 = self._load_md5(path + ".md5")
         for file_obj in api_list_func(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_token,
+            api_token=self.global_config.varfish_api_token,
             **{func_uuid_arg: uuid_value},
         ):
             if file_obj.md5 == md5:
@@ -461,7 +468,7 @@ class CaseImporter:
             with open(path, "rb") as handle:
                 api_create_func(
                     server_url=self.global_config.varfish_server_url,
-                    api_key=self.global_config.varfish_api_token,
+                    api_token=self.global_config.varfish_api_token,
                     **{func_uuid_arg: uuid_value},
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
@@ -530,7 +537,7 @@ class CaseImporter:
 
         for case_info in api.variant_set_import_info_list(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_token,
+            api_token=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
         ):
             if case_info.variant_type == variant_type:
@@ -538,7 +545,7 @@ class CaseImporter:
         else:  # found no match
             return api.variant_set_import_info_create(
                 server_url=self.global_config.varfish_server_url,
-                api_key=self.global_config.varfish_api_token,
+                api_token=self.global_config.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 data=models.VariantSetImportInfo(
                     genomebuild=GenomeBuild.GRCH37, variant_type=variant_type
@@ -549,7 +556,7 @@ class CaseImporter:
         """Submit the case import."""
         return api.case_import_info_update(
             server_url=self.global_config.varfish_server_url,
-            api_key=self.global_config.varfish_api_token,
+            api_token=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
             data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
@@ -565,6 +572,12 @@ def setup_argparse(parser):
     )
     parser.add_argument(
         "--case-name-suffix", type=str, default="", help="Suffix to append to case name."
+    )
+    parser.add_argument(
+        "--resubmit",
+        default=False,
+        action="store_true",
+        help="Also import if state is already 'submit'",
     )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(

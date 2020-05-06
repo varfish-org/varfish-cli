@@ -56,21 +56,21 @@ ENDPOINT_DB_INFO_FILE_CREATE = ENDPOINT_DB_INFO_FILE_LIST
 
 
 def case_list(
-    server_url: str, api_key: str, project_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, project_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[Case]:
     """Listing of cases from a project UUID."""
     while server_url.endswith("/"):
         server_url = server_url[:-1]
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_LIST.format(project_uuid=project_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     result.raise_for_status()
     return CONVERTER.structure(result.json(), typing.List[Case])
 
 
 def case_import_info_list(
-    server_url: str, api_key: str, project_uuid: typing.Union[str, uuid.UUID], owner=None
+    server_url: str, api_token: str, project_uuid: typing.Union[str, uuid.UUID], owner=None
 ) -> typing.List[CaseImportInfo]:
     """Listing case import infos from a project UUID."""
     while server_url.endswith("/"):
@@ -79,7 +79,7 @@ def case_import_info_list(
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_LIST.format(project_uuid=project_uuid),
     )
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     if owner:
         params = {"owner": owner}
     else:
@@ -101,7 +101,7 @@ def case_import_info_list(
 
 def case_import_info_create(
     server_url: str,
-    api_key: str,
+    api_token: str,
     project_uuid: typing.Union[str, uuid.UUID],
     data: models.CaseImportInfo,
 ) -> CaseImportInfo:
@@ -113,7 +113,7 @@ def case_import_info_create(
         ENDPOINT_CASE_IMPORT_INFO_CREATE.format(project_uuid=project_uuid),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     logger.debug("json=%s", CONVERTER.unstructure(data))
     result = requests.post(endpoint, headers=headers, json=CONVERTER.unstructure(data))
     if not result.ok:
@@ -131,7 +131,7 @@ def case_import_info_create(
 
 def case_import_info_update(
     server_url: str,
-    api_key: str,
+    api_token: str,
     project_uuid: typing.Union[str, uuid.UUID],
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     data: models.CaseImportInfo,
@@ -146,7 +146,7 @@ def case_import_info_update(
         ),
     )
     logger.debug("Sending PUT request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     logger.debug("json=%s", CONVERTER.unstructure(data))
     result = requests.put(endpoint, headers=headers, json=CONVERTER.unstructure(data))
     if not result.ok:
@@ -163,7 +163,7 @@ def case_import_info_update(
 
 
 def variant_set_import_info_list(
-    server_url: str, api_key: str, case_import_info_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, case_import_info_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[VariantSetImportInfo]:
     """List variant set import infos."""
     while server_url.endswith("/"):
@@ -173,7 +173,7 @@ def variant_set_import_info_list(
         ENDPOINT_VARIANT_SET_IMPORT_INFO_LIST.format(case_import_info_uuid=case_import_info_uuid),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     if not result.ok:
         try:
@@ -190,7 +190,7 @@ def variant_set_import_info_list(
 
 def variant_set_import_info_create(
     server_url: str,
-    api_key: str,
+    api_token: str,
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     data: VariantSetImportInfo,
 ) -> typing.List[VariantSetImportInfo]:
@@ -202,7 +202,7 @@ def variant_set_import_info_create(
         ENDPOINT_VARIANT_SET_IMPORT_INFO_CREATE.format(case_import_info_uuid=case_import_info_uuid),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, json=CONVERTER.unstructure(data))
     if not result.ok:
         try:
@@ -218,7 +218,7 @@ def variant_set_import_info_create(
 
 
 def bam_qc_file_list(
-    server_url: str, api_key: str, case_import_info_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, case_import_info_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[BamQcFile]:
     while server_url.endswith("/"):
         server_url = server_url[:-1]
@@ -227,7 +227,7 @@ def bam_qc_file_list(
         ENDPOINT_BAM_QC_FILE_LIST.format(case_import_info_uuid=case_import_info_uuid),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     if not result.ok:
         try:
@@ -244,7 +244,7 @@ def bam_qc_file_list(
 
 def bam_qc_file_upload(
     server_url: str,
-    api_key: str,
+    api_token: str,
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     data: BamQcFile,
     files: typing.Dict[str, typing.BinaryIO],
@@ -256,7 +256,7 @@ def bam_qc_file_upload(
         ENDPOINT_BAM_QC_FILE_CREATE.format(case_import_info_uuid=case_import_info_uuid),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files)
     if not result.ok:
         try:
@@ -272,7 +272,7 @@ def bam_qc_file_upload(
 
 
 def genotype_file_list(
-    server_url: str, api_key: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[GenotypeFile]:
     while server_url.endswith("/"):
         server_url = server_url[:-1]
@@ -283,7 +283,7 @@ def genotype_file_list(
         ),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     if not result.ok:
         try:
@@ -300,7 +300,7 @@ def genotype_file_list(
 
 def genotype_file_upload(
     server_url: str,
-    api_key: str,
+    api_token: str,
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     data: GenotypeFile,
     files: typing.Dict[str, typing.BinaryIO],
@@ -314,7 +314,7 @@ def genotype_file_upload(
         ),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files)
     if not result.ok:
         try:
@@ -330,7 +330,7 @@ def genotype_file_upload(
 
 
 def effects_file_list(
-    server_url: str, api_key: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[EffectsFile]:
     while server_url.endswith("/"):
         server_url = server_url[:-1]
@@ -341,7 +341,7 @@ def effects_file_list(
         ),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     if not result.ok:
         try:
@@ -358,7 +358,7 @@ def effects_file_list(
 
 def effects_file_upload(
     server_url: str,
-    api_key: str,
+    api_token: str,
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     data: EffectsFile,
     files: typing.Dict[str, typing.BinaryIO],
@@ -372,7 +372,7 @@ def effects_file_upload(
         ),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files)
     if not result.ok:
         try:
@@ -388,7 +388,7 @@ def effects_file_upload(
 
 
 def db_info_file_list(
-    server_url: str, api_key: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
+    server_url: str, api_token: str, variant_set_import_info_uuid: typing.Union[str, uuid.UUID]
 ) -> typing.List[DatabaseInfoFile]:
     while server_url.endswith("/"):
         server_url = server_url[:-1]
@@ -399,7 +399,7 @@ def db_info_file_list(
         ),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers)
     if not result.ok:
         try:
@@ -416,7 +416,7 @@ def db_info_file_list(
 
 def db_info_file_upload(
     server_url: str,
-    api_key: str,
+    api_token: str,
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     data: DatabaseInfoFile,
     files: typing.Dict[str, typing.BinaryIO],
@@ -430,7 +430,7 @@ def db_info_file_upload(
         ),
     )
     logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_key}
+    headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files)
     if not result.ok:
         try:

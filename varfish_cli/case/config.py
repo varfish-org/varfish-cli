@@ -77,6 +77,9 @@ class CaseCreateImportInfoConfig:
     #: Regular expression to use for modifying family.
     strip_family_regex: str
 
+    #: Whether to re re-submit or not.
+    resubmit: bool
+
     @staticmethod
     def create(args, case_config, strip_family_regex, toml_config=None):
         # toml_config = toml_config or {}
@@ -86,4 +89,5 @@ class CaseCreateImportInfoConfig:
             paths=args.paths,
             strip_family_regex=args.strip_family_regex,
             case_name_suffix=args.case_name_suffix,
+            resubmit=args.resubmit,
         )
