@@ -25,3 +25,6 @@ tqdm
 
 # Tabular display.
 tabulate
+
+# Levenshtein distance.
+python-Levenshtein

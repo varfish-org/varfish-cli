@@ -12,6 +12,7 @@ import uuid
 from itertools import chain
 
 import attr
+import Levenshtein
 from logzero import logger
 from tabulate import tabulate
 
@@ -25,6 +26,8 @@ from ..api import (
     GenotypeFile,
     EffectsFile,
     CaseImportState,
+    CaseImportInfo,
+    DatabaseInfoFile,
 )
 from .config import CaseCreateImportInfoConfig
 
@@ -139,6 +142,10 @@ class PathWithTimestamp:
     def from_path(cls, path):
         """Construct from path."""
         return PathWithTimestamp(path, os.stat(os.path.realpath(path)).st_mtime)
+
+    @property
+    def basename(self):
+        return os.path.basename(self.path)
 
 
 class FileType(enum.Enum):
@@ -274,9 +281,72 @@ class CaseImporter:
             return 1
 
         logger.info("... uploading files (if necessary) ...")
-        self._upload_files(case_import_info)
+        good_md5s = self._upload_files(case_import_info)
+        logger.info("... purging old files (if necessary) ...")
+        self._purge_old_files(case_import_info, good_md5s)
         logger.info("... and updating state to 'submitted'")
         self._submit_import(case_import_info)
+
+    def _purge_old_files(self, case_import_info: CaseImportInfo, good_md5s: typing.Collection[str]):
+        bam_qc_files = api.bam_qc_file_list(
+            server_url=self.global_config.varfish_server_url,
+            api_token=self.global_config.varfish_api_token,
+            case_import_info_uuid=case_import_info.sodar_uuid,
+        )
+        for bam_qc_file in bam_qc_files:
+            if bam_qc_file.md5 not in good_md5s:
+                api.bam_qc_file_destroy(
+                    server_url=self.global_config.varfish_server_url,
+                    api_token=self.global_config.varfish_api_token,
+                    case_import_info_uuid=case_import_info.sodar_uuid,
+                    bam_qc_file_uuid=bam_qc_file.sodar_uuid,
+                )
+
+        variant_sets = api.variant_set_import_info_list(
+            server_url=self.global_config.varfish_server_url,
+            api_token=self.global_config.varfish_api_token,
+            case_import_info_uuid=case_import_info.sodar_uuid,
+        )
+        for variant_set in variant_sets:
+            genotype_files = api.genotype_file_list(
+                server_url=self.global_config.varfish_server_url,
+                api_token=self.global_config.varfish_api_token,
+                variant_set_import_info_uuid=variant_set.sodar_uuid,
+            )
+            for gt_file in genotype_files:
+                if gt_file.md5 not in good_md5s:
+                    api.genotype_file_destroy(
+                        server_url=self.global_config.varfish_server_url,
+                        api_token=self.global_config.varfish_api_token,
+                        variant_set_import_info_uuid=variant_set.sodar_uuid,
+                        genotype_file_uuid=gt_file.sodar_uuid,
+                    )
+            effect_files = api.effects_file_list(
+                server_url=self.global_config.varfish_server_url,
+                api_token=self.global_config.varfish_api_token,
+                variant_set_import_info_uuid=variant_set.sodar_uuid,
+            )
+            for eff_file in effect_files:
+                if eff_file.md5 not in good_md5s:
+                    api.effects_file_destroy(
+                        server_url=self.global_config.varfish_server_url,
+                        api_token=self.global_config.varfish_api_token,
+                        variant_set_import_info_uuid=variant_set.sodar_uuid,
+                        effects_file_uuid=eff_file.sodar_uuid,
+                    )
+            db_info_files = api.db_info_file_list(
+                server_url=self.global_config.varfish_server_url,
+                api_token=self.global_config.varfish_api_token,
+                variant_set_import_info_uuid=variant_set.sodar_uuid,
+            )
+            for db_info_file in db_info_files:
+                if db_info_file.md5 not in good_md5s:
+                    api.db_info_file_destroy(
+                        server_url=self.global_config.varfish_server_url,
+                        api_token=self.global_config.varfish_api_token,
+                        variant_set_import_info_uuid=variant_set.sodar_uuid,
+                        db_info_file_uuid=db_info_file.sodar_uuid,
+                    )
 
     def _split_files_by_role(self):
         """Split out files by their role into ``self.path_ped`` and ``self.paths_*``."""
@@ -300,6 +370,18 @@ class CaseImporter:
                 file_type_to_list[guessed].append(PathWithTimestamp.from_path(path))
             else:
                 logger.error("Could not assign %s of type %s", path, guessed)
+
+        guessed = []
+        for key, lst in file_type_to_list.items():
+            for no, path in enumerate(lst):
+                if no:
+                    guessed.append(["", path.basename])
+                else:
+                    guessed.append([key, path.basename])
+        logger.info(
+            "Guessed file types =\n%s",
+            tabulate(guessed, headers=["file type", "file name"], tablefmt="grid"),
+        )
 
         issues = []
         if not self.path_ped:
@@ -347,10 +429,9 @@ class CaseImporter:
             project_uuid=self.create_config.project_uuid,
         ):
             if strip_suffix(case_info.name) == name:
-                logger.info("Found existing case info: %s", case_info)
-                if self.create_config.resubmit and case_info.state == CaseImportState.SUBMITTED:
-                    logger.info("Case is submitted and --resubmit given, marking as draft.")
+                if self.create_config.resubmit and case_info.state != CaseImportState.DRAFT:
                     case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
+                    logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
                         server_url=self.global_config.varfish_server_url,
                         api_token=self.global_config.varfish_api_token,
@@ -358,7 +439,12 @@ class CaseImporter:
                         case_import_info_uuid=case_info.sodar_uuid,
                         data=case_info,
                     )
-                return case_info
+                    return case_info
+                elif (
+                    case_info.state == CaseImportState.DRAFT and not self.create_config.force_fresh
+                ):
+                    logger.info("Found existing case draft info: %s", case_info)
+                    return case_info
         else:  # found no match
             return api.case_import_info_create(
                 server_url=self.global_config.varfish_server_url,
@@ -462,7 +548,7 @@ class CaseImporter:
         ):
             if file_obj.md5 == md5:
                 logger.debug("- found %s with md5 %s", obj_type, md5)
-                break
+                return md5
         else:  # found no match
             logger.info("- uploading %s %s", obj_type, path)
             with open(path, "rb") as handle:
@@ -473,11 +559,12 @@ class CaseImporter:
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
                 )
+                return md5
 
     def _upload_files(self, case_import_info: models.CaseImportInfo):
         """Upload files where necessary."""
         # First, BAM QC files.
-        for path in self.paths_bam_qc:
+        good_md5s = [
             self._perform_file_upload(
                 path=path.path,
                 api_list_func=api.bam_qc_file_list,
@@ -487,13 +574,34 @@ class CaseImporter:
                 file_type=BamQcFile,
                 api_create_func=api.bam_qc_file_upload,
             )
+            for path in self.paths_bam_qc
+        ]
+
+        # Match DB info files to small/large variants by file name match/mismatch.
+        db_infos_small = []
+        db_infos_sv = []
+        db_infos_small = self.paths_database_info
+        # TODO: The following is waiting for #575
+        # cf.:https://cubi-gitlab.bihealth.org/CUBI_Engineering/VarFish/varfish-web/-/issues/575
+        #
+        # for db_info_file in self.paths_database_info:
+        #     best = None
+        #     best_dist = None
+        #     for lst, paths in ((db_infos_small, self.paths_genotype), (db_infos_sv, self.paths_genotype_sv)):
+        #         for path in paths:
+        #             dist = Levenshtein.distance(db_info_file.path, path.path)
+        #             if best_dist is None or best_dist > dist:
+        #                 best = lst
+        #                 best_dist = dist
+        #     if best is not None:
+        #         best.append(db_info_file)
 
         if self.paths_genotype:
             logger.info("- create new small variant set if necessary")
             variant_set_import_info = self._create_variant_set_import_info(
                 case_import_info, CaseVariantType.SMALL
             )
-            for path in self.paths_genotype:
+            good_md5s += [
                 self._perform_file_upload(
                     path=path.path,
                     api_list_func=api.genotype_file_list,
@@ -503,13 +611,27 @@ class CaseImporter:
                     file_type=GenotypeFile,
                     api_create_func=api.genotype_file_upload,
                 )
+                for path in self.paths_genotype
+            ]
+            good_md5s += [
+                self._perform_file_upload(
+                    path=path.path,
+                    api_list_func=api.db_info_file_list,
+                    func_uuid_arg="variant_set_import_info_uuid",
+                    uuid_value=variant_set_import_info.sodar_uuid,
+                    obj_type="db info file",
+                    file_type=DatabaseInfoFile,
+                    api_create_func=api.db_info_file_upload,
+                )
+                for path in db_infos_small
+            ]
 
         if self.paths_genotype_sv:
             logger.info("- create new structural variant set if necessary")
             variant_set_import_info = self._create_variant_set_import_info(
                 case_import_info, CaseVariantType.STRUCTURAL
             )
-            for path in self.paths_genotype_sv:
+            good_md5s += [
                 self._perform_file_upload(
                     path=path.path,
                     api_list_func=api.genotype_file_list,
@@ -519,7 +641,9 @@ class CaseImporter:
                     file_type=GenotypeFile,
                     api_create_func=api.genotype_file_upload,
                 )
-            for path in self.paths_effect_sv:
+                for path in self.paths_genotype_sv
+            ]
+            good_md5s += [
                 self._perform_file_upload(
                     path=path.path,
                     api_list_func=api.effects_file_list,
@@ -529,6 +653,22 @@ class CaseImporter:
                     file_type=EffectsFile,
                     api_create_func=api.effects_file_upload,
                 )
+                for path in self.paths_effect_sv
+            ]
+            good_md5s += [
+                self._perform_file_upload(
+                    path=path.path,
+                    api_list_func=api.db_info_file_list,
+                    func_uuid_arg="variant_set_import_info_uuid",
+                    uuid_value=variant_set_import_info.sodar_uuid,
+                    obj_type="db info file",
+                    file_type=DatabaseInfoFile,
+                    api_create_func=api.db_info_file_upload,
+                )
+                for path in db_infos_sv
+            ]
+
+        return good_md5s
 
     def _create_variant_set_import_info(
         self, case_import_info: models.CaseImportInfo, variant_type: CaseVariantType
@@ -574,10 +714,16 @@ def setup_argparse(parser):
         "--case-name-suffix", type=str, default="", help="Suffix to append to case name."
     )
     parser.add_argument(
-        "--resubmit",
+        "--force-fresh",
         default=False,
         action="store_true",
-        help="Also import if state is already 'submit'",
+        help="Force using fresh case import even if old draft found",
+    )
+    parser.add_argument(
+        "--resubmit",
+        default=True,  # XXX
+        action="store_true",
+        help="Force resubmission of cases in submit state",
     )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(
