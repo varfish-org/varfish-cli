@@ -429,7 +429,15 @@ class CaseImporter:
             project_uuid=self.create_config.project_uuid,
         ):
             if strip_suffix(case_info.name) == name:
-                if self.create_config.resubmit and case_info.state != CaseImportState.DRAFT:
+                logger.info("Found existing case info: %s", case_info)
+                # Make sure to update index and pedigree to current value.
+                case_info = attr.assoc(
+                    case_info,
+                    index=index,
+                    pedigree=self.pedigree,
+                )
+                if self.create_config.resubmit and case_info.state == CaseImportState.SUBMITTED:
+                    logger.info("Case is submitted and --resubmit given, marking as draft.")
                     case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
                     logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
@@ -460,10 +468,9 @@ class CaseImporter:
             logger.debug("Checking genotype vs. pedigree samples for %s", path.path)
             gts = self._load_dict_col(path.path, "genotype").keys()
             if gts != with_gts:
-                raise InconsistentSamplesDataException(
-                    "Inconsistent samples in %s vs. %s (exclusive %s vs. %s)"
-                    % (path.path, self.path_ped.path, gts - with_gts, with_gts - gts)
-                )
+                tpl = "Inconsistent samples in %s vs. %s (exclusive %s vs. %s)"
+                args = (path.path, self.path_ped.path, gts - with_gts, with_gts - gts)
+                print("WARNING: %s" % (tpl % args), file=sys.stderr)
 
     def _check_bam_qc(self):
         """Check bam_qc."""
