@@ -431,12 +431,11 @@ class CaseImporter:
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
                 # Make sure to update index and pedigree to current value.
-                case_info = attr.assoc(
-                    case_info,
-                    index=index,
-                    pedigree=self.pedigree,
-                )
-                if self.create_config.resubmit and case_info.state == CaseImportState.SUBMITTED:
+                case_info = attr.assoc(case_info, index=index, pedigree=self.pedigree,)
+                if self.create_config.resubmit and case_info.state in (
+                    CaseImportState.SUBMITTED,
+                    CaseImportState.IMPORTED,
+                ):
                     logger.info("Case is submitted and --resubmit given, marking as draft.")
                     case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
                     logger.info("Updating state existing case draft info: %s", case_info)
@@ -466,7 +465,11 @@ class CaseImporter:
         with_gts = {m.name for m in self.pedigree if m.has_gt_entries}
         for path in chain(self.paths_genotype, self.paths_genotype_sv):
             logger.debug("Checking genotype vs. pedigree samples for %s", path.path)
-            gts = self._load_dict_col(path.path, "genotype").keys()
+            dict_col = self._load_dict_col(path.path, "genotype")
+            if not dict_col:
+                print("INFO: empty file %s" % path.path, file=sys.stderr)
+                continue
+            gts = dict_col.keys()
             if gts != with_gts:
                 tpl = "Inconsistent samples in %s vs. %s (exclusive %s vs. %s)"
                 args = (path.path, self.path_ped.path, gts - with_gts, with_gts - gts)
@@ -524,8 +527,8 @@ class CaseImporter:
 
     def _load_dict_col(self, genotype_file, column):
         with gzip.open(genotype_file, "rt") as inputf:
-            first_line = inputf.readline().splitlines(False)[0]
-            second_line = inputf.readline().splitlines(False)[0]
+            first_line = inputf.readline().strip()
+            second_line = inputf.readline().strip()
             if not second_line:
                 return None
             else:
