@@ -17,7 +17,7 @@ Installation
     [global]
 
     # URL to VarFish server.
-    varfish_url = https://varfish.example.com/
+    varfish_server_url = "https://varfish.example.com/"
     # API token to use for VarFish API.
     varfish_api_token = "XXX"
     EOF
