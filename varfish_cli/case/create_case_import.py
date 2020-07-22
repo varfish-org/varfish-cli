@@ -435,6 +435,7 @@ class CaseImporter:
                 if self.create_config.resubmit and case_info.state in (
                     CaseImportState.SUBMITTED,
                     CaseImportState.IMPORTED,
+                    CaseImportState.FAILED,
                 ):
                     logger.info("Case is submitted and --resubmit given, marking as draft.")
                     case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
