@@ -12,7 +12,6 @@ import uuid
 from itertools import chain
 
 import attr
-import Levenshtein
 from logzero import logger
 from tabulate import tabulate
 
@@ -28,6 +27,7 @@ from ..api import (
     CaseImportState,
     CaseImportInfo,
     DatabaseInfoFile,
+    VariantSetImportState,
 )
 from .config import CaseCreateImportInfoConfig
 
@@ -636,6 +636,13 @@ class CaseImporter:
                 )
                 for path in db_infos_small
             ]
+            api.variant_set_import_info_update(
+                server_url=self.global_config.varfish_server_url,
+                api_token=self.global_config.varfish_api_token,
+                case_import_info_uuid=case_import_info.sodar_uuid,
+                variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
+                data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+            )
 
         if self.paths_genotype_sv:
             logger.info("- create new structural variant set if necessary")
@@ -678,6 +685,13 @@ class CaseImporter:
                 )
                 for path in db_infos_sv
             ]
+            api.variant_set_import_info_update(
+                server_url=self.global_config.varfish_server_url,
+                api_token=self.global_config.varfish_api_token,
+                case_import_info_uuid=case_import_info.sodar_uuid,
+                variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
+                data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+            )
 
         return good_md5s
 
@@ -686,13 +700,35 @@ class CaseImporter:
     ):
         """Create variant set import info necessary."""
 
-        for case_info in api.variant_set_import_info_list(
+        for variant_set_info in api.variant_set_import_info_list(
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
         ):
-            if case_info.variant_type == variant_type:
-                return case_info
+            if not variant_set_info.variant_type == variant_type:
+                continue
+            if self.create_config.resubmit and variant_set_info.state in (
+                VariantSetImportState.UPLOADED,
+                VariantSetImportState.IMPORTED,
+                VariantSetImportState.FAILED,
+            ):
+                logger.info("Variant set is submitted and --resubmit given, marking as draft.")
+                variant_set_info = attr.assoc(variant_set_info, state=VariantSetImportState.DRAFT)
+                logger.info("Updating state existing variant set draft info: %s", variant_set_info)
+                api.variant_set_import_info_update(
+                    server_url=self.global_config.varfish_server_url,
+                    api_token=self.global_config.varfish_api_token,
+                    case_import_info_uuid=case_import_info.sodar_uuid,
+                    variant_set_import_info_uuid=variant_set_info.sodar_uuid,
+                    data=variant_set_info,
+                )
+                return variant_set_info
+            elif (
+                variant_set_info.state == VariantSetImportState.DRAFT
+                and not self.create_config.force_fresh
+            ):
+                logger.info("Found existing variant_set draft info: %s", variant_set_info)
+                return variant_set_info
         else:  # found no match
             return api.variant_set_import_info_create(
                 server_url=self.global_config.varfish_server_url,
@@ -703,7 +739,9 @@ class CaseImporter:
                 ),
             )
 
-    def _submit_import(self, case_import_info: models.CaseImportInfo):
+    def _submit_import(
+        self, case_import_info: models.CaseImportInfo,
+    ):
         """Submit the case import."""
         return api.case_import_info_update(
             server_url=self.global_config.varfish_server_url,

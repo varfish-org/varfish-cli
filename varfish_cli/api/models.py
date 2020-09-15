@@ -84,6 +84,21 @@ class CaseImportState(Enum):
     FAILED = "failed"
 
 
+class VariantSetImportState(Enum):
+    """Enumeration for the states."""
+
+    #: Draft state, allows modification.
+    DRAFT = "draft"
+    #: Files uploaded for import.
+    UPLOADED = "uploaded"
+    #: Imported into database.
+    IMPORTED = "imported"
+    #: Previously in database but not any more.
+    EVICTED = "evicted"
+    #: Failed import.
+    FAILED = "failed"
+
+
 @attr.s(frozen=True, auto_attribs=True)
 class CaseImportInfo:
     """Case import information as returned by the VarFish API."""
@@ -147,6 +162,8 @@ class VariantSetImportInfo:
     date_modified: typing.Optional[datetime.datetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
+    #: State.
+    state: VariantSetImportState = VariantSetImportState.DRAFT
 
 
 @attr.s(frozen=True, auto_attribs=True)

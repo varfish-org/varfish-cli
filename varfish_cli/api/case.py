@@ -39,6 +39,10 @@ ENDPOINT_VARIANT_SET_IMPORT_INFO_LIST = (
 )
 #: End point for creating import variant set infos.
 ENDPOINT_VARIANT_SET_IMPORT_INFO_CREATE = ENDPOINT_VARIANT_SET_IMPORT_INFO_LIST
+#: End point for creating import variant set infos.
+ENDPOINT_VARIANT_SET_IMPORT_INFO_UPDATE = (
+    "/importer/api/variant-set-import-info/{case_import_info_uuid}/{variant_set_import_info_uuid}/"
+)
 #: End point for listing BAM QC files.
 ENDPOINT_BAM_QC_FILE_LIST = "/importer/api/bam-qc-file/{case_import_info_uuid}/"
 #: End point for creating BAM QC files.
@@ -252,6 +256,40 @@ def variant_set_import_info_create(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(endpoint, headers=headers, json=CONVERTER.unstructure(data))
+    if not result.ok:
+        try:
+            msg = "REST API returned status code %d: %s" % (
+                result.status_code,
+                " ".join([" ".join(v) for v in result.json().values()]),
+            )
+        except JSONDecodeError:
+            msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
+        raise RestApiCallException(msg)
+    else:
+        return CONVERTER.structure(result.json(), VariantSetImportInfo)
+
+
+def variant_set_import_info_update(
+    server_url: str,
+    api_token: str,
+    case_import_info_uuid: typing.Union[str, uuid.UUID],
+    variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
+    data: VariantSetImportInfo,
+) -> VariantSetImportInfo:
+    """Create variant set import info."""
+    while server_url.endswith("/"):
+        server_url = server_url[:-1]
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_VARIANT_SET_IMPORT_INFO_UPDATE.format(
+            case_import_info_uuid=case_import_info_uuid,
+            variant_set_import_info_uuid=variant_set_import_info_uuid,
+        ),
+    )
+    logger.debug("Sending PUT request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    logger.debug("json=%s", CONVERTER.unstructure(data))
+    result = requests.put(endpoint, headers=headers, json=CONVERTER.unstructure(data))
     if not result.ok:
         try:
             msg = "REST API returned status code %d: %s" % (

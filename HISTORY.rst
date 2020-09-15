@@ -2,6 +2,13 @@
 History
 =======
 
+----
+HEAD
+----
+
+- Added state field to ``VariantSetImportInfo`` class.
+- Added endpoint for updating variant set import info.
+
 ------
 v0.2.2
 ------
