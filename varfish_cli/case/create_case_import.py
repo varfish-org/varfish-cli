@@ -431,7 +431,7 @@ class CaseImporter:
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
                 # Make sure to update index and pedigree to current value.
-                case_info = attr.assoc(case_info, index=index, pedigree=self.pedigree,)
+                case_info = attr.assoc(case_info, index=index, pedigree=self.pedigree)
                 if self.create_config.resubmit and case_info.state in (
                     CaseImportState.SUBMITTED,
                     CaseImportState.IMPORTED,

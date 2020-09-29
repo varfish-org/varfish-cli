@@ -3,6 +3,7 @@
 import typing
 import uuid
 from json import JSONDecodeError
+from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
 import requests
 from logzero import logger
@@ -114,7 +115,7 @@ def case_import_info_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -144,7 +145,7 @@ def case_import_info_retrieve(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -174,7 +175,7 @@ def case_import_info_create(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -207,7 +208,7 @@ def case_import_info_update(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -233,7 +234,7 @@ def variant_set_import_info_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -262,7 +263,7 @@ def variant_set_import_info_create(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -296,7 +297,7 @@ def variant_set_import_info_update(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -321,7 +322,7 @@ def bam_qc_file_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -350,7 +351,7 @@ def bam_qc_file_upload(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -380,7 +381,7 @@ def bam_qc_file_destroy(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
 
@@ -405,7 +406,7 @@ def genotype_file_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -436,7 +437,7 @@ def genotype_file_upload(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -467,7 +468,7 @@ def genotype_file_destroy(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
 
@@ -492,7 +493,7 @@ def effects_file_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -523,7 +524,7 @@ def effects_file_upload(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -554,7 +555,7 @@ def effects_file_destroy(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
 
@@ -579,7 +580,7 @@ def db_info_file_list(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
@@ -610,7 +611,7 @@ def db_info_file_upload(
                 result.status_code,
                 " ".join([" ".join(v) for v in result.json().values()]),
             )
-        except JSONDecodeError:
+        except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
