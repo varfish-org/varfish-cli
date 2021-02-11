@@ -10,6 +10,9 @@ class CommonConfig:
     #: Verbose mode activated
     verbose: bool
 
+    #: Whether to enable SSL verification in HTTPS requests.
+    verify_ssl: bool
+
     #: API key to use for VarFish.
     varfish_api_token: str = attr.ib(repr=lambda value: repr(value[:4] + (len(value) - 4) * "*"))
 
@@ -21,6 +24,7 @@ class CommonConfig:
         toml_config = toml_config or {}
         return CommonConfig(
             verbose=args.verbose,
+            verify_ssl=args.verify_ssl,
             varfish_api_token=(
                 args.varfish_api_token or toml_config.get("global", {})["varfish_api_token"]
             ),

@@ -25,6 +25,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         server_url=base_config.varfish_server_url,
         api_token=base_config.varfish_api_token,
         project_uuid=config.project_uuid,
+        verify_ssl=config.verify_ssl,
     )
 
     print("Case List", file=file)

@@ -292,6 +292,7 @@ class CaseImporter:
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
+            verify_ssl=self.global_config.verify_ssl,
         )
         for bam_qc_file in bam_qc_files:
             if bam_qc_file.md5 not in good_md5s:
@@ -300,18 +301,21 @@ class CaseImporter:
                     api_token=self.global_config.varfish_api_token,
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     bam_qc_file_uuid=bam_qc_file.sodar_uuid,
+                    verify_ssl=self.global_config.verify_ssl,
                 )
 
         variant_sets = api.variant_set_import_info_list(
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
+            verify_ssl=self.global_config.verify_ssl,
         )
         for variant_set in variant_sets:
             genotype_files = api.genotype_file_list(
                 server_url=self.global_config.varfish_server_url,
                 api_token=self.global_config.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
+                verify_ssl=self.global_config.verify_ssl,
             )
             for gt_file in genotype_files:
                 if gt_file.md5 not in good_md5s:
@@ -320,11 +324,13 @@ class CaseImporter:
                         api_token=self.global_config.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         genotype_file_uuid=gt_file.sodar_uuid,
+                        verify_ssl=self.global_config.verify_ssl,
                     )
             effect_files = api.effects_file_list(
                 server_url=self.global_config.varfish_server_url,
                 api_token=self.global_config.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
+                verify_ssl=self.global_config.verify_ssl,
             )
             for eff_file in effect_files:
                 if eff_file.md5 not in good_md5s:
@@ -333,11 +339,13 @@ class CaseImporter:
                         api_token=self.global_config.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         effects_file_uuid=eff_file.sodar_uuid,
+                        verify_ssl=self.global_config.verify_ssl,
                     )
             db_info_files = api.db_info_file_list(
                 server_url=self.global_config.varfish_server_url,
                 api_token=self.global_config.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
+                verify_ssl=self.global_config.verify_ssl,
             )
             for db_info_file in db_info_files:
                 if db_info_file.md5 not in good_md5s:
@@ -346,6 +354,7 @@ class CaseImporter:
                         api_token=self.global_config.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         db_info_file_uuid=db_info_file.sodar_uuid,
+                        verify_ssl=self.global_config.verify_ssl,
                     )
 
     def _split_files_by_role(self):
@@ -427,6 +436,7 @@ class CaseImporter:
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
+            verify_ssl=self.global_config.verify_ssl,
         ):
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
@@ -446,6 +456,7 @@ class CaseImporter:
                         project_uuid=self.create_config.project_uuid,
                         case_import_info_uuid=case_info.sodar_uuid,
                         data=case_info,
+                        verify_ssl=self.global_config.verify_ssl,
                     )
                     return case_info
                 elif (
@@ -459,6 +470,7 @@ class CaseImporter:
                 api_token=self.global_config.varfish_api_token,
                 project_uuid=self.create_config.project_uuid,
                 data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
+                verify_ssl=self.global_config.verify_ssl,
             )
 
     def _check_genotypes(self):
@@ -556,6 +568,7 @@ class CaseImporter:
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             **{func_uuid_arg: uuid_value},
+            verify_ssl=self.global_config.verify_ssl,
         ):
             if file_obj.md5 == md5:
                 logger.debug("- found %s with md5 %s", obj_type, md5)
@@ -569,6 +582,7 @@ class CaseImporter:
                     **{func_uuid_arg: uuid_value},
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
+                    verify_ssl=self.global_config.verify_ssl,
                 )
                 return md5
 
@@ -642,6 +656,7 @@ class CaseImporter:
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+                verify_ssl=self.global_config.verify_ssl,
             )
 
         if self.paths_genotype_sv:
@@ -691,6 +706,7 @@ class CaseImporter:
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+                verify_ssl=self.global_config.verify_ssl,
             )
 
         return good_md5s
@@ -704,6 +720,7 @@ class CaseImporter:
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
+            verify_ssl=self.global_config.verify_ssl,
         ):
             if not variant_set_info.variant_type == variant_type:
                 continue
@@ -721,6 +738,7 @@ class CaseImporter:
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     variant_set_import_info_uuid=variant_set_info.sodar_uuid,
                     data=variant_set_info,
+                    verify_ssl=self.global_config.verify_ssl,
                 )
                 return variant_set_info
             elif (
@@ -737,11 +755,10 @@ class CaseImporter:
                 data=models.VariantSetImportInfo(
                     genomebuild=GenomeBuild.GRCH37, variant_type=variant_type
                 ),
+                verify_ssl=self.global_config.verify_ssl,
             )
 
-    def _submit_import(
-        self, case_import_info: models.CaseImportInfo,
-    ):
+    def _submit_import(self, case_import_info: models.CaseImportInfo):
         """Submit the case import."""
         return api.case_import_info_update(
             server_url=self.global_config.varfish_server_url,
@@ -749,6 +766,7 @@ class CaseImporter:
             project_uuid=self.create_config.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
             data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
+            verify_ssl=self.global_config.verify_ssl,
         )
 
 

@@ -35,6 +35,13 @@ def setup_argparse():
 
     group = parser.add_argument_group("Basic Configuration")
     group.add_argument(
+        "--no-verify-ssl",
+        dest="verify_ssl",
+        default=True,
+        action="store_false",
+        help="Disable HTTPS SSL verification",
+    )
+    group.add_argument(
         "--config",
         default=os.environ.get("VARFISH_CONFIG_PATH", None),
         help="Path to configuration file.",

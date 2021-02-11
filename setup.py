@@ -57,7 +57,7 @@ setup(
     packages=find_packages(include=["varfish_cli"]),
     test_suite="tests",
     tests_require=test_requirements,
-    url="https://github.com/bihealth/varfish_cli",
+    url="https://github.com/bihealth/varfish-cli",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     zip_safe=False,
