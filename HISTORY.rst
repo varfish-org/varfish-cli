@@ -2,6 +2,12 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Switching build system to Github Actions
+
 ------
 v0.2.4
 ------

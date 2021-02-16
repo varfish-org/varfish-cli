@@ -1,24 +1,37 @@
-.PHONY: default black flake8 mypy test test-v test-vv coverage_html
+.PHONY: all
+all: black
 
-default: black flake8 mypy test coverage_html
-
+.PHONY: black
 black:
 	black -l 100 .
 
-black-check:
+.PHONY: test
+test:
 	black -l 100 --check .
 
+.PHONY: pytest
+pytest:
+	pytest .
+
+.PHONY: lint-all
+lint-all: bandit pyflakes pep257 prospector
+
+.PHONY: bandit
+bandit:
+	bandit -c bandit.yml -r varfish_cli
+
+.PHONY: pyflakes
+pyflakes:
+	pyflakes varfish_cli tests
+
+.PHONY: pep257
+pep257:
+	pep257
+
+.PHONY: flake8
 flake8:
-	flake8 .
+	flake8
 
-mypy:
-	mypy varfish_cli
-
-test:
-	pytest --disable-pytest-warnings
-
-test-v:
-	pytest -v --disable-pytest-warnings
-
-test-vv:
-	pytest -vv --disable-pytest-warnings
+.PHONY: prospector
+prospector:
+	prospector
