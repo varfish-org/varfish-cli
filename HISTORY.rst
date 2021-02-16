@@ -2,9 +2,9 @@
 History
 =======
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.2.5
+------
 
 - Switching build system to Github Actions
 - Adding many tests

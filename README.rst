@@ -59,3 +59,15 @@ Installation
     # API token to use for VarFish API.
     varfish_api_token = "XXX"
     EOF
+
+---------
+Releasing
+---------
+
+.. code-block:: bash
+
+    $ $EDITOR HISTORY.rst
+    $ git tag ...
+    $ rm -rf dist
+    $ python setup.py sdist
+    $ twine dist/*.tar.gz
