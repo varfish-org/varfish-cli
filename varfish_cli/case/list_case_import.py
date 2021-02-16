@@ -29,7 +29,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         api_token=base_config.varfish_api_token,
         project_uuid=config.project_uuid,
         owner=config.owner,
-        verify_ssl=config.verify_ssl,
+        verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
     print("Case Import Info List", file=file)

@@ -7,6 +7,8 @@ HEAD (unreleased)
 -----------------
 
 - Switching build system to Github Actions
+- Adding many tests
+- Fixing ``verify_ssl`` for case list.
 
 ------
 v0.2.4

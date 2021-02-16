@@ -15,7 +15,7 @@ def setup_argparse(parser):
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
 
 
-def run(config, toml_config, args, _parser, _subparser, _file=sys.stdout):
+def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     """Run case list command."""
     config = CaseListConfig.create(args, config, toml_config)
     logger.info("Configuration: %s", config)
@@ -25,7 +25,7 @@ def run(config, toml_config, args, _parser, _subparser, _file=sys.stdout):
         server_url=base_config.varfish_server_url,
         api_token=base_config.varfish_api_token,
         project_uuid=config.project_uuid,
-        verify_ssl=config.verify_ssl,
+        verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
     print("Case List", file=file)

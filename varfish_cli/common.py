@@ -26,10 +26,10 @@ class CommonConfig:
             verbose=args.verbose,
             verify_ssl=args.verify_ssl,
             varfish_api_token=(
-                args.varfish_api_token or toml_config.get("global", {})["varfish_api_token"]
+                args.varfish_api_token or toml_config.get("global", {}).get("varfish_api_token")
             ),
             varfish_server_url=(
-                args.varfish_server_url or toml_config.get("global", {})["varfish_server_url"]
+                args.varfish_server_url or toml_config.get("global", {}).get("varfish_server_url")
             ),
         )
 

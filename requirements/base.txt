@@ -17,6 +17,9 @@ toml
 # Functionaly programming tools.
 toolz
 
+# simplejson has better encoders/decoders
+simplejson
+
 # HTTP requests for humans.
 requests
 
