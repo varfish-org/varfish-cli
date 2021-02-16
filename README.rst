@@ -70,4 +70,4 @@ Releasing
     $ git tag ...
     $ rm -rf dist
     $ python setup.py sdist
-    $ twine dist/*.tar.gz
+    $ twine upload dist/*.tar.gz
