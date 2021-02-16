@@ -197,8 +197,7 @@ class FileTypeGuesser:
         for file_type, func in matchers.items():
             if func(first_line):
                 return file_type
-        else:
-            return None  # no match
+        return None  # no match
 
     def _looks_like_ped(self, arr):
         return len(arr) == 6 and arr[4] in ("0", "1", "2") and arr[5] in ("0", "1", "2")
@@ -286,6 +285,7 @@ class CaseImporter:
         self._purge_old_files(case_import_info, good_md5s)
         logger.info("... and updating state to 'submitted'")
         self._submit_import(case_import_info)
+        return 0
 
     def _purge_old_files(self, case_import_info: CaseImportInfo, good_md5s: typing.Collection[str]):
         bam_qc_files = api.bam_qc_file_list(
@@ -464,14 +464,14 @@ class CaseImporter:
                 ):
                     logger.info("Found existing case draft info: %s", case_info)
                     return case_info
-        else:  # found no match
-            return api.case_import_info_create(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
-                project_uuid=self.create_config.project_uuid,
-                data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
-                verify_ssl=self.global_config.verify_ssl,
-            )
+        # else: found no match
+        return api.case_import_info_create(
+            server_url=self.global_config.varfish_server_url,
+            api_token=self.global_config.varfish_api_token,
+            project_uuid=self.create_config.project_uuid,
+            data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
+            verify_ssl=self.global_config.verify_ssl,
+        )
 
     def _check_genotypes(self):
         """Check genotypes."""
@@ -800,7 +800,7 @@ def setup_argparse(parser):
     )
 
 
-def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
+def run(config, toml_config, args, _parser, _subparser, _file=sys.stdout):
     """Run case import create command."""
     config = CaseCreateImportInfoConfig.create(args, config, toml_config)
     return CaseImporter(config).run()

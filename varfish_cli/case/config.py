@@ -33,6 +33,7 @@ class CaseListConfig:
 
     @staticmethod
     def create(args, case_config, toml_config=None):
+        _ = toml_config
         # toml_config = toml_config or {}
         return CaseListConfig(case_config=case_config, project_uuid=args.project_uuid)
 
@@ -85,6 +86,7 @@ class CaseCreateImportInfoConfig:
 
     @staticmethod
     def create(args, case_config, strip_family_regex, toml_config=None):
+        _ = toml_config
         # toml_config = toml_config or {}
         return CaseCreateImportInfoConfig(
             case_config=case_config,
