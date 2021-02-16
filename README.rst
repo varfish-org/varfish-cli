@@ -1,4 +1,5 @@
 .. image:: https://github.com/bihealth/cubi-tk/workflows/CI/badge.svg
+    :target: https://github.com/bihealth/varfish-cli/actions
     :alt: Continuous Integration Status
 .. image:: https://app.codacy.com/project/badge/Grade/83ee38265942489193d6ce8a547eb9f9
     :target: https://www.codacy.com/gh/bihealth/varfish-cli/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=bihealth/varfish-cli&amp;utm_campaign=Badge_Grade
