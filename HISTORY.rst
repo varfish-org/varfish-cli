@@ -2,6 +2,12 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Fix reading of non-compressed genotypes TSV file.
+
 ------
 v0.2.6
 ------

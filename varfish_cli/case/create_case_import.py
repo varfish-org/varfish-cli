@@ -539,7 +539,11 @@ class CaseImporter:
         return case_name, pedigree
 
     def _load_dict_col(self, genotype_file, column):
-        with gzip.open(genotype_file, "rt") as inputf:
+        try:
+            handle = gzip.open(genotype_file, "rt")
+        except OSError:
+            handle = open(genotype_file, "rt")
+        with handle as inputf:
             first_line = inputf.readline().strip()
             second_line = inputf.readline().strip()
             if not second_line:
