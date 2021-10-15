@@ -19,3 +19,7 @@ class RestApiCallException(BaseException):
 
 class InconsistentSamplesDataException(BaseException):
     """Raised on sample inconsistencies in files."""
+
+
+class InconsistentGenomeBuild(BaseException):
+    """Raised when genome builds are inconsistent."""

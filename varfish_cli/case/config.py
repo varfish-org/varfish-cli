@@ -84,6 +84,9 @@ class CaseCreateImportInfoConfig:
     #: Whether to force creation of fresh case import info.
     force_fresh: bool
 
+    #: Expected genome build.
+    genomebuild: str
+
     @staticmethod
     def create(args, case_config, strip_family_regex, toml_config=None):
         _ = toml_config
@@ -96,4 +99,5 @@ class CaseCreateImportInfoConfig:
             case_name_suffix=args.case_name_suffix,
             resubmit=args.resubmit,
             force_fresh=args.force_fresh,
+            genomebuild=args.genomebuild,
         )

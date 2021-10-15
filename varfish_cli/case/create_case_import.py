@@ -33,7 +33,12 @@ from .config import CaseCreateImportInfoConfig
 
 
 #: Regular expressions of suffixes to remove.
-from ..exceptions import MissingFileOnImport, RestApiCallException, InconsistentSamplesDataException
+from ..exceptions import (
+    MissingFileOnImport,
+    RestApiCallException,
+    InconsistentSamplesDataException,
+    InconsistentGenomeBuild,
+)
 from ..parse_ped import parse_ped, DISEASE_MAP, SEX_MAP
 
 REMOVE_SUFFIX_RES = (r"-N.-DNA.-.*$",)
@@ -271,6 +276,14 @@ class CaseImporter:
             logger.error("Problem during file to role assignment, giving up!")
             return 1
 
+        logger.info("... checking genomebuild consistency ...")
+        try:
+            self._check_genomebuild_consistency()
+        except InconsistentGenomeBuild as e:
+            self._log_exception(e)
+            logger.error("Inconsistent genome builds, giving up!")
+            return 1
+
         logger.info("... creating case import info ...")
         try:
             case_import_info = self._create_case_import_info()
@@ -407,6 +420,24 @@ class CaseImporter:
         if issues:
             raise MissingFileOnImport("Problem(s) with import files: %s" % ", ".join(issues))
 
+    def _check_genomebuild_consistency(self):
+        """Check consistency with genomebuild."""
+
+        for path_gt in self.paths_genotype + self.paths_genotype_sv:
+            if path_gt.path.endswith(".gz"):
+                openf = gzip.open(path_gt.path, "rt")
+            else:
+                openf = open(path_gt.path, "rt")
+            with openf as inputf:
+                header = inputf.readline().splitlines(keepends=False)[0].split("\t")
+                line = inputf.readline().splitlines(keepends=False)[0].split("\t")
+                rec = dict(zip(header, line))
+                if rec["release"] != self.create_config.genomebuild:
+                    raise InconsistentGenomeBuild(
+                        "Inconsistent genome build from file (%s): %s and from args: %s"
+                        % (path_gt.path, rec["release"], self.create_config.genomebuild)
+                    )
+
     def _create_case_import_info(self):
         """Create case if necessary."""
 
@@ -448,7 +479,11 @@ class CaseImporter:
                     CaseImportState.FAILED,
                 ):
                     logger.info("Case is submitted and --resubmit given, marking as draft.")
-                    case_info = attr.assoc(case_info, state=CaseImportState.DRAFT)
+                    case_info = attr.assoc(
+                        case_info,
+                        release=GenomeBuild(self.create_config.genomebuild),
+                        state=CaseImportState.DRAFT,
+                    )
                     logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
                         server_url=self.global_config.varfish_server_url,
@@ -469,7 +504,12 @@ class CaseImporter:
             server_url=self.global_config.varfish_server_url,
             api_token=self.global_config.varfish_api_token,
             project_uuid=self.create_config.project_uuid,
-            data=models.CaseImportInfo(name=name, index=index, pedigree=self.pedigree),
+            data=models.CaseImportInfo(
+                release=GenomeBuild(self.create_config.genomebuild),
+                name=name,
+                index=index,
+                pedigree=self.pedigree,
+            ),
             verify_ssl=self.global_config.verify_ssl,
         )
 
@@ -734,7 +774,11 @@ class CaseImporter:
                 VariantSetImportState.FAILED,
             ):
                 logger.info("Variant set is submitted and --resubmit given, marking as draft.")
-                variant_set_info = attr.assoc(variant_set_info, state=VariantSetImportState.DRAFT)
+                variant_set_info = attr.assoc(
+                    variant_set_info,
+                    genomebuild=GenomeBuild(self.create_config.genomebuild),
+                    state=VariantSetImportState.DRAFT,
+                )
                 logger.info("Updating state existing variant set draft info: %s", variant_set_info)
                 api.variant_set_import_info_update(
                     server_url=self.global_config.varfish_server_url,
@@ -757,7 +801,8 @@ class CaseImporter:
                 api_token=self.global_config.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 data=models.VariantSetImportInfo(
-                    genomebuild=GenomeBuild.GRCH37, variant_type=variant_type
+                    genomebuild=GenomeBuild(self.create_config.genomebuild),
+                    variant_type=variant_type,
                 ),
                 verify_ssl=self.global_config.verify_ssl,
             )
@@ -795,6 +840,12 @@ def setup_argparse(parser):
         default=True,  # XXX
         action="store_true",
         help="Force resubmission of cases in submit state",
+    )
+    parser.add_argument(
+        "--genomebuild",
+        default="GRCh37",
+        help="The genome build (GRCh37/GRCh38) of this case, defaults to GRCh37.",
+        choices=("GRCh37", "GRCh38"),
     )
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
     parser.add_argument(

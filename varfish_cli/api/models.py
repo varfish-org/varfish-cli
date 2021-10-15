@@ -99,10 +99,21 @@ class VariantSetImportState(Enum):
     FAILED = "failed"
 
 
+class GenomeBuild(Enum):
+    """Enumeration of possible genome builds."""
+
+    #: GRCh37.
+    GRCH37 = "GRCh37"
+    #: GRCh38
+    GRCH38 = "GRCh38"
+
+
 @attr.s(frozen=True, auto_attribs=True)
 class CaseImportInfo:
     """Case import information as returned by the VarFish API."""
 
+    #: Genome build
+    release: GenomeBuild
     #: Case name.
     name: str
     #: Index name.
@@ -127,13 +138,6 @@ class CaseImportInfo:
     notes: typing.Optional[str] = None
     #: Tags
     tags: typing.List[str] = attr.Factory(list)
-
-
-class GenomeBuild(Enum):
-    """Enumeration of possible genome builds."""
-
-    #: GRCh37.
-    GRCH37 = "GRCh37"
 
 
 class CaseVariantType(Enum):

@@ -1,33 +1,36 @@
 # Base requirements
 
 # Attrs, helpful for removing boilerplate, cattr is for serialization/deserializaton.
-attrs
-cattrs
+attrs >=21.2.0,<22.0
+cattrs >=1.7.1,<2..0
 # Easy date parsing (e.g., from API).
-python-dateutil
+python-dateutil >=2.8.1,<3.0
 # Pretty printing.
-prettyprinter
+prettyprinter >=0.18.0,<0.19
 
 # Easy logging.
-logzero
+logzero >=1.7.0,<2.0
 
 # Compact, round-tripable configuration format.
-toml
+toml >=0.10.2,<0.11
 
 # Functionaly programming tools.
-toolz
+toolz >=0.11.1,<0.12
 
 # simplejson has better encoders/decoders
-simplejson
+simplejson >=3.17.2,<4.0
 
 # HTTP requests for humans.
-requests
+requests >=2.25.1,<3.0
 
 # Useful progress display.
-tqdm
+tqdm >=4.61.1<5.0
 
 # Tabular display.
-tabulate
+tabulate >=0.8.9,<0.9
 
 # Levenshtein distance.
-python-Levenshtein
+python-Levenshtein >=0.12.2,<0.13
+
+# Fixing babel version
+babel >=2.7.0,<3.0

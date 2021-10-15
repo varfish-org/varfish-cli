@@ -37,6 +37,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     print(file=file)
     for info in res:
         print("- uuid: %s" % repr(str(info.sodar_uuid)), file=file)
+        print("  owner: %s" % repr(info.release.value), file=file)
         print("  owner: %s" % repr(info.owner), file=file)
         print("  name: %s" % repr(info.name), file=file)
         print("  index: %s" % repr(info.index), file=file)
