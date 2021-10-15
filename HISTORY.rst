@@ -2,9 +2,9 @@
 History
 =======
 
------------------
-HEAD (unreleased)
------------------
+------
+V0.2.8
+------
 
 - Adding support to specify genome build on import (defaulting to GRCh37).
 
