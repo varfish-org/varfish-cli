@@ -53,4 +53,5 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
                 ),
                 file=file,
             )
-        print()
+        print(file=file)
+    file.flush()

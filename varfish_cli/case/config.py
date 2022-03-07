@@ -1,11 +1,15 @@
 """Configuration classes for ``varfish-cli case *`` commands."""
 
 import attr
+import cattrs
+import json
+import pathlib
 import uuid
 
 import typing
 
-from ..common import CommonConfig
+from varfish_cli.common import CommonConfig
+from varfish_cli.api import models
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -100,4 +104,140 @@ class CaseCreateImportInfoConfig:
             resubmit=args.resubmit,
             force_fresh=args.force_fresh,
             genomebuild=args.genomebuild,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryListConfig:
+    """Configuration for the ``varfish-cli case small-var-query-list`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the case to list for.
+    case_uuid: uuid.UUID
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryListConfig(case_config=case_config, case_uuid=args.case_uuid,)
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryCreateConfig:
+    """Configuration for the ``varfish-cli case small-var-query-create`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    case_uuid: uuid.UUID
+
+    #: The query settings to set.
+    query_settings: models.CaseQuerySettingsV1
+
+    #: The name of the query to set, if any.
+    name: typing.Optional[str] = None
+
+    #: Whether or not to make the query public, if any.
+    public: bool = False
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        if args.query_settings.startswith("@"):
+            with open(args.query_settings[1:], "rt") as inputf:
+                query_settings = json.load(inputf)
+        else:
+            query_settings = json.loads(args.args.query_settings.startswith)
+        return CaseSmallVariantQueryCreateConfig(
+            case_config=case_config,
+            case_uuid=args.case_uuid,
+            query_settings=cattrs.structure(query_settings, models.CaseQuerySettingsV1),
+            name=args.name,
+            public=args.public,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryRetrieveConfig:
+    """Configuration for the ``varfish-cli case small-var-query-retrieve`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    query_uuid: uuid.UUID
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryRetrieveConfig(
+            case_config=case_config, query_uuid=args.query_uuid,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryStatusConfig:
+    """Configuration for the ``varfish-cli case small-var-query-status`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    query_uuid: uuid.UUID
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryStatusConfig(
+            case_config=case_config, query_uuid=args.query_uuid,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryUpdateConfig:
+    """Configuration for the ``varfish-cli case small-var-query-update`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    query_uuid: uuid.UUID
+
+    #: The name of the query to set, if any.
+    name: typing.Optional[str] = None
+
+    #: Whether or not to make the query public, if any.
+    public: typing.Optional[bool] = None
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryUpdateConfig(
+            case_config=case_config, query_uuid=args.query_uuid, name=args.name, public=args.public,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryFetchResultsConfig:
+    """Configuration for the ``varfish-cli case small-var-query-fetch-results`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    query_uuid: uuid.UUID
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryFetchResultsConfig(
+            case_config=case_config, query_uuid=args.query_uuid,
         )

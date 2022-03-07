@@ -1,10 +1,12 @@
 """Implementation of API operations on cases."""
 
+import json
 import typing
 import uuid
 from json import JSONDecodeError
 from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
+import attr
 import requests
 from logzero import logger
 
@@ -18,9 +20,13 @@ from .models import (
     GenotypeFile,
     EffectsFile,
     DatabaseInfoFile,
+    CaseQueryV1,
 )
 
 from ..exceptions import RestApiCallException
+
+ACCEPT_API_VARFISH = ""
+
 
 #: End point for listing cases.
 ENDPOINT_CASE_LIST = "/variants/api/case/{project_uuid}/"
@@ -77,6 +83,36 @@ ENDPOINT_DB_INFO_FILE_DESTROY = (
     "/importer/api/database-info-file/{variant_set_import_info_uuid}/{db_info_file_uuid}/"
 )
 
+#: End point for listing case queries.
+ENDPOINT_CASE_QUERY_LIST = "/variants/api/query-case/list/{case_uuid}/"
+#: End point for creating case queries.
+ENDPOINT_CASE_QUERY_CREATE = "/variants/api/query-case/create/{case_uuid}/"
+#: End point for retrieving case queries.
+ENDPOINT_CASE_QUERY_RETRIEVE = "/variants/api/query-case/retrieve/{query_uuid}/"
+#: End point for obtaining case query status.
+ENDPOINT_CASE_QUERY_STATUS = "/variants/api/query-case/status/{query_uuid}/"
+#: End point for updating case query.
+ENDPOINT_CASE_QUERY_UPDATE = "/variants/api/query-case/update/{query_uuid}/"
+#: End point for fetching case query results.
+ENDPOINT_CASE_QUERY_FETCH_RESULTS = "/variants/api/query-case/results/{query_uuid}/"
+
+
+def _strip_trailing_slash(s: str) -> str:
+    while s.endswith("/"):
+        s = s[:-1]
+    return s
+
+
+def _construct_rest_api_call_exception(response: requests.Response) -> RestApiCallException:
+    try:
+        msg = "REST API returned status code %d: %s" % (
+            response.status_code,
+            " ".join([" ".join(v) for v in response.json().values()]),
+        )
+    except (JSONDecodeError, SimpleJSONDecodeError):
+        msg = "REST API returned status code %d: %s" % (response.status_code, response.content)
+    return RestApiCallException(msg)
+
 
 def case_list(
     server_url: str,
@@ -85,8 +121,7 @@ def case_list(
     verify_ssl: bool = True,
 ) -> typing.List[Case]:
     """Listing of cases from a project UUID."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_LIST.format(project_uuid=project_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
@@ -103,8 +138,7 @@ def case_import_info_list(
     verify_ssl: bool = True,
 ) -> typing.List[CaseImportInfo]:
     """Listing case import infos from a project UUID."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_LIST.format(project_uuid=project_uuid),
@@ -136,8 +170,7 @@ def case_import_info_retrieve(
     info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_RETRIEVE.format(
@@ -168,8 +201,7 @@ def case_import_info_create(
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
     """Create new CaseImportInfo on server."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_CREATE.format(project_uuid=project_uuid),
@@ -202,8 +234,7 @@ def case_import_info_update(
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
     """Update CaseImportInfo on server."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_UPDATE.format(
@@ -236,8 +267,7 @@ def variant_set_import_info_list(
     verify_ssl: bool = True,
 ) -> typing.List[VariantSetImportInfo]:
     """List variant set import infos."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_LIST.format(case_import_info_uuid=case_import_info_uuid),
@@ -266,8 +296,7 @@ def variant_set_import_info_create(
     verify_ssl: bool = True,
 ) -> typing.List[VariantSetImportInfo]:
     """Create variant set import info."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_CREATE.format(case_import_info_uuid=case_import_info_uuid),
@@ -299,8 +328,7 @@ def variant_set_import_info_update(
     verify_ssl: bool = True,
 ) -> VariantSetImportInfo:
     """Create variant set import info."""
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_UPDATE.format(
@@ -333,8 +361,7 @@ def bam_qc_file_list(
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[BamQcFile]:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_LIST.format(case_import_info_uuid=case_import_info_uuid),
@@ -363,8 +390,7 @@ def bam_qc_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> BamQcFile:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_CREATE.format(case_import_info_uuid=case_import_info_uuid),
@@ -394,8 +420,7 @@ def bam_qc_file_destroy(
     bam_qc_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_DESTROY.format(
@@ -422,8 +447,7 @@ def genotype_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[GenotypeFile]:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_LIST.format(
@@ -454,8 +478,7 @@ def genotype_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> GenotypeFile:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_CREATE.format(
@@ -487,8 +510,7 @@ def genotype_file_destroy(
     genotype_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_DESTROY.format(
@@ -516,8 +538,7 @@ def effects_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[EffectsFile]:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_LIST.format(
@@ -548,8 +569,7 @@ def effects_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> EffectsFile:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_CREATE.format(
@@ -581,8 +601,7 @@ def effects_file_destroy(
     effects_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_DESTROY.format(
@@ -610,8 +629,7 @@ def db_info_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[DatabaseInfoFile]:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_LIST.format(
@@ -642,8 +660,7 @@ def db_info_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> DatabaseInfoFile:
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_CREATE.format(
@@ -675,8 +692,7 @@ def db_info_file_destroy(
     db_info_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    while server_url.endswith("/"):
-        server_url = server_url[:-1]
+    server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_DESTROY.format(
@@ -696,3 +712,111 @@ def db_info_file_destroy(
         except JSONDecodeError:
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
+
+
+def small_var_query_list(
+    server_url: str, api_token: str, case_uuid: uuid.UUID, verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_LIST.format(case_uuid=case_uuid,),)
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return result.json()
+
+
+def small_var_query_create(
+    server_url: str,
+    api_token: str,
+    case_uuid: uuid.UUID,
+    case_query: models.CaseQueryV1,
+    verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_CREATE.format(case_uuid=case_uuid,),)
+    logger.debug("Sending POST request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    logger.debug("data = %s", json.dumps(CONVERTER.unstructure(case_query), indent="  "))
+    result = requests.post(
+        endpoint, json=CONVERTER.unstructure(case_query), headers=headers, verify=verify_ssl
+    )
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return result.json()
+
+
+def small_var_query_retrieve(
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid,),)
+    logger.debug("Sending POST request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return result.json()
+
+
+def small_var_query_status(
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_STATUS.format(query_uuid=query_uuid,),)
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return result.json()
+
+
+def small_var_query_update(
+    server_url: str,
+    api_token: str,
+    query_uuid: uuid.UUID,
+    case_query: models.CaseQueryV1,
+    verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    headers = {"Authorization": "Token %s" % api_token}
+
+    server_url = _strip_trailing_slash(server_url)
+    endpoint_get = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid,),
+    )
+    logger.debug("Sending GET request to end point %s", endpoint_get)
+    result_get = requests.get(endpoint_get, headers=headers, verify=verify_ssl,)
+    if not result_get.ok:
+        raise _construct_rest_api_call_exception(result_get)
+
+    endpoint_put = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_UPDATE.format(query_uuid=query_uuid,),)
+    logger.debug("Sending PUT request to end point %s", endpoint_put)
+    if case_query.public is None:
+        case_query = attr.evolve(case_query, public=result_get.json()["public"])
+    if not case_query.name:
+        case_query = attr.evolve(case_query, name="")
+    result_put = requests.put(
+        endpoint_put, data=CONVERTER.unstructure(case_query), headers=headers, verify=verify_ssl
+    )
+    if not result_put.ok:
+        raise _construct_rest_api_call_exception(result_put)
+    return result_put.json()
+
+
+def small_var_query_fetch_results(
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(query_uuid=query_uuid,),
+    )
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return result.json()

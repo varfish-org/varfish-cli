@@ -63,3 +63,4 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         else:
             print("  members: []", file=file)
         print(file=file)
+    file.flush()
