@@ -12,15 +12,18 @@ from logzero import logger
 
 from . import models
 from .models import (
+    CONVERTER,
     Case,
     CaseImportInfo,
-    CONVERTER,
+    CaseQueryV1,
     VariantSetImportInfo,
     BamQcFile,
     GenotypeFile,
     EffectsFile,
     DatabaseInfoFile,
-    CaseQueryV1,
+    SmallVariantV1,
+    CaseQueryResultV1,
+    QueryShortcutsResultV1,
 )
 
 from ..exceptions import RestApiCallException
@@ -29,7 +32,7 @@ ACCEPT_API_VARFISH = ""
 
 
 #: End point for listing cases.
-ENDPOINT_CASE_LIST = "/variants/api/case/{project_uuid}/"
+ENDPOINT_CASE_LIST = "/variants/api/case/list/{project_uuid}/"
 #: End point for listing case import infos.
 ENDPOINT_CASE_IMPORT_INFO_LIST = "/importer/api/case-import-info/{project_uuid}/"
 #: End point for creating case import infos.
@@ -95,6 +98,10 @@ ENDPOINT_CASE_QUERY_STATUS = "/variants/api/query-case/status/{query_uuid}/"
 ENDPOINT_CASE_QUERY_UPDATE = "/variants/api/query-case/update/{query_uuid}/"
 #: End point for fetching case query results.
 ENDPOINT_CASE_QUERY_FETCH_RESULTS = "/variants/api/query-case/results/{query_uuid}/"
+#: End point for generating query parameters from shortcuts.
+ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT = (
+    "/variants/api/query-case/query-settings-shortcut/{case_uuid}/"
+)
 
 
 def _strip_trailing_slash(s: str) -> str:
@@ -724,7 +731,7 @@ def small_var_query_list(
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     if not result.ok:
         raise _construct_rest_api_call_exception(result)
-    return result.json()
+    return CONVERTER.structure(result.json(), typing.List[CaseQueryResultV1])
 
 
 def small_var_query_create(
@@ -744,7 +751,7 @@ def small_var_query_create(
     )
     if not result.ok:
         raise _construct_rest_api_call_exception(result)
-    return result.json()
+    return CONVERTER.structure(result.json(), CaseQueryV1)
 
 
 def small_var_query_retrieve(
@@ -817,6 +824,48 @@ def small_var_query_fetch_results(
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    print(result.json())
     if not result.ok:
         raise _construct_rest_api_call_exception(result)
-    return result.json()
+    return CONVERTER.structure(result.json(), typing.List[SmallVariantV1])
+
+
+def small_var_query_settings_shortcut(
+    server_url: str,
+    api_token: str,
+    case_uuid: uuid.UUID,
+    database: str,
+    quick_preset: str,
+    inheritance: typing.Optional[str] = None,
+    frequency: typing.Optional[str] = None,
+    impact: typing.Optional[str] = None,
+    quality: typing.Optional[str] = None,
+    chromosomes: typing.Optional[str] = None,
+    flags_etc: typing.Optional[str] = None,
+    verify_ssl: bool = True,
+) -> typing.Dict[str, typing.Any]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(case_uuid=case_uuid,),
+    )
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    params = {"database": database, "quick_preset": quick_preset}
+    params.pop("database")  ## TODO: REMOVE ME
+    if inheritance:
+        params["inheritance"] = inheritance
+    if frequency:
+        params["frequency"] = frequency
+    if impact:
+        params["impact"] = impact
+    if quality:
+        params["quality"] = quality
+    if chromosomes:
+        params["chromosomes"] = chromosomes
+    if flags_etc:
+        params["flags_etc"] = flags_etc
+    result = requests.get(endpoint, headers=headers, params=params, verify=verify_ssl)
+    if not result.ok:
+        raise _construct_rest_api_call_exception(result)
+    return CONVERTER.structure(result.json(), QueryShortcutsResultV1)

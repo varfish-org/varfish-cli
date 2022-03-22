@@ -294,7 +294,7 @@ class RecessiveModeV1(Enum):
     COMPOUND_RECESSIVE = "compound-recessive"
 
 
-@attr.s(auto_attribs=True, frozen=True)
+@unique
 class FailChoiceV1(Enum):
     IGNORE = "ignore"
     DROP_VARIANT = "drop-variant"
@@ -320,7 +320,6 @@ class QualitySettingsV1:
 
     dp_het: typing.Optional[int] = None
     dp_hom: typing.Optional[int] = None
-    number: typing.Optional[float] = None
     gq: typing.Optional[int] = None
     ab: typing.Optional[float] = None
     ad: typing.Optional[int] = None
@@ -369,7 +368,7 @@ class CaseQuerySettingsV1:
     mitomap_enabled: bool
 
     quality: typing.Dict[str, QualitySettingsV1]
-    genotype: typing.Dict[str, GenotypeChoiceV1]
+    genotype: typing.Dict[str, typing.Optional[GenotypeChoiceV1]]
 
     transcripts_coding: bool = True
     transcripts_noncoding: bool = False
@@ -394,10 +393,10 @@ class CaseQuerySettingsV1:
     flag_molecular_positive: bool = True
     flag_molecular_uncertain: bool = True
 
-    flag_phenotype_empty: bool = True
-    flag_phenotype_negative: bool = True
-    flag_phenotype_positive: bool = True
-    flag_phenotype_uncertain: bool = True
+    flag_phenotype_match_empty: bool = True
+    flag_phenotype_match_negative: bool = True
+    flag_phenotype_match_positive: bool = True
+    flag_phenotype_match_uncertain: bool = True
 
     flag_summary_empty: bool = True
     flag_summary_negative: bool = True
@@ -472,11 +471,100 @@ class CaseQuerySettingsV1:
     helixmtdb_hom_count: typing.Optional[int] = None
 
     mitomap_count: typing.Optional[int] = None
-    mitmomap_frequency: typing.Optional[float] = None
+    mitomap_frequency: typing.Optional[float] = None
 
 
 @attr.s(frozen=True, auto_attribs=True)
 class CaseQueryV1:
+    public: bool = False
+    query_settings: typing.Optional[typing.Dict[str, typing.Any]] = None
+    sodar_uuid: typing.Optional[uuid.UUID] = None
+    date_created: typing.Optional[datetime.datetime] = None
+    user: typing.Optional[uuid.UUID] = None
+    form_id: typing.Optional[str] = None
+    form_version: typing.Optional[int] = None
+    case: typing.Optional[uuid.UUID] = None
+    name: typing.Optional[str] = None
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class QuickPresetsV1:
+    inheritance: str
+    frequency: str
+    impact: str
+    quality: str
+    chromosomes: str
+    flags_etc: str
+    database: str
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class QueryShortcutsResultV1:
+    presets: QuickPresetsV1
+    query_settings: typing.Dict[str, typing.Any]
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseQueryResultV1:
+    """Case query as returned by API."""
+
+    sodar_uuid: uuid.UUID
+    date_created: datetime.datetime
+    user: uuid.UUID
+    case: uuid.UUID
+    form_id: str
+    form_version: int
     name: typing.Optional[str]
     public: bool = False
-    query_settings: typing.Optional[CaseQuerySettingsV1] = None
+    query_settings: typing.Optional[typing.Any] = None
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class SmallVariantV1:
+    """Small variant as returned by query result"""
+
+    release: str
+    chromosome: str
+    start: int
+    reference: str
+    alternative: str
+    var_type: str
+    info: typing.Dict[str, typing.Any]
+    genotype: typing.Dict[str, typing.Dict[str, typing.Any]]
+
+    num_hom_alt: int
+    num_hom_ref: int
+    num_het: int
+    num_hemi_alt: int
+    num_hemi_ref: int
+    in_clinvar: bool
+    exac_frequency: int
+    exac_homozygous: int
+    exac_heterozygous: int
+    exac_hemizygous: int
+    thousand_genomes_frequency: int
+    thousand_genomes_homozygous: int
+    thousand_genomes_heterozygous: int
+    thousand_genomes_hemizygous: int
+    gnomad_exomes_frequency: int
+    gnomad_exomes_homozygous: int
+    gnomad_exomes_heterozygous: int
+    gnomad_exomes_hemizygous: int
+    gnomad_genomes_frequency: int
+    gnomad_genomes_homozygous: int
+    gnomad_genomes_heterozygous: int
+    gnomad_genomes_hemizygous: int
+    refseq_gene_id: typing.Optional[str]
+    refseq_transcript_id: typing.Optional[str]
+    refseq_transcript_coding: typing.Optional[bool]
+    refseq_hgvs_c: typing.Optional[str]
+    refseq_hgvs_p: typing.Optional[str]
+    refseq_effect: typing.List[str]
+    refseq_exon_dist: typing.Optional[int]
+    ensembl_gene_id: typing.Optional[str]
+    ensembl_transcript_id: typing.Optional[str]
+    ensembl_transcript_coding: typing.Optional[bool]
+    ensembl_hgvs_c: typing.Optional[str]
+    ensembl_hgvs_p: typing.Optional[str]
+    ensembl_effect: typing.List[str]
+    ensembl_exon_dist: typing.Optional[int]

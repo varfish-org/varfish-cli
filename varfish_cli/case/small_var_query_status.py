@@ -30,9 +30,14 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         query_uuid=args.query_uuid,
     )
 
-    print("Query Status", file=file)
-    print("============", file=file)
-    print(file=file)
-    json.dump(res, file, indent="  ")
-    print(file=file)
-    file.flush()
+    logger.info("Query Status")
+    logger.info("============")
+    if config.case_config.output_file == "-":
+        json.dump(res, sys.stdout, indent="  ")
+        sys.stdout.write("\n")
+        sys.stdout.flush()
+    else:
+        with open(config.case_config.output_file, "wt") as outputf:
+            json.dump(res, outputf, indent="  ")
+            outputf.write("\n")
+    logger.info("All done. Have a nice day!")

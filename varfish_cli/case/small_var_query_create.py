@@ -5,9 +5,11 @@ import json
 import sys
 import uuid
 
+import cattrs
 from logzero import logger
 
 from varfish_cli import api
+from varfish_cli.common import CustomEncoder
 from varfish_cli.case.config import CaseSmallVariantQueryCreateConfig
 
 
@@ -24,10 +26,10 @@ def setup_argparse(parser):
     parser.add_argument(
         "--not-public", dest="public", action="store_false", help="Make query non-public (if given)"
     )
-    parser.add_argument(
-        "--query-settings", type=str, help="Query settings JSON or path to JSON file with @prefix"
-    )
     parser.add_argument("case_uuid", help="UUID of the case to create query for.", type=uuid.UUID)
+    parser.add_argument(
+        "query_settings", type=str, help="Query settings JSON or path to JSON file with @prefix"
+    )
 
 
 def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
@@ -39,14 +41,17 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     case_query = api.CaseQueryV1(
         name=args.name, public=args.public, query_settings=config.query_settings
     )
-    res = api.small_var_query_create(
+    query = api.small_var_query_create(
         server_url=base_config.varfish_server_url,
         api_token=base_config.varfish_api_token,
         case_uuid=config.case_uuid,
         case_query=case_query,
     )
 
-    print("Created Query", file=file)
-    print("=============", file=file)
-    json.dump(res.json(), file, indent="  ")
-    print(file=file)
+    logger.info("All done. Have a nice day!")
+    logger.info("Created Query")
+    logger.info("=============")
+    json.dump(cattrs.unstructure(query), file, indent="  ", cls=CustomEncoder)
+    file.write("\n")
+    file.flush()
+    logger.info("All done. Have a nice day!")

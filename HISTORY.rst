@@ -2,8 +2,14 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Adding implementation of REST API (#7).
+
 ------
-V0.2.8
+v0.2.8
 ------
 
 - Adding support to specify genome build on import (defaulting to GRCh37).

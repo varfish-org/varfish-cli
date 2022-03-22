@@ -1,13 +1,33 @@
 """Implementation of ``varfish-cli small-var-query-list``"""
+
 import argparse
 import json
 import sys
+import typing
 import uuid
 
+import attrs
 from logzero import logger
 
 from varfish_cli import api
-from varfish_cli.case.config import CaseSmallVariantQueryListConfig
+from varfish_cli.common import write_output, tabular_output
+from varfish_cli.case.config import OutputFormat, CaseSmallVariantQueryListConfig
+
+#: The default fields by output format.
+DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {
+    OutputFormat.TABLE: (
+        "sodar_uuid",
+        "date_created",
+        "case",
+        "user",
+        "form_id",
+        "form_version",
+        "name",
+        "public",
+    ),
+    OutputFormat.CSV: None,
+    OutputFormat.JSON: None,
+}
 
 
 def setup_argparse(parser):
@@ -15,9 +35,13 @@ def setup_argparse(parser):
     parser.add_argument("case_uuid", help="UUID of the case to list queries for.", type=uuid.UUID)
 
 
-def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
+def run(case_config, toml_config, args, _parser, _subparser, file=sys.stdout):
     """Run list query command."""
-    config = CaseSmallVariantQueryListConfig.create(args, config, toml_config)
+    case_config = attrs.evolve(
+        case_config,
+        output_fields=case_config.output_fields or DEFAULT_FIELDS.get(case_config.output_format),
+    )
+    config = CaseSmallVariantQueryListConfig.create(args, case_config, toml_config)
     logger.info("Configuration: %s", config)
     logger.info("Listing queries")
     base_config = config.case_config.global_config
@@ -27,7 +51,29 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         case_uuid=args.case_uuid,
     )
 
-    print("Query List", file=file)
-    print("==========", file=file)
-    print(file=file)
-    json.dump(res, file, indent="  ")
+    logger.info("Generating output")
+    header = (
+        case_config.output_fields
+        if case_config.output_fields
+        else [f.name for f in attrs.fields(api.CaseQueryResultV1)]
+    )
+    output = tabular_output(values=res, header=header)
+
+    logger.info("Writing output")
+    logger.info("==============")
+    if config.case_config.output_file == "-":
+        write_output(
+            output,
+            sys.stdout,
+            config.case_config.output_format,
+            config.case_config.output_delimiter,
+        )
+    else:
+        with open(config.case_config.output_file, "wt") as outputf:
+            write_output(
+                output,
+                outputf,
+                config.case_config.output_format,
+                config.case_config.output_delimiter,
+            )
+    logger.info("All done. Have a nice day!")

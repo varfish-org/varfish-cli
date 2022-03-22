@@ -1,14 +1,15 @@
 """Configuration classes for ``varfish-cli case *`` commands."""
 
-import attr
-import cattrs
+from enum import unique, Enum
 import json
 import pathlib
+import typing
 import uuid
 
-import typing
+import attr
+import cattrs
 
-from varfish_cli.common import CommonConfig
+from varfish_cli.common import CommonConfig, OutputFormat
 from varfish_cli.api import models
 
 
@@ -16,13 +17,32 @@ from varfish_cli.api import models
 class CaseConfig:
     """Configuration for the ``varfish-cli case`` command."""
 
-    #: Global configuration.
+    #: Global configuration
     global_config: CommonConfig
+
+    #: Path to output file
+    output_file: str = "-"
+
+    #: Output format
+    output_format: OutputFormat = OutputFormat.TABLE
+
+    #: delimiter for CSV output
+    output_delimiter: str = ","
+
+    #: Fields to use for output.
+    output_fields: typing.Optional[typing.List[str]] = []
 
     @staticmethod
     def create(args, global_config, toml_config=None):
+        _ = toml_config
         # toml_config = toml_config or {}
-        return CaseConfig(global_config=global_config)
+        return CaseConfig(
+            output_format=OutputFormat(args.output_format),
+            output_file=args.output_file,
+            output_delimiter=args.output_delimiter,
+            output_fields=args.output_fields.split(",") if args.output_fields else [],
+            global_config=global_config,
+        )
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -152,12 +172,67 @@ class CaseSmallVariantQueryCreateConfig:
                 query_settings = json.load(inputf)
         else:
             query_settings = json.loads(args.args.query_settings.startswith)
+        # Allow both reading raw query_settings and response from query settings shortcuts
+        if "query_settings" in query_settings:
+            query_settings = query_settings["query_settings"]
         return CaseSmallVariantQueryCreateConfig(
             case_config=case_config,
             case_uuid=args.case_uuid,
             query_settings=cattrs.structure(query_settings, models.CaseQuerySettingsV1),
             name=args.name,
             public=args.public,
+        )
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class CaseSmallVariantQueryShortcut:
+    """Configuration for the ``varfish-cli case small-var-query-shortcut`` command."""
+
+    #: Case configuration.
+    case_config: CaseConfig
+
+    #: UUID of the small variant query to retrieve.
+    case_uuid: uuid.UUID
+
+    #: The database to use
+    database: str
+
+    #: The quick preset to use
+    quick_preset: str
+
+    #: Setting in category inheritance
+    inheritance: typing.Optional[str] = None
+
+    #: Setting in category frequency
+    frequency: typing.Optional[str] = None
+
+    #: Setting in category impact
+    impact: typing.Optional[str] = None
+
+    #: Setting in category quality
+    quality: typing.Optional[str] = None
+
+    #: Setting in category chromosomes
+    chromosomes: typing.Optional[str] = None
+
+    #: Setting in category flags_etc
+    flags_etc: typing.Optional[str] = None
+
+    @staticmethod
+    def create(args, case_config, toml_config=None):
+        _ = toml_config
+        # toml_config = toml_config or {}
+        return CaseSmallVariantQueryShortcut(
+            case_config=case_config,
+            case_uuid=args.case_uuid,
+            database=args.database,
+            quick_preset=args.quick_preset,
+            inheritance=args.inheritance,
+            frequency=args.frequency,
+            impact=args.impact,
+            quality=args.quality,
+            chromosomes=args.chromosomes,
+            flags_etc=args.flags_etc,
         )
 
 

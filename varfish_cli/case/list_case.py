@@ -1,13 +1,25 @@
 """Implementation of ``varfish-cli case list``."""
 
+import attrs
 import argparse
+import json
 import sys
+import typing
 import uuid
 
 from logzero import logger
 
-from .. import api
-from .config import CaseListConfig
+from varfish_cli import api
+from varfish_cli.common import write_output, tabular_output
+from varfish_cli.case.config import OutputFormat, CaseListConfig
+
+
+#: The default fields to use for output.
+DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {
+    OutputFormat.TABLE: ("sodar_uuid", "name", "index", "members"),
+    OutputFormat.CSV: None,
+    OutputFormat.JSON: None,
+}
 
 
 def setup_argparse(parser):
@@ -15,9 +27,13 @@ def setup_argparse(parser):
     parser.add_argument("project_uuid", help="UUID of the project to get.", type=uuid.UUID)
 
 
-def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
+def run(case_config, toml_config, args, _parser, _subparser, file=sys.stdout):
     """Run case list command."""
-    config = CaseListConfig.create(args, config, toml_config)
+    case_config = attrs.evolve(
+        case_config,
+        output_fields=case_config.output_fields or DEFAULT_FIELDS.get(case_config.output_format),
+    )
+    config = CaseListConfig.create(args, case_config, toml_config)
     logger.info("Configuration: %s", config)
     logger.info("Listing cases")
     base_config = config.case_config.global_config
@@ -28,30 +44,41 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
-    print("Case List", file=file)
-    print("=========", file=file)
-    print(file=file)
-    for case in res:
-        print("- uuid: %s" % repr(str(case.sodar_uuid)), file=file)
-        print("  name: %s" % repr(case.name), file=file)
-        print("  index: %s" % repr(case.index), file=file)
-        print("  members:", file=file)
+    def format_member(case):
+        value = []
         for member in case.pedigree:
-            print(
-                "    - { name: %s, father: %s, mother: %s, sex: %s, affected: %s }"
-                % tuple(
-                    [
-                        repr(x)
-                        for x in (
-                            member.name,
-                            member.father,
-                            member.mother,
-                            member.sex,
-                            member.affected,
-                        )
-                    ]
-                ),
-                file=file,
+            value.append(
+                {k: getattr(member, k) for k in ("name", "father", "mother", "sex", "affected")}
             )
-        print(file=file)
-    file.flush()
+        if case_config.output_format == OutputFormat.TABLE:
+            return json.dumps(value, indent=" ")
+        else:
+            return value
+
+    logger.info("Generating output")
+    header = (
+        case_config.output_fields
+        if case_config.output_fields
+        else [f.name for f in attrs.fields(api.Case)]
+    )
+    header = [{"pedigree": "members"}.get(v, v) for v in header]  # pedigree => members, rest same
+    output = tabular_output(values=res, header=header, field_formatters={"members": format_member})
+
+    logger.info("Writing output")
+    if config.case_config.output_file == "-":
+        write_output(
+            output,
+            sys.stdout,
+            config.case_config.output_format,
+            config.case_config.output_delimiter,
+        )
+    else:
+        with open(config.case_config.output_file, "wt") as outputf:
+            write_output(
+                output,
+                outputf,
+                config.case_config.output_format,
+                config.case_config.output_delimiter,
+            )
+
+    logger.info("All done. Have a nice day!")
