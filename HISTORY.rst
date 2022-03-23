@@ -2,9 +2,9 @@
 History
 =======
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.3.0
+------
 
 - Adding implementation of REST API (#7).
 
