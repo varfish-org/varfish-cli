@@ -60,6 +60,24 @@ Installation
     varfish_api_token = "XXX"
     EOF
 
+Using pip
+---------
+
+`varfish-cli` is also available as a pip-Package. Preferably install into
+a separate venv.
+
+.. code-block:: bash
+    
+    $ pip install varfish-cli
+    $ cat >~/.varfishrc.toml <<EOF
+    [global]
+
+    # URL to VarFish server.
+    varfish_server_url = "https://varfish.example.com/"
+    # API token to use for VarFish API.
+    varfish_api_token = "XXX"
+    EOF
+
 ---------
 Releasing
 ---------
