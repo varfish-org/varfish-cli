@@ -824,7 +824,6 @@ def small_var_query_fetch_results(
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    print(result.json())
     if not result.ok:
         raise _construct_rest_api_call_exception(result)
     return CONVERTER.structure(result.json(), typing.List[SmallVariantV1])
