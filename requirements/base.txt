@@ -29,3 +29,6 @@ tabulate >=0.8.9,<0.9
 
 # Levenshtein distance.
 python-Levenshtein >=0.12.2,<0.13
+
+# JSON schema.
+jsonschema >=4.4.0,<4.5
