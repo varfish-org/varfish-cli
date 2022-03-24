@@ -48,6 +48,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         database=config.database,
         quick_preset=config.quick_preset,
         **{k: getattr(config, k) for k in KEYS},
+        verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
     logger.info("Created Query")

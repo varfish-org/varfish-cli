@@ -55,9 +55,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"VarFish CLI"
-copyright = u"2020 CUBI - Core Unit Bioinformatics, Berlin Institute of Health"
-author = u"Manuel Holtgrewe"
+project = "VarFish CLI"
+copyright = "2020 CUBI - Core Unit Bioinformatics, Berlin Institute of Health"
+author = "Manuel Holtgrewe"
 
 # The version info for the project you're documenting, acts as replacement
 # for |version| and |release|, also used in various other places throughout
@@ -136,8 +136,8 @@ latex_documents = [
     (
         master_doc,
         "varfish_cli.tex",
-        u"VarFish CLI Documentation",
-        u"Core Unit Bioinformatics",
+        "VarFish CLI Documentation",
+        "Core Unit Bioinformatics",
         "manual",
     )
 ]
@@ -147,7 +147,7 @@ latex_documents = [
 
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
-man_pages = [(master_doc, "varfish_cli", u"VarFish CLI Documentation", [author], 1)]
+man_pages = [(master_doc, "varfish_cli", "VarFish CLI Documentation", [author], 1)]
 
 
 # -- Options for Texinfo output ----------------------------------------
@@ -159,7 +159,7 @@ texinfo_documents = [
     (
         master_doc,
         "varfish_cli",
-        u"VarFish CLI Documentation",
+        "VarFish CLI Documentation",
         author,
         "varfish_cli",
         "One line description of project.",

@@ -2,6 +2,12 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Allow disabling of `verify_ssl` in CLI
+
 ------
 v0.3.0
 ------

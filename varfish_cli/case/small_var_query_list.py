@@ -49,6 +49,7 @@ def run(case_config, toml_config, args, _parser, _subparser, file=sys.stdout):
         server_url=base_config.varfish_server_url,
         api_token=base_config.varfish_api_token,
         case_uuid=args.case_uuid,
+        verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
     logger.info("Generating output")

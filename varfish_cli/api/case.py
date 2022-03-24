@@ -722,10 +722,18 @@ def db_info_file_destroy(
 
 
 def small_var_query_list(
-    server_url: str, api_token: str, case_uuid: uuid.UUID, verify_ssl: bool = True,
+    server_url: str,
+    api_token: str,
+    case_uuid: uuid.UUID,
+    verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
     server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_LIST.format(case_uuid=case_uuid,),)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_LIST.format(
+            case_uuid=case_uuid,
+        ),
+    )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -742,7 +750,12 @@ def small_var_query_create(
     verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
     server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_CREATE.format(case_uuid=case_uuid,),)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_CREATE.format(
+            case_uuid=case_uuid,
+        ),
+    )
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     logger.debug("data = %s", json.dumps(CONVERTER.unstructure(case_query), indent="  "))
@@ -755,10 +768,18 @@ def small_var_query_create(
 
 
 def small_var_query_retrieve(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+    server_url: str,
+    api_token: str,
+    query_uuid: uuid.UUID,
+    verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
     server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid,),)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_RETRIEVE.format(
+            query_uuid=query_uuid,
+        ),
+    )
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -768,10 +789,18 @@ def small_var_query_retrieve(
 
 
 def small_var_query_status(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+    server_url: str,
+    api_token: str,
+    query_uuid: uuid.UUID,
+    verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
     server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_STATUS.format(query_uuid=query_uuid,),)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_STATUS.format(
+            query_uuid=query_uuid,
+        ),
+    )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -792,14 +821,25 @@ def small_var_query_update(
     server_url = _strip_trailing_slash(server_url)
     endpoint_get = "%s%s" % (
         server_url,
-        ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid,),
+        ENDPOINT_CASE_QUERY_RETRIEVE.format(
+            query_uuid=query_uuid,
+        ),
     )
     logger.debug("Sending GET request to end point %s", endpoint_get)
-    result_get = requests.get(endpoint_get, headers=headers, verify=verify_ssl,)
+    result_get = requests.get(
+        endpoint_get,
+        headers=headers,
+        verify=verify_ssl,
+    )
     if not result_get.ok:
         raise _construct_rest_api_call_exception(result_get)
 
-    endpoint_put = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_UPDATE.format(query_uuid=query_uuid,),)
+    endpoint_put = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_QUERY_UPDATE.format(
+            query_uuid=query_uuid,
+        ),
+    )
     logger.debug("Sending PUT request to end point %s", endpoint_put)
     if case_query.public is None:
         case_query = attr.evolve(case_query, public=result_get.json()["public"])
@@ -814,12 +854,17 @@ def small_var_query_update(
 
 
 def small_var_query_fetch_results(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True,
+    server_url: str,
+    api_token: str,
+    query_uuid: uuid.UUID,
+    verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
     server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
-        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(query_uuid=query_uuid,),
+        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(
+            query_uuid=query_uuid,
+        ),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
@@ -846,7 +891,9 @@ def small_var_query_settings_shortcut(
     server_url = _strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
-        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(case_uuid=case_uuid,),
+        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(
+            case_uuid=case_uuid,
+        ),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}

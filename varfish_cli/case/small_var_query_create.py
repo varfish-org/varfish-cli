@@ -46,6 +46,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
         api_token=base_config.varfish_api_token,
         case_uuid=config.case_uuid,
         case_query=case_query,
+        verify_ssl=config.case_config.global_config.verify_ssl,
     )
 
     logger.info("All done. Have a nice day!")

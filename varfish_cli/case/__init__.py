@@ -42,10 +42,13 @@ def setup_argparse(parser: argparse.ArgumentParser) -> None:
         default=of_default,
     )
     parser.add_argument(
-        "--output-fields", help="Output fields if non-default ones",
+        "--output-fields",
+        help="Output fields if non-default ones",
     )
     parser.add_argument(
-        "--output-delimiter", help=f"Separator for CSV output, default: ','", default=",",
+        "--output-delimiter",
+        help=f"Separator for CSV output, default: ','",
+        default=",",
     )
     parser.add_argument(
         "--output-file", help="Path to file to write to, defaults to stdout", default="-"
