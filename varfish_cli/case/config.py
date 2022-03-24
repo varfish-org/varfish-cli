@@ -10,7 +10,7 @@ import attr
 import cattrs
 
 from varfish_cli.common import CommonConfig, OutputFormat
-from varfish_cli.api import models
+from varfish_cli.api import models, CONVERTER
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -181,7 +181,7 @@ class CaseSmallVariantQueryCreateConfig:
         return CaseSmallVariantQueryCreateConfig(
             case_config=case_config,
             case_uuid=args.case_uuid,
-            query_settings=cattrs.structure(query_settings, models.CaseQuerySettingsV1),
+            query_settings=CONVERTER.structure(query_settings, models.CaseQuerySettingsV1),
             name=args.name,
             public=args.public,
         )

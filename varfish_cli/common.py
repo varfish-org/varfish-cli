@@ -12,6 +12,7 @@ import uuid
 import cattr
 from dateutil.parser import isoparse
 from tabulate import tabulate
+from varfish_cli.api import CONVERTER
 
 
 class CustomEncoder(json.JSONEncoder):
@@ -28,19 +29,6 @@ class CustomEncoder(json.JSONEncoder):
         else:
             # Default implementation raises not-serializable TypeError exception
             return json.JSONEncoder.default(self, obj)  # pragma: no cover
-
-
-cattr.register_structure_hook(
-    datetime.datetime, lambda dt_str, _: isoparse(dt_str) if dt_str else None
-)
-cattr.register_structure_hook(
-    datetime.date, lambda dt_str, _: isoparse(dt_str).date() if dt_str else None
-)
-cattr.register_structure_hook(
-    datetime.time, lambda dt_str, _: isoparse(dt_str).time() if dt_str else None
-)
-
-cattr.register_structure_hook(uuid.UUID, lambda uuid_str, _: uuid.UUID(hex=uuid_str))
 
 
 @unique

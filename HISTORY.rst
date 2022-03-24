@@ -2,6 +2,12 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Fixing structuring/unstructuring of genomic region
+
 ------
 v0.3.1
 ------

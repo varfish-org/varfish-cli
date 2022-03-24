@@ -6,13 +6,13 @@ import cattr
 import requests_mock
 
 from varfish_cli.__main__ import main
-from varfish_cli.api import models
+from varfish_cli.api import models, CONVERTER
 
 
 def test_run_case_list():
     url = "https://varfish.example.com"
     address = "%s/variants/api/case/c3752df7-fa32-4784-8a48-e8f0e5a28790/" % url
-    cases = cattr.unstructure(
+    cases = CONVERTER.unstructure(
         [
             models.Case(
                 sodar_uuid=str(uuid.uuid4()),

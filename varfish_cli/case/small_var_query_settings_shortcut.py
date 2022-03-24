@@ -53,5 +53,5 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
 
     logger.info("Created Query")
     logger.info("=============")
-    json.dump(cattrs.unstructure(res), file, indent="  ")
+    json.dump(api.CONVERTER.unstructure(res), file, indent="  ")
     logger.info("All done. Have a nice day!")

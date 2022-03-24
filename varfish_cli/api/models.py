@@ -1,36 +1,14 @@
 """Data models for supporting the VarFish CLI."""
 
-import copy
 import datetime
-import json
-import os.path
+import re
 import typing
 import uuid
 from enum import unique, Enum
 
 import attr
 import cattr
-from jsonschema import Draft7Validator, validators
 import dateutil.parser
-
-
-def _setup_converter() -> cattr.Converter:
-    result = cattr.Converter()
-    result.register_structure_hook(uuid.UUID, lambda d, _: uuid.UUID(d))
-    result.register_unstructure_hook(uuid.UUID, str)
-    result.register_structure_hook(datetime.datetime, lambda d, _: dateutil.parser.parse(d))
-    result.register_unstructure_hook(
-        datetime.datetime,
-        lambda obj: obj.replace(tzinfo=datetime.timezone.utc)
-        .astimezone()
-        .replace(microsecond=0)
-        .isoformat(),
-    )
-    return result
-
-
-#: cattr Converter to use
-CONVERTER = _setup_converter()
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -342,6 +320,12 @@ class GenomicRegionV1:
     chromosome: str
     range: typing.Optional[RangeV1] = None
 
+    def to_str(self):
+        if not self.range:
+            return self.chromosome
+        else:
+            return "%s:%d-%d" % (self.chromosome, self.range.start, self.range.end)
+
 
 def convert_genomic_region_v1(region: GenomicRegionV1):
     if region.range:
@@ -568,3 +552,35 @@ class SmallVariantV1:
     ensembl_hgvs_p: typing.Optional[str]
     ensembl_effect: typing.List[str]
     ensembl_exon_dist: typing.Optional[int]
+
+
+def _structure_genomic_region(s, _):
+    if not re.match("^[a-zA-Z0-9]+(:(\\d+(,\\d+)*)-(\\d+(,\\d+)*))?$", s):
+        raise RuntimeError("Invalid genomic region string: %s" % repr(s))
+    if ":" in s:
+        chrom, range = s.split(":")
+        start, end = range.split("-")
+        return GenomicRegionV1(chromosome=chrom, range=RangeV1(int(start), int(end)))
+    else:
+        return GenomicRegionV1(chromosome=s)
+
+
+def _setup_converter() -> cattr.Converter:
+    result = cattr.Converter()
+    result.register_structure_hook(uuid.UUID, lambda d, _: uuid.UUID(d))
+    result.register_unstructure_hook(uuid.UUID, str)
+    result.register_structure_hook(datetime.datetime, lambda d, _: dateutil.parser.parse(d))
+    result.register_unstructure_hook(
+        datetime.datetime,
+        lambda obj: obj.replace(tzinfo=datetime.timezone.utc)
+        .astimezone()
+        .replace(microsecond=0)
+        .isoformat(),
+    )
+    result.register_structure_hook(GenomicRegionV1, _structure_genomic_region)
+    result.register_unstructure_hook(GenomicRegionV1, GenomicRegionV1.to_str)
+    return result
+
+
+#: cattr Converter to use
+CONVERTER = _setup_converter()
