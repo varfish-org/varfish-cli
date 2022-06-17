@@ -20,6 +20,11 @@ def args():
         case_name_suffix="suffix",
         resubmit=True,
         force_fresh=False,
+        output_file="-",
+        output_format=config.OutputFormat.TABLE,
+        output_delimiter=",",
+        output_fields=[],
+        genomebuild="GRCh37",
     )
 
 

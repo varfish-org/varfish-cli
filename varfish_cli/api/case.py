@@ -898,7 +898,7 @@ def small_var_query_settings_shortcut(
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     params = {"database": database, "quick_preset": quick_preset}
-    params.pop("database")  ## TODO: REMOVE ME
+    params.pop("database")  # TODO: REMOVE ME
     if inheritance:
         params["inheritance"] = inheritance
     if frequency:

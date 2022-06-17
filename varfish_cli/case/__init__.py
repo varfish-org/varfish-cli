@@ -47,7 +47,7 @@ def setup_argparse(parser: argparse.ArgumentParser) -> None:
     )
     parser.add_argument(
         "--output-delimiter",
-        help=f"Separator for CSV output, default: ','",
+        help="Separator for CSV output, default: ','",
         default=",",
     )
     parser.add_argument(
