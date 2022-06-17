@@ -12,6 +12,7 @@ import uuid
 from itertools import chain
 
 import attr
+import Levenshtein
 from logzero import logger
 from tabulate import tabulate
 
@@ -162,6 +163,8 @@ class FileType(enum.Enum):
     MD5 = "md5"
     #: Database infos file.
     DB_INFOS = "db_infos"
+    #: Database infos file for SVs.
+    DB_INFOS_SV = "db_infos_sv"
     #: BAM QC file.
     BAM_QC = "bam_qc"
     #: Genotypes file.
@@ -257,6 +260,8 @@ class CaseImporter:
         self.paths_effect_sv: typing.List[PathWithTimestamp] = []
         #: The paths to the database info files to import.
         self.paths_database_info: typing.List[PathWithTimestamp] = []
+        #: The paths to the database info files to import for SVs.
+        self.paths_database_info_sv: typing.List[PathWithTimestamp] = []
 
         #: The pedigree members.
         self.pedigree: typing.List[PedigreeMember] = None
@@ -370,10 +375,11 @@ class CaseImporter:
                         verify_ssl=self.global_config.verify_ssl,
                     )
 
-    def _split_files_by_role(self):
+    def _split_files_by_role(self):  # noqa
         """Split out files by their role into ``self.path_ped`` and ``self.paths_*``."""
         file_type_to_list = {
             FileType.DB_INFOS: self.paths_database_info,
+            FileType.DB_INFOS_SV: self.paths_database_info_sv,
             FileType.BAM_QC: self.paths_bam_qc,
             FileType.GTS: self.paths_genotype,
             FileType.GTS_SV: self.paths_genotype_sv,
@@ -392,6 +398,24 @@ class CaseImporter:
                 file_type_to_list[guessed].append(PathWithTimestamp.from_path(path))
             else:
                 logger.error("Could not assign %s of type %s", path, guessed)
+
+        paths_database_info = list(self.paths_database_info)
+
+        # Match DB info files to small/large variants by file name match/mismatch.
+        for db_info_file in paths_database_info:
+            best_is_sv = None
+            best_dist = None
+
+            for is_sv, paths in (False, self.paths_genotype), (True, self.paths_genotype_sv):
+                for path in paths:
+                    dist = Levenshtein.distance(db_info_file.path, path.path)
+                    if best_dist is None or best_dist > dist:
+                        best_is_sv = is_sv
+                        best_dist = dist
+
+            if best_is_sv:
+                self.paths_database_info_sv.append(db_info_file)
+                self.paths_database_info.remove(db_info_file)
 
         guessed = []
         for key, lst in file_type_to_list.items():
@@ -646,25 +670,6 @@ class CaseImporter:
             for path in self.paths_bam_qc
         ]
 
-        # Match DB info files to small/large variants by file name match/mismatch.
-        db_infos_small = []
-        db_infos_sv = []
-        db_infos_small = self.paths_database_info
-        # TODO: The following is waiting for #575
-        # cf.:https://cubi-gitlab.bihealth.org/CUBI_Engineering/VarFish/varfish-web/-/issues/575
-        #
-        # for db_info_file in self.paths_database_info:
-        #     best = None
-        #     best_dist = None
-        #     for lst, paths in ((db_infos_small, self.paths_genotype), (db_infos_sv, self.paths_genotype_sv)):
-        #         for path in paths:
-        #             dist = Levenshtein.distance(db_info_file.path, path.path)
-        #             if best_dist is None or best_dist > dist:
-        #                 best = lst
-        #                 best_dist = dist
-        #     if best is not None:
-        #         best.append(db_info_file)
-
         if self.paths_genotype:
             logger.info("- create new small variant set if necessary")
             variant_set_import_info = self._create_variant_set_import_info(
@@ -692,7 +697,7 @@ class CaseImporter:
                     file_type=DatabaseInfoFile,
                     api_create_func=api.db_info_file_upload,
                 )
-                for path in db_infos_small
+                for path in self.paths_database_info
             ]
             api.variant_set_import_info_update(
                 server_url=self.global_config.varfish_server_url,
@@ -742,7 +747,7 @@ class CaseImporter:
                     file_type=DatabaseInfoFile,
                     api_create_func=api.db_info_file_upload,
                 )
-                for path in db_infos_sv
+                for path in self.paths_database_info_sv
             ]
             api.variant_set_import_info_update(
                 server_url=self.global_config.varfish_server_url,

@@ -9,10 +9,7 @@ import json
 import typing
 import uuid
 
-import cattr
-from dateutil.parser import isoparse
 from tabulate import tabulate
-from varfish_cli.api import CONVERTER
 
 
 class CustomEncoder(json.JSONEncoder):

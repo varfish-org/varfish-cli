@@ -7,6 +7,7 @@ HEAD (unreleased)
 -----------------
 
 - Fixing structuring/unstructuring of genomic region
+- Case importer distinguished smallvar and SV DB info files (#13).
 
 ------
 v0.3.1

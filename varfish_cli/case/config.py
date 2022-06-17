@@ -1,13 +1,10 @@
 """Configuration classes for ``varfish-cli case *`` commands."""
 
-from enum import unique, Enum
 import json
-import pathlib
 import typing
 import uuid
 
 import attr
-import cattrs
 
 from varfish_cli.common import CommonConfig, OutputFormat
 from varfish_cli.api import models, CONVERTER

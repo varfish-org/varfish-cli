@@ -1,7 +1,6 @@
 """Implementation of ``varfish-cli small-var-query-fetch-results``"""
 
 import argparse
-import json
 import sys
 import typing
 import uuid

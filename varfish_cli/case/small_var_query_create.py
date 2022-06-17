@@ -5,7 +5,6 @@ import json
 import sys
 import uuid
 
-import cattrs
 from logzero import logger
 
 from varfish_cli import api
