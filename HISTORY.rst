@@ -2,12 +2,17 @@
 History
 =======
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.3.3
+------
+
+- Case importer distinguished smallvar and SV DB info files (#13).
+
+------
+v0.3.2
+------
 
 - Fixing structuring/unstructuring of genomic region
-- Case importer distinguished smallvar and SV DB info files (#13).
 
 ------
 v0.3.1
