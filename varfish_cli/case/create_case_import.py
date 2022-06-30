@@ -97,8 +97,39 @@ EXPECTED_GTS = [
     "ensembl_exon_dist",
 ]
 
-#: Expected header for SV genotypes.
+#: Expected header for SV genotypes (new).
 EXPECTED_GTS_SV = [
+    "release",
+    "chromosome",
+    "chromosome_no",
+    "bin",
+    "chromosome2",
+    "chromosome_no2",
+    "bin2",
+    "pe_orientation",
+    "start",
+    "end",
+    "start_ci_left",
+    "start_ci_right",
+    "end_ci_left",
+    "end_ci_right",
+    "case_id",
+    "set_id",
+    "sv_uuid",
+    "caller",
+    "sv_type",
+    "sv_sub_type",
+    "info",
+    "num_hom_alt",
+    "num_hom_ref",
+    "num_het",
+    "num_hemi_alt",
+    "num_hemi_ref",
+    "genotype",
+]
+
+#: Expected header for SV genotypes (old).
+EXPECTED_GTS_SV_OLD = [
     "release",
     "chromosome",
     "chromosome_no",
@@ -225,7 +256,7 @@ class FileTypeGuesser:
         return arr == EXPECTED_GTS
 
     def _looks_like_gts_sv(self, arr):
-        return arr == EXPECTED_GTS_SV
+        return arr == EXPECTED_GTS_SV or arr == EXPECTED_GTS_SV_OLD
 
     def _looks_like_effects_sv(self, arr):
         return arr == EXPECTED_EFFECTS_SV
@@ -584,7 +615,11 @@ class CaseImporter:
 
         case_name = None
         pedigree = []
-        with open(self.path_ped.path) as inputf:
+        if self.path_ped.path.endswith(".gz"):
+            fopen = gzip.open
+        else:
+            fopen = open
+        with fopen(self.path_ped.path, "rt") as inputf:
             for donor in parse_ped(inputf):
                 case_name = donor.family_id
                 pedigree.append(

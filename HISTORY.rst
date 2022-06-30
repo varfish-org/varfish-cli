@@ -2,6 +2,12 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Adding support for latest varfish-annotator output for svs (#16).
+
 ------
 v0.3.3
 ------
