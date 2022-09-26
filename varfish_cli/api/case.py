@@ -33,6 +33,8 @@ ACCEPT_API_VARFISH = ""
 
 #: End point for listing cases.
 ENDPOINT_CASE_LIST = "/variants/api/case/list/{project_uuid}/"
+#: End point for fetching case information.
+ENDPOINT_CASE_RETRIEVE = "/variants/api/case/retrieve/{case_uuid}"
 #: End point for listing case import infos.
 ENDPOINT_CASE_IMPORT_INFO_LIST = "/importer/api/case-import-info/{project_uuid}/"
 #: End point for creating case import infos.
@@ -135,6 +137,21 @@ def case_list(
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     result.raise_for_status()
     return CONVERTER.structure(result.json(), typing.List[Case])
+
+
+def case_retrieve(
+    server_url: str,
+    api_token: str,
+    case_uuid: typing.Union[str, uuid.UUID],
+    verify_ssl: bool = True,
+) -> CaseImportInfo:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_RETRIEVE.format(case_uuid=case_uuid))
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    result.raise_for_status()
+    return CONVERTER.structure(result.json(), CaseImportInfo)
 
 
 def case_import_info_list(
