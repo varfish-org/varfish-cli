@@ -2,6 +2,13 @@
 History
 =======
 
+-----------------
+HEAD (unreleased)
+-----------------
+
+- Allowing to upload per-case gene annotation file (#20).
+- Adding client endpoint for retrieving case from API (#18).
+
 ------
 v0.3.4
 ------

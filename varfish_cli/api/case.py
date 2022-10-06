@@ -18,6 +18,7 @@ from .models import (
     CaseQueryV1,
     VariantSetImportInfo,
     BamQcFile,
+    CaseGeneAnnotationFile,
     GenotypeFile,
     EffectsFile,
     DatabaseInfoFile,
@@ -63,6 +64,14 @@ ENDPOINT_BAM_QC_FILE_CREATE = ENDPOINT_BAM_QC_FILE_LIST
 ENDPOINT_BAM_QC_FILE_DESTROY = (
     "/importer/api/bam-qc-file/{case_import_info_uuid}/{bam_qc_file_uuid}/"
 )
+#: End point for listing gene annotation files.
+ENDPOINT_CASE_GENE_ANNOTATION_FILE_LIST = (
+    "/importer/api/case-gene-annotation-file/{case_import_info_uuid}/"
+)
+#: End point for creating gene annotation files.
+ENDPOINT_CASE_GENE_ANNOTATION_FILE_CREATE = ENDPOINT_CASE_GENE_ANNOTATION_FILE_LIST
+#: End point for destroy gene annotation files
+ENDPOINT_CASE_GENE_ANNOTATION_FILE_DESTROY = "/importer/api/case-gene-annotation-file/{case_import_info_uuid}/{case_gene_annotation_file_uuid}/"
 #: End point for listing genotype files.
 ENDPOINT_GENOTYPE_FILE_LIST = "/importer/api/genotype-file/{variant_set_import_info_uuid}/"
 #: End point for creating genotype files.
@@ -449,6 +458,95 @@ def bam_qc_file_destroy(
         server_url,
         ENDPOINT_BAM_QC_FILE_DESTROY.format(
             case_import_info_uuid=case_import_info_uuid, bam_qc_file_uuid=bam_qc_file_uuid
+        ),
+    )
+    logger.debug("Sending DELETE request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.delete(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        try:
+            msg = "REST API returned status code %d: %s" % (
+                result.status_code,
+                " ".join([" ".join(v) for v in result.json().values()]),
+            )
+        except (JSONDecodeError, SimpleJSONDecodeError):
+            msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
+        raise RestApiCallException(msg)
+
+
+def case_gene_annotation_file_list(
+    server_url: str,
+    api_token: str,
+    case_import_info_uuid: typing.Union[str, uuid.UUID],
+    verify_ssl: bool = True,
+) -> typing.List[CaseGeneAnnotationFile]:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_GENE_ANNOTATION_FILE_LIST.format(case_import_info_uuid=case_import_info_uuid),
+    )
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    if not result.ok:
+        try:
+            msg = "REST API returned status code %d: %s" % (
+                result.status_code,
+                " ".join([" ".join(v) for v in result.json().values()]),
+            )
+        except (JSONDecodeError, SimpleJSONDecodeError):
+            msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
+        raise RestApiCallException(msg)
+    else:
+        return CONVERTER.structure(result.json(), typing.List[CaseGeneAnnotationFile])
+
+
+def case_gene_annotation_file_upload(
+    server_url: str,
+    api_token: str,
+    case_import_info_uuid: typing.Union[str, uuid.UUID],
+    data: CaseGeneAnnotationFile,
+    files: typing.Dict[str, typing.BinaryIO],
+    verify_ssl: bool = True,
+) -> CaseGeneAnnotationFile:
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_GENE_ANNOTATION_FILE_CREATE.format(
+            case_import_info_uuid=case_import_info_uuid
+        ),
+    )
+    logger.debug("Sending POST request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.post(
+        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+    )
+    if not result.ok:
+        try:
+            msg = "REST API returned status code %d: %s" % (
+                result.status_code,
+                " ".join([" ".join(v) for v in result.json().values()]),
+            )
+        except (JSONDecodeError, SimpleJSONDecodeError):
+            msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
+        raise RestApiCallException(msg)
+    else:
+        return CONVERTER.structure(result.json(), CaseGeneAnnotationFile)
+
+
+def case_gene_annotation_file_destroy(
+    server_url: str,
+    api_token: str,
+    case_import_info_uuid: typing.Union[str, uuid.UUID],
+    case_gene_annotation_file_uuid: typing.Union[str, uuid.UUID],
+    verify_ssl: bool = True,
+):
+    server_url = _strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (
+        server_url,
+        ENDPOINT_CASE_GENE_ANNOTATION_FILE_DESTROY.format(
+            case_import_info_uuid=case_import_info_uuid,
+            case_gene_annotation_file_uuid=case_gene_annotation_file_uuid,
         ),
     )
     logger.debug("Sending DELETE request to end point %s", endpoint)

@@ -172,6 +172,25 @@ class BamQcFile:
 
 
 @attr.s(frozen=True, auto_attribs=True)
+class CaseGeneAnnotationFile:
+    """Information for Gene Annotation file without the payload."""
+
+    #: Name of the file.
+    name: str
+    #: MD5 sum of the file.
+    md5: str
+
+    #: The case identifier.
+    sodar_uuid: typing.Optional[uuid.UUID] = None
+    #: Date of creation.
+    date_created: typing.Optional[datetime.datetime] = None
+    #: Date of last modification.
+    date_modified: typing.Optional[datetime.datetime] = None
+    #: UUID of the linked ``CaseImportInfo``.
+    case_import_info: typing.Optional[uuid.UUID] = None
+
+
+@attr.s(frozen=True, auto_attribs=True)
 class GenotypeFile:
     """Genotype file."""
 
