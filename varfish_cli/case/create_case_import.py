@@ -23,6 +23,7 @@ from ..api import (
     GenomeBuild,
     CaseVariantType,
     BamQcFile,
+    CaseGeneAnnotationFile,
     GenotypeFile,
     EffectsFile,
     CaseImportState,
@@ -165,6 +166,14 @@ EXPECTED_EFFECTS_SV = [
     "ensembl_effect",
 ]
 
+#: Expected header for gene annotations.
+EXPECTED_GENE_ANNOTATIONS = [
+    "gene_symbol",
+    "entrez_id",
+    "ensembl_gene_id",
+    "annotation",
+]
+
 
 @attr.s(frozen=True, auto_attribs=True)
 class PathWithTimestamp:
@@ -204,6 +213,8 @@ class FileType(enum.Enum):
     GTS_SV = "gts_sv"
     #: Feature effects for SVs.
     EFFECTS_SV = "effects_sv"
+    #: Feature effects for SVs.
+    GENE_ANNOTATION = "case_gene_annotation"
 
 
 class FileTypeGuesser:
@@ -232,6 +243,7 @@ class FileTypeGuesser:
             FileType.GTS: self._looks_like_gts,
             FileType.GTS_SV: self._looks_like_gts_sv,
             FileType.EFFECTS_SV: self._looks_like_effects_sv,
+            FileType.GENE_ANNOTATION: self._looks_like_case_gene_annotation,
         }
         for file_type, func in matchers.items():
             if func(first_line):
@@ -261,6 +273,9 @@ class FileTypeGuesser:
     def _looks_like_effects_sv(self, arr):
         return arr == EXPECTED_EFFECTS_SV
 
+    def _looks_like_case_gene_annotation(self, arr):
+        return arr == EXPECTED_GENE_ANNOTATIONS
+
 
 class CaseImporter:
     """Implementation of an idempotent case importer.
@@ -283,6 +298,8 @@ class CaseImporter:
         self.path_ped: typing.Optional[PathWithTimestamp] = None
         #: The path to the BAM QC files to import.
         self.paths_bam_qc: typing.List[PathWithTimestamp] = []
+        #: The paths to the gene annotation files to import.
+        self.paths_case_gene_annotations: typing.List[PathWithTimestamp] = []
         #: The paths to the genotype TSV files for small variants.
         self.paths_genotype: typing.List[PathWithTimestamp] = []
         #: The paths to the genotype TSV files for small variants.
@@ -412,6 +429,7 @@ class CaseImporter:
             FileType.DB_INFOS: self.paths_database_info,
             FileType.DB_INFOS_SV: self.paths_database_info_sv,
             FileType.BAM_QC: self.paths_bam_qc,
+            FileType.GENE_ANNOTATION: self.paths_case_gene_annotations,
             FileType.GTS: self.paths_genotype,
             FileType.GTS_SV: self.paths_genotype_sv,
             FileType.EFFECTS_SV: self.paths_effect_sv,
@@ -703,6 +721,19 @@ class CaseImporter:
                 api_create_func=api.bam_qc_file_upload,
             )
             for path in self.paths_bam_qc
+        ]
+        # Then gene annotations
+        good_md5s += [
+            self._perform_file_upload(
+                path=path.path,
+                api_list_func=api.case_gene_annotation_file_list,
+                func_uuid_arg="case_import_info_uuid",
+                uuid_value=case_import_info.sodar_uuid,
+                obj_type="Gene Annotation",
+                file_type=CaseGeneAnnotationFile,
+                api_create_func=api.case_gene_annotation_file_upload,
+            )
+            for path in self.paths_case_gene_annotations
         ]
 
         if self.paths_genotype:
