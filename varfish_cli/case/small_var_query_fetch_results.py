@@ -9,8 +9,11 @@ import attrs
 from logzero import logger
 
 from varfish_cli import api
-from varfish_cli.common import write_output, tabular_output
-from varfish_cli.case.config import OutputFormat, CaseSmallVariantQueryFetchResultsConfig
+from varfish_cli.case.config import (
+    CaseSmallVariantQueryFetchResultsConfig,
+    OutputFormat,
+)
+from varfish_cli.common import tabular_output, write_output
 
 #: The default output fields.
 DEFAULT_OUTPUT_FIELDS = (

@@ -32,6 +32,6 @@ pep257:
 flake8:
 	flake8
 
-.PHONY: prospector
-prospector:
-	prospector
+.PHONY: isort
+isort:
+	isort --force-sort-within-sections --profile=black .

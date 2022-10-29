@@ -6,8 +6,8 @@ import uuid
 
 import attr
 
+from varfish_cli.api import CONVERTER, models
 from varfish_cli.common import CommonConfig, OutputFormat
-from varfish_cli.api import models, CONVERTER
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -138,10 +138,7 @@ class CaseSmallVariantQueryListConfig:
     def create(args, case_config, toml_config=None):
         _ = toml_config
         # toml_config = toml_config or {}
-        return CaseSmallVariantQueryListConfig(
-            case_config=case_config,
-            case_uuid=args.case_uuid,
-        )
+        return CaseSmallVariantQueryListConfig(case_config=case_config, case_uuid=args.case_uuid)
 
 
 @attr.s(frozen=True, auto_attribs=True)
@@ -251,8 +248,7 @@ class CaseSmallVariantQueryRetrieveConfig:
         _ = toml_config
         # toml_config = toml_config or {}
         return CaseSmallVariantQueryRetrieveConfig(
-            case_config=case_config,
-            query_uuid=args.query_uuid,
+            case_config=case_config, query_uuid=args.query_uuid
         )
 
 
@@ -271,8 +267,7 @@ class CaseSmallVariantQueryStatusConfig:
         _ = toml_config
         # toml_config = toml_config or {}
         return CaseSmallVariantQueryStatusConfig(
-            case_config=case_config,
-            query_uuid=args.query_uuid,
+            case_config=case_config, query_uuid=args.query_uuid
         )
 
 
@@ -297,10 +292,7 @@ class CaseSmallVariantQueryUpdateConfig:
         _ = toml_config
         # toml_config = toml_config or {}
         return CaseSmallVariantQueryUpdateConfig(
-            case_config=case_config,
-            query_uuid=args.query_uuid,
-            name=args.name,
-            public=args.public,
+            case_config=case_config, query_uuid=args.query_uuid, name=args.name, public=args.public
         )
 
 
@@ -319,6 +311,5 @@ class CaseSmallVariantQueryFetchResultsConfig:
         _ = toml_config
         # toml_config = toml_config or {}
         return CaseSmallVariantQueryFetchResultsConfig(
-            case_config=case_config,
-            query_uuid=args.query_uuid,
+            case_config=case_config, query_uuid=args.query_uuid
         )

@@ -1,10 +1,10 @@
 """Data models for supporting the VarFish CLI."""
 
 import datetime
+from enum import Enum, unique
 import re
 import typing
 import uuid
-from enum import unique, Enum
 
 import attr
 import cattr
@@ -603,3 +603,55 @@ def _setup_converter() -> cattr.Converter:
 
 #: cattr Converter to use
 CONVERTER = _setup_converter()
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class VarAnnoSetV1:
+    """VarAnnoSet as returned by query result"""
+
+    #: The case identifier.
+    sodar_uuid: uuid.UUID
+    #: Date of creation.
+    date_created: datetime.datetime
+    #: Date of last modification.
+    date_modified: datetime.datetime
+
+    #: Project UUID.
+    project: uuid.UUID
+    #: Title of the set.
+    title: str
+    #: Description of the set.
+    description: str
+    #: Genome build of the release.
+    release: str
+    #: Fields for the variant annotation set.
+    fields: typing.List[str]
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class VarAnnoSetEntryV1:
+    """VarAnnoSet as returned by query result"""
+
+    #: The case identifier.
+    sodar_uuid: uuid.UUID
+    #: Date of creation.
+    date_created: datetime.datetime
+    #: Date of last modification.
+    date_modified: datetime.datetime
+
+    #: VarAnnoSet UUID.
+    varannoset: uuid.UUID
+    #: Genome build of coordinate.
+    release: str
+    #: Chromosome of coordinate.
+    chromosome: str
+    #: Start position of entry.
+    start: int
+    #: End position of entry.
+    end: int
+    #: Reference allele.
+    reference: str
+    #: Alternative allele.
+    alternative: str
+    #: Data, the set's fields are the keys.
+    payload: typing.Dict[str, str]

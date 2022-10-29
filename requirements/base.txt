@@ -32,3 +32,6 @@ python-Levenshtein >=0.12.2,<0.13
 
 # JSON schema.
 jsonschema >=4.4.0,<4.5
+
+# Type checking
+typeguard >=2.13.3,<3.0

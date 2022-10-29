@@ -1,31 +1,32 @@
 """Implementation of API operations on cases."""
 
 import json
+from json import JSONDecodeError
 import typing
 import uuid
-from json import JSONDecodeError
-from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
 import attr
-import requests
 from logzero import logger
+import requests
+from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
-from . import models
-from .models import (
+from varfish_cli.api import models
+from varfish_cli.api.models import (
     CONVERTER,
-    Case,
-    CaseImportInfo,
-    CaseQueryV1,
-    VariantSetImportInfo,
     BamQcFile,
+    Case,
     CaseGeneAnnotationFile,
-    GenotypeFile,
-    EffectsFile,
-    DatabaseInfoFile,
-    SmallVariantV1,
+    CaseImportInfo,
     CaseQueryResultV1,
+    CaseQueryV1,
+    DatabaseInfoFile,
+    EffectsFile,
+    GenotypeFile,
     QueryShortcutsResultV1,
+    SmallVariantV1,
+    VariantSetImportInfo,
 )
+from varfish_cli.common import strip_trailing_slash
 
 from ..exceptions import RestApiCallException
 
@@ -115,12 +116,6 @@ ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT = (
 )
 
 
-def _strip_trailing_slash(s: str) -> str:
-    while s.endswith("/"):
-        s = s[:-1]
-    return s
-
-
 def _construct_rest_api_call_exception(response: requests.Response) -> RestApiCallException:
     try:
         msg = "REST API returned status code %d: %s" % (
@@ -139,7 +134,7 @@ def case_list(
     verify_ssl: bool = True,
 ) -> typing.List[Case]:
     """Listing of cases from a project UUID."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_LIST.format(project_uuid=project_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
@@ -154,7 +149,7 @@ def case_retrieve(
     case_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_RETRIEVE.format(case_uuid=case_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
@@ -171,7 +166,7 @@ def case_import_info_list(
     verify_ssl: bool = True,
 ) -> typing.List[CaseImportInfo]:
     """Listing case import infos from a project UUID."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_LIST.format(project_uuid=project_uuid),
@@ -203,7 +198,7 @@ def case_import_info_retrieve(
     info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_RETRIEVE.format(
@@ -234,7 +229,7 @@ def case_import_info_create(
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
     """Create new CaseImportInfo on server."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_CREATE.format(project_uuid=project_uuid),
@@ -267,7 +262,7 @@ def case_import_info_update(
     verify_ssl: bool = True,
 ) -> CaseImportInfo:
     """Update CaseImportInfo on server."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_IMPORT_INFO_UPDATE.format(
@@ -300,7 +295,7 @@ def variant_set_import_info_list(
     verify_ssl: bool = True,
 ) -> typing.List[VariantSetImportInfo]:
     """List variant set import infos."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_LIST.format(case_import_info_uuid=case_import_info_uuid),
@@ -329,7 +324,7 @@ def variant_set_import_info_create(
     verify_ssl: bool = True,
 ) -> typing.List[VariantSetImportInfo]:
     """Create variant set import info."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_CREATE.format(case_import_info_uuid=case_import_info_uuid),
@@ -361,7 +356,7 @@ def variant_set_import_info_update(
     verify_ssl: bool = True,
 ) -> VariantSetImportInfo:
     """Create variant set import info."""
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_VARIANT_SET_IMPORT_INFO_UPDATE.format(
@@ -394,7 +389,7 @@ def bam_qc_file_list(
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[BamQcFile]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_LIST.format(case_import_info_uuid=case_import_info_uuid),
@@ -423,7 +418,7 @@ def bam_qc_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> BamQcFile:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_CREATE.format(case_import_info_uuid=case_import_info_uuid),
@@ -453,7 +448,7 @@ def bam_qc_file_destroy(
     bam_qc_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_BAM_QC_FILE_DESTROY.format(
@@ -480,7 +475,7 @@ def case_gene_annotation_file_list(
     case_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[CaseGeneAnnotationFile]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_GENE_ANNOTATION_FILE_LIST.format(case_import_info_uuid=case_import_info_uuid),
@@ -509,7 +504,7 @@ def case_gene_annotation_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> CaseGeneAnnotationFile:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_GENE_ANNOTATION_FILE_CREATE.format(
@@ -541,7 +536,7 @@ def case_gene_annotation_file_destroy(
     case_gene_annotation_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_CASE_GENE_ANNOTATION_FILE_DESTROY.format(
@@ -569,7 +564,7 @@ def genotype_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[GenotypeFile]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_LIST.format(
@@ -600,7 +595,7 @@ def genotype_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> GenotypeFile:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_CREATE.format(
@@ -632,7 +627,7 @@ def genotype_file_destroy(
     genotype_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_GENOTYPE_FILE_DESTROY.format(
@@ -660,7 +655,7 @@ def effects_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[EffectsFile]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_LIST.format(
@@ -691,7 +686,7 @@ def effects_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> EffectsFile:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_CREATE.format(
@@ -723,7 +718,7 @@ def effects_file_destroy(
     effects_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_EFFECTS_FILE_DESTROY.format(
@@ -751,7 +746,7 @@ def db_info_file_list(
     variant_set_import_info_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ) -> typing.List[DatabaseInfoFile]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_LIST.format(
@@ -782,7 +777,7 @@ def db_info_file_upload(
     files: typing.Dict[str, typing.BinaryIO],
     verify_ssl: bool = True,
 ) -> DatabaseInfoFile:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_CREATE.format(
@@ -814,7 +809,7 @@ def db_info_file_destroy(
     db_info_file_uuid: typing.Union[str, uuid.UUID],
     verify_ssl: bool = True,
 ):
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
         ENDPOINT_DB_INFO_FILE_DESTROY.format(
@@ -837,18 +832,10 @@ def db_info_file_destroy(
 
 
 def small_var_query_list(
-    server_url: str,
-    api_token: str,
-    case_uuid: uuid.UUID,
-    verify_ssl: bool = True,
+    server_url: str, api_token: str, case_uuid: uuid.UUID, verify_ssl: bool = True
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_LIST.format(
-            case_uuid=case_uuid,
-        ),
-    )
+    server_url = strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_LIST.format(case_uuid=case_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -864,13 +851,8 @@ def small_var_query_create(
     case_query: models.CaseQueryV1,
     verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_CREATE.format(
-            case_uuid=case_uuid,
-        ),
-    )
+    server_url = strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_CREATE.format(case_uuid=case_uuid))
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     logger.debug("data = %s", json.dumps(CONVERTER.unstructure(case_query), indent="  "))
@@ -883,18 +865,10 @@ def small_var_query_create(
 
 
 def small_var_query_retrieve(
-    server_url: str,
-    api_token: str,
-    query_uuid: uuid.UUID,
-    verify_ssl: bool = True,
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_RETRIEVE.format(
-            query_uuid=query_uuid,
-        ),
-    )
+    server_url = strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid))
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -904,18 +878,10 @@ def small_var_query_retrieve(
 
 
 def small_var_query_status(
-    server_url: str,
-    api_token: str,
-    query_uuid: uuid.UUID,
-    verify_ssl: bool = True,
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_STATUS.format(
-            query_uuid=query_uuid,
-        ),
-    )
+    server_url = strip_trailing_slash(server_url)
+    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_STATUS.format(query_uuid=query_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
@@ -933,28 +899,14 @@ def small_var_query_update(
 ) -> typing.Dict[str, typing.Any]:
     headers = {"Authorization": "Token %s" % api_token}
 
-    server_url = _strip_trailing_slash(server_url)
-    endpoint_get = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_RETRIEVE.format(
-            query_uuid=query_uuid,
-        ),
-    )
+    server_url = strip_trailing_slash(server_url)
+    endpoint_get = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid))
     logger.debug("Sending GET request to end point %s", endpoint_get)
-    result_get = requests.get(
-        endpoint_get,
-        headers=headers,
-        verify=verify_ssl,
-    )
+    result_get = requests.get(endpoint_get, headers=headers, verify=verify_ssl)
     if not result_get.ok:
         raise _construct_rest_api_call_exception(result_get)
 
-    endpoint_put = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_UPDATE.format(
-            query_uuid=query_uuid,
-        ),
-    )
+    endpoint_put = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_UPDATE.format(query_uuid=query_uuid))
     logger.debug("Sending PUT request to end point %s", endpoint_put)
     if case_query.public is None:
         case_query = attr.evolve(case_query, public=result_get.json()["public"])
@@ -969,17 +921,12 @@ def small_var_query_update(
 
 
 def small_var_query_fetch_results(
-    server_url: str,
-    api_token: str,
-    query_uuid: uuid.UUID,
-    verify_ssl: bool = True,
+    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
-        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(
-            query_uuid=query_uuid,
-        ),
+        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(query_uuid=query_uuid),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
@@ -1003,12 +950,10 @@ def small_var_query_settings_shortcut(
     flags_etc: typing.Optional[str] = None,
     verify_ssl: bool = True,
 ) -> typing.Dict[str, typing.Any]:
-    server_url = _strip_trailing_slash(server_url)
+    server_url = strip_trailing_slash(server_url)
     endpoint = "%s%s" % (
         server_url,
-        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(
-            case_uuid=case_uuid,
-        ),
+        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(case_uuid=case_uuid),
     )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}

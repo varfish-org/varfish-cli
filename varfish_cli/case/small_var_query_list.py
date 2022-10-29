@@ -9,8 +9,8 @@ import attrs
 from logzero import logger
 
 from varfish_cli import api
-from varfish_cli.common import write_output, tabular_output
-from varfish_cli.case.config import OutputFormat, CaseSmallVariantQueryListConfig
+from varfish_cli.case.config import CaseSmallVariantQueryListConfig, OutputFormat
+from varfish_cli.common import tabular_output, write_output
 
 #: The default fields by output format.
 DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {

@@ -1,11 +1,15 @@
-"""Implementation of varfish-cli subcommand."""
+"""Implementation of varfish-cli subcommand 'case'."""
 
 import argparse
 
 from varfish_cli.case.config import CaseConfig, OutputFormat
+from varfish_cli.case.create_case_import import (
+    setup_argparse as setup_argparse_create_import,
+)
 from varfish_cli.case.list_case import setup_argparse as setup_argparse_list
-from varfish_cli.case.list_case_import import setup_argparse as setup_argparse_list_import
-from varfish_cli.case.create_case_import import setup_argparse as setup_argparse_create_import
+from varfish_cli.case.list_case_import import (
+    setup_argparse as setup_argparse_list_import,
+)
 from varfish_cli.case.small_var_query_create import (
     setup_argparse as setup_argparse_small_var_query_create,
 )
@@ -18,16 +22,15 @@ from varfish_cli.case.small_var_query_list import (
 from varfish_cli.case.small_var_query_retrieve import (
     setup_argparse as setup_argparse_small_var_query_retrieve,
 )
+from varfish_cli.case.small_var_query_settings_shortcut import (
+    setup_argparse as setup_argparse_small_var_query_settings_shortcut,
+)
 from varfish_cli.case.small_var_query_status import (
     setup_argparse as setup_argparse_small_var_query_status,
 )
 from varfish_cli.case.small_var_query_update import (
     setup_argparse as setup_argparse_small_var_query_update,
 )
-from varfish_cli.case.small_var_query_settings_shortcut import (
-    setup_argparse as setup_argparse_small_var_query_settings_shortcut,
-)
-
 from varfish_cli.common import run_nocmd
 
 
@@ -41,14 +44,9 @@ def setup_argparse(parser: argparse.ArgumentParser) -> None:
         choices=of_choices,
         default=of_default,
     )
+    parser.add_argument("--output-fields", help="Output fields if non-default ones")
     parser.add_argument(
-        "--output-fields",
-        help="Output fields if non-default ones",
-    )
-    parser.add_argument(
-        "--output-delimiter",
-        help="Separator for CSV output, default: ','",
-        default=",",
+        "--output-delimiter", help="Separator for CSV output, default: ','", default=","
     )
     parser.add_argument(
         "--output-file", help="Path to file to write to, defaults to stdout", default="-"

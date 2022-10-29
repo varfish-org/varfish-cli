@@ -3,45 +3,44 @@
 import argparse
 import enum
 import gzip
+from itertools import chain
 import json
 import os
 import re
 import sys
 import typing
 import uuid
-from itertools import chain
 
-import attr
 import Levenshtein
+import attr
 from logzero import logger
 from tabulate import tabulate
 
 from .. import api
 from ..api import (
-    models,
-    PedigreeMember,
-    GenomeBuild,
-    CaseVariantType,
     BamQcFile,
     CaseGeneAnnotationFile,
-    GenotypeFile,
-    EffectsFile,
-    CaseImportState,
     CaseImportInfo,
+    CaseImportState,
+    CaseVariantType,
     DatabaseInfoFile,
+    EffectsFile,
+    GenomeBuild,
+    GenotypeFile,
+    PedigreeMember,
     VariantSetImportState,
+    models,
 )
-from .config import CaseCreateImportInfoConfig
-
 
 #: Regular expressions of suffixes to remove.
 from ..exceptions import (
+    InconsistentGenomeBuild,
+    InconsistentSamplesDataException,
     MissingFileOnImport,
     RestApiCallException,
-    InconsistentSamplesDataException,
-    InconsistentGenomeBuild,
 )
-from ..parse_ped import parse_ped, DISEASE_MAP, SEX_MAP
+from ..parse_ped import DISEASE_MAP, SEX_MAP, parse_ped
+from .config import CaseCreateImportInfoConfig
 
 REMOVE_SUFFIX_RES = (r"-N.-DNA.-.*$",)
 
@@ -167,12 +166,7 @@ EXPECTED_EFFECTS_SV = [
 ]
 
 #: Expected header for gene annotations.
-EXPECTED_GENE_ANNOTATIONS = [
-    "gene_symbol",
-    "entrez_id",
-    "ensembl_gene_id",
-    "annotation",
-]
+EXPECTED_GENE_ANNOTATIONS = ["gene_symbol", "entrez_id", "ensembl_gene_id", "annotation"]
 
 
 @attr.s(frozen=True, auto_attribs=True)

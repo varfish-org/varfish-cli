@@ -5,7 +5,7 @@ import uuid
 import requests_mock
 
 from varfish_cli.__main__ import main
-from varfish_cli.api import models, CONVERTER
+from varfish_cli.api import CONVERTER, models
 
 
 def test_run_case_list():

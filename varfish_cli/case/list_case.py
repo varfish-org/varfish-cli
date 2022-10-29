@@ -1,18 +1,17 @@
 """Implementation of ``varfish-cli case list``."""
 
-import attrs
 import argparse
 import json
 import sys
 import typing
 import uuid
 
+import attrs
 from logzero import logger
 
 from varfish_cli import api
-from varfish_cli.common import write_output, tabular_output
-from varfish_cli.case.config import OutputFormat, CaseListConfig
-
+from varfish_cli.case.config import CaseListConfig, OutputFormat
+from varfish_cli.common import tabular_output, write_output
 
 #: The default fields to use for output.
 DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {
