@@ -2,9 +2,9 @@
 History
 =======
 
------------------
-HEAD (unreleased)
------------------
+------
+v0.4.0
+------
 
 - Adding support for varannos REST API (#24).
 
