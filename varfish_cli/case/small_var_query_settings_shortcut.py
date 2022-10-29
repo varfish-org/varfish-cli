@@ -10,14 +10,7 @@ from logzero import logger
 from varfish_cli import api
 from varfish_cli.case.config import CaseSmallVariantQueryShortcut
 
-KEYS = (
-    "inheritance",
-    "frequency",
-    "impact",
-    "quality",
-    "chromosomes",
-    "flags_etc",
-)
+KEYS = ("inheritance", "frequency", "impact", "quality", "chromosomes", "flags_etc")
 
 
 def setup_argparse(parser):

@@ -8,8 +8,8 @@ import uuid
 from logzero import logger
 
 from varfish_cli import api
-from varfish_cli.common import CustomEncoder
 from varfish_cli.case.config import CaseSmallVariantQueryCreateConfig
+from varfish_cli.common import CustomEncoder
 
 
 def setup_argparse(parser):

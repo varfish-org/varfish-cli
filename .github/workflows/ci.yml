@@ -42,3 +42,5 @@ jobs:
         if: ${{ matrix.python-version < '3.9' }}
       - name: Check style with flake8
         run: flake8 .
+      - name: Check with isort
+        run: isort --force-sort-within-sections --profile=black --check .

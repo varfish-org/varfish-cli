@@ -1,14 +1,14 @@
 """Shared code."""
 
-import attr
 import csv
 import datetime
-from enum import unique, Enum
+from enum import Enum, unique
 import io
 import json
 import typing
 import uuid
 
+import attr
 from tabulate import tabulate
 
 
@@ -116,3 +116,9 @@ def tabular_output(
             row.append(the_value)
         output.append(row)
     return output
+
+
+def strip_trailing_slash(s: str) -> str:
+    while s.endswith("/"):
+        s = s[:-1]
+    return s

@@ -33,10 +33,7 @@ def run(config, toml_config, args, _parser, _subparser, file=sys.stdout):
     logger.info("Configuration: %s", config)
     logger.info("Updating query")
     base_config = config.case_config.global_config
-    case_query = api.CaseQueryV1(
-        name=args.name,
-        public=args.public,
-    )
+    case_query = api.CaseQueryV1(name=args.name, public=args.public)
     res = api.small_var_query_update(
         server_url=base_config.varfish_server_url,
         api_token=base_config.varfish_api_token,

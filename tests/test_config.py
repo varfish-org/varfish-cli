@@ -1,9 +1,9 @@
 from types import SimpleNamespace
 
-from varfish_cli.common import CommonConfig
-from varfish_cli.case import config
-
 import pytest
+
+from varfish_cli.case import config
+from varfish_cli.common import CommonConfig
 
 
 @pytest.fixture
