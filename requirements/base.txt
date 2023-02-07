@@ -2,7 +2,7 @@
 
 # Attrs, helpful for removing boilerplate, cattr is for serialization/deserializaton.
 attrs >=21.2.0,<22.0
-cattrs >=1.7.1,<2..0
+cattrs >=1.7.1,<2.0
 # Easy date parsing (e.g., from API).
 python-dateutil >=2.8.1,<3.0
 
@@ -22,7 +22,7 @@ simplejson >=3.17.2,<4.0
 requests >=2.25.1,<3.0
 
 # Useful progress display.
-tqdm >=4.61.1<5.0
+tqdm >=4.61.1,<5.0
 
 # Tabular display.
 tabulate >=0.8.9,<0.9
