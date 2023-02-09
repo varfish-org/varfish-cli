@@ -1,10 +1,6 @@
-.. image:: https://github.com/bihealth/varfish-cli/workflows/CI/badge.svg
-    :target: https://github.com/bihealth/varfish-cli/actions
-    :alt: Continuous Integration Status
-
-.. image:: https://img.shields.io/badge/License-MIT-green.svg
-    :alt: MIT License
-    :target: https://opensource.org/licenses/MIT
+[![CI Status](https://github.com/bihealth/varfish-cli/workflows/main/badge.svg)](https://github.com/bihealth/varfish-cli/actions)
+[![codecov](https://codecov.io/gh/bihealth/varfish-cli/branch/main/graph/badge.svg?token=9ZX53MPEJT)](https://codecov.io/gh/bihealth/varfish-cli)
+[![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
 # VarFish CLI
 
