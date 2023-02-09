@@ -30,7 +30,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-            pip install -r requirements/test.txt
+            pip install -r requirements/test_black.txt
             pip freeze
 
       - name: Run linting tools
