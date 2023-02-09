@@ -1,4 +1,4 @@
-[![CI Status](https://github.com/bihealth/varfish-cli/workflows/main/badge.svg)](https://github.com/bihealth/varfish-cli/actions)
+[![CI](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml/badge.svg)](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/bihealth/varfish-cli/branch/main/graph/badge.svg?token=9ZX53MPEJT)](https://codecov.io/gh/bihealth/varfish-cli)
 [![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
