@@ -22,13 +22,13 @@ simplejson >=3.17.2,<4.0
 requests >=2.25.1,<3.0
 
 # Useful progress display.
-tqdm >=4.61.1<5.0
+tqdm >=4.61.1,<5.0
 
 # Tabular display.
 tabulate >=0.8.9,<0.9
 
 # Levenshtein distance.
-python-Levenshtein >=0.12.2,<0.13
+polyleven >=0.8,<0.9
 
 # JSON schema.
 jsonschema >=4.4.0,<4.5

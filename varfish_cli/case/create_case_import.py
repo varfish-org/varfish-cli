@@ -11,7 +11,7 @@ import sys
 import typing
 import uuid
 
-import Levenshtein
+import polyleven
 import attr
 from logzero import logger
 from tabulate import tabulate
@@ -451,7 +451,7 @@ class CaseImporter:
 
             for is_sv, paths in (False, self.paths_genotype), (True, self.paths_genotype_sv):
                 for path in paths:
-                    dist = Levenshtein.distance(db_info_file.path, path.path)
+                    dist = polyleven.levenshtein(db_info_file.path, path.path)
                     if best_dist is None or best_dist > dist:
                         best_is_sv = is_sv
                         best_dist = dist
