@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.1](https://www.github.com/bihealth/varfish-cli/compare/v0.5.0...v0.5.1) (2023-02-09)
+
+
+### Bug Fixes
+
+* manifest for readme and changelog ([#35](https://www.github.com/bihealth/varfish-cli/issues/35)) ([f14d647](https://www.github.com/bihealth/varfish-cli/commit/f14d6472728995b9e18726fbfb7c36e86319c999))
+
 ## [0.5.0](https://www.github.com/bihealth/varfish-cli/compare/v0.4.0...v0.5.0) (2023-02-09)
 
 
