@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.5.0](https://www.github.com/bihealth/varfish-cli/compare/v0.4.0...v0.5.0) (2023-02-09)
+
+
+### Features
+
+* replace python-Levenshtein with polyleven ([#26](https://www.github.com/bihealth/varfish-cli/issues/26)) ([#32](https://www.github.com/bihealth/varfish-cli/issues/32)) ([73703bd](https://www.github.com/bihealth/varfish-cli/commit/73703bd73796b066de689954caa19a5767f97d76))
+
+
+### Documentation
+
+* fixing CI status badge ([#34](https://www.github.com/bihealth/varfish-cli/issues/34)) ([9967bbd](https://www.github.com/bihealth/varfish-cli/commit/9967bbd7a706d8338c188468a67a8bbebdb7a330))
+
 ## 0.4.0
 
 - Adding support for varannos REST API (#24).
