@@ -23,11 +23,11 @@ def parse_requirements(path):
     return requirements
 
 
-with open("README.rst") as readme_file:
+with open("README.md") as readme_file:
     readme = readme_file.read()
 
-with open("HISTORY.rst") as history_file:
-    history = history_file.read()
+with open("CHANGELOG.md") as changelog_file:
+    changelog = changelog_file.read()
 
 test_requirements = parse_requirements("requirements/test.txt")
 install_requirements = parse_requirements("requirements/base.txt")
@@ -50,7 +50,8 @@ setup(
     description="Command line interface client for VarFish Server.",
     install_requires=install_requirements,
     license="MIT license",
-    long_description=readme + "\n\n" + history,
+    long_description=readme + "\n\n" + changelog,
+    long_description_content_type="text/markdown",
     include_package_data=True,
     keywords="varfish_cli",
     name="varfish_cli",
