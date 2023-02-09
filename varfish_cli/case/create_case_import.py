@@ -11,9 +11,9 @@ import sys
 import typing
 import uuid
 
-import polyleven
 import attr
 from logzero import logger
+import polyleven
 from tabulate import tabulate
 
 from .. import api
