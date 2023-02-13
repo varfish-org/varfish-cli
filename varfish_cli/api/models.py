@@ -50,9 +50,9 @@ class Case:
     #: Number of SVs in case.
     num_svs: typing.Optional[int]
     #: Cusom User Notes
-    notes: str
+    notes: typing.Optional[str] = None
     #: Status of case. Can be either "active" "closed-<solved|unsolved>" or "initial"
-    status: str
+    status: typing.Optional[str] = None
 
 
 class CaseImportState(Enum):

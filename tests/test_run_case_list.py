@@ -10,24 +10,32 @@ from varfish_cli.api import CONVERTER, models
 
 def test_run_case_list():
     url = "https://varfish.example.com"
-    address = "%s/variants/api/case/list/c3752df7-fa32-4784-8a48-e8f0e5a28790/" % url
+    address = "%s/cases/api/case/list/c3752df7-fa32-4784-8a48-e8f0e5a28790/" % url
     cases = CONVERTER.unstructure(
-        [
-            models.Case(
-                sodar_uuid=str(uuid.uuid4()),
-                date_created=datetime.datetime.now(),
-                date_modified=datetime.datetime.now(),
-                name="Case_Name",
-                index="index",
-                pedigree=[
-                    models.PedigreeMember(
-                        name="index", father="0", mother="0", sex=2, affected=2, has_gt_entries=True
-                    )
-                ],
-                num_small_vars=123,
-                num_svs=456,
-            )
-        ]
+        {
+            "next": None,
+            "results": [
+                models.Case(
+                    sodar_uuid=str(uuid.uuid4()),
+                    date_created=datetime.datetime.now(),
+                    date_modified=datetime.datetime.now(),
+                    name="Case_Name",
+                    index="index",
+                    pedigree=[
+                        models.PedigreeMember(
+                            name="index",
+                            father="0",
+                            mother="0",
+                            sex=2,
+                            affected=2,
+                            has_gt_entries=True,
+                        )
+                    ],
+                    num_small_vars=123,
+                    num_svs=456,
+                )
+            ],
+        }
     )
     with requests_mock.Mocker() as m:
         m.get(address, json=cases)
