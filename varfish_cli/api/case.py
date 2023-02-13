@@ -34,7 +34,7 @@ ACCEPT_API_VARFISH = ""
 
 
 #: End point for listing cases.
-ENDPOINT_CASE_LIST = "/variants/api/case/list/{project_uuid}/"
+ENDPOINT_CASE_LIST = "/cases/api/case/list/{project_uuid}/"
 #: End point for fetching case information.
 ENDPOINT_CASE_RETRIEVE = "/variants/api/case/retrieve/{case_uuid}"
 #: End point for listing case import infos.
@@ -127,6 +127,24 @@ def _construct_rest_api_call_exception(response: requests.Response) -> RestApiCa
     return RestApiCallException(msg)
 
 
+def _paginated_request(endpoint, result_data=None, **kwargs):
+    if not endpoint:
+        return result_data
+
+    if result_data is None:
+        result_data = []
+
+    result = requests.get(endpoint, **kwargs)
+    result.raise_for_status()
+
+    result_json = result.json()
+    if "results" in result_json and "next" in result_json:
+        result_data += result_json["results"]
+        return _paginated_request(result_json["next"], result_data=result_data, **kwargs)
+    else:
+        raise RestApiCallException(f"Call against {endpoint} did not return paginated object: {result_json}")
+
+
 def case_list(
     server_url: str,
     api_token: str,
@@ -138,9 +156,8 @@ def case_list(
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_LIST.format(project_uuid=project_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
-    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    result.raise_for_status()
-    return CONVERTER.structure(result.json(), typing.List[Case])
+    result = _paginated_request(endpoint, headers=headers, verify=verify_ssl, params={"page_size": 100})
+    return CONVERTER.structure(result, typing.List[Case])
 
 
 def case_retrieve(
