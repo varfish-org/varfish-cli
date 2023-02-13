@@ -142,7 +142,9 @@ def _paginated_request(endpoint, result_data=None, **kwargs):
         result_data += result_json["results"]
         return _paginated_request(result_json["next"], result_data=result_data, **kwargs)
     else:
-        raise RestApiCallException(f"Call against {endpoint} did not return paginated object: {result_json}")
+        raise RestApiCallException(
+            f"Call against {endpoint} did not return paginated object: {result_json}"
+        )
 
 
 def case_list(
@@ -156,7 +158,9 @@ def case_list(
     endpoint = "%s%s" % (server_url, ENDPOINT_CASE_LIST.format(project_uuid=project_uuid))
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
-    result = _paginated_request(endpoint, headers=headers, verify=verify_ssl, params={"page_size": 100})
+    result = _paginated_request(
+        endpoint, headers=headers, verify=verify_ssl, params={"page_size": 100}
+    )
     return CONVERTER.structure(result, typing.List[Case])
 
 
