@@ -1,5 +1,12 @@
 # Changelog
 
+### [0.5.2](https://www.github.com/bihealth/varfish-cli/compare/v0.5.1...v0.5.2) (2023-06-12)
+
+
+### Bug Fixes
+
+* Fixing case list API ([#37](https://www.github.com/bihealth/varfish-cli/issues/37)) ([ccaccfc](https://www.github.com/bihealth/varfish-cli/commit/ccaccfcbec7fb209492f1855b5e740f20ac60bbc))
+
 ### [0.5.1](https://www.github.com/bihealth/varfish-cli/compare/v0.5.0...v0.5.1) (2023-02-09)
 
 
