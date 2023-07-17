@@ -24,7 +24,6 @@ from ..api import (
     CaseImportState,
     CaseVariantType,
     DatabaseInfoFile,
-    EffectsFile,
     GenomeBuild,
     GenotypeFile,
     PedigreeMember,
@@ -476,7 +475,7 @@ class CaseImporter:
         if not self.path_ped:
             issues.append("no PED file given")
         if len(self.paths_effect_sv):
-            logging.info("Will ignore any SV effect files")
+            logger.info("Will ignore any SV effect files")
         if not self.paths_genotype and not self.paths_genotype_sv:
             issues.append("neither small nor SVs given")
         if len(self.paths_genotype) > 1:
