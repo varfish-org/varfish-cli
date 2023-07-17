@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.5.3](https://github.com/bihealth/varfish-cli/compare/v0.5.2...v0.5.3) (2023-07-17)
+
+
+### Features
+
+* force release of 0.6 ([#46](https://github.com/bihealth/varfish-cli/issues/46)) ([f003be8](https://github.com/bihealth/varfish-cli/commit/f003be8b1f953ff4ab22f7d274264747dd39870d))
+
+
+### Bug Fixes
+
+* allow varfish upload without SV effects ([#43](https://github.com/bihealth/varfish-cli/issues/43)) ([4aead65](https://github.com/bihealth/varfish-cli/commit/4aead65054e97adf7564f8fb3d3a3e0db755c34f))
+* fixing issue with logging ([ab62f24](https://github.com/bihealth/varfish-cli/commit/ab62f242445150c2472aa45ea0c0f6d7782a7b8c))
+
 ### [0.5.2](https://www.github.com/bihealth/varfish-cli/compare/v0.5.1...v0.5.2) (2023-07-17)
 
 
