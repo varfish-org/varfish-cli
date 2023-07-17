@@ -475,11 +475,8 @@ class CaseImporter:
         issues = []
         if not self.path_ped:
             issues.append("no PED file given")
-        if len(self.paths_genotype_sv) != len(self.paths_effect_sv):
-            issues.append(
-                "different number of SV genotypes (%d)/effects (%d)"
-                % (len(self.paths_genotype_sv), len(self.paths_effect_sv))
-            )
+        if len(self.paths_effect_sv):
+            logging.info("Will ignore any SV effect files")
         if not self.paths_genotype and not self.paths_genotype_sv:
             issues.append("neither small nor SVs given")
         if len(self.paths_genotype) > 1:
@@ -784,18 +781,6 @@ class CaseImporter:
                     api_create_func=api.genotype_file_upload,
                 )
                 for path in self.paths_genotype_sv
-            ]
-            good_md5s += [
-                self._perform_file_upload(
-                    path=path.path,
-                    api_list_func=api.effects_file_list,
-                    func_uuid_arg="variant_set_import_info_uuid",
-                    uuid_value=variant_set_import_info.sodar_uuid,
-                    obj_type="effects file",
-                    file_type=EffectsFile,
-                    api_create_func=api.effects_file_upload,
-                )
-                for path in self.paths_effect_sv
             ]
             good_md5s += [
                 self._perform_file_upload(
