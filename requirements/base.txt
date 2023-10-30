@@ -12,9 +12,6 @@ jsonschema >=4.4,<4.5
 # Easy logging.
 logzero >=1.7.0,<2.0
 
-# Compact, round-tripable configuration format.
-toml >=0.10.2,<0.11
-
 # simplejson has better encoders/decoders
 simplejson >=3.17.2,<4.0
 

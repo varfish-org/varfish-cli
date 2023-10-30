@@ -3,7 +3,8 @@
 import argparse
 
 from varfish_cli.common import run_nocmd
-from varfish_cli.varannos.config import OutputFormat, VarannosConfig
+from varfish_cli.varannos.config import OutputFormat
+from varfish_cli.varannos.config import VarannosConfig
 from varfish_cli.varannos.varannoset_destroy import (
     setup_argparse as setup_argparse_varannoset_destroy,
 )
