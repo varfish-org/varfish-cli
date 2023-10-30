@@ -1,7 +1,7 @@
 .. _manual-main:
 
 Welcome to VarFish CLI documentation!
-====================================
+=====================================
 
 * TODO
 
