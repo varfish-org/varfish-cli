@@ -1,13 +1,13 @@
 """Implementation of varfish-cli subcommand 'varannos'."""
 
-import uuid
 import typing
+import uuid
 
 import typer
-from varfish_cli.cli.common import ListObjects, RetrieveObject
 
-from varfish_cli.common import OutputFormat
 from varfish_cli import api, common
+from varfish_cli.cli.common import ListObjects, RetrieveObject
+from varfish_cli.common import OutputFormat
 
 #: Default fields for varannos.
 DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {

@@ -30,6 +30,6 @@ flake8:
 lint: flake8 isort-check black-check
 # lint: flake8 isort-check black-check mypy
 
-.PHONY: pytest
-pytest:
+.PHONY: test
+test:
 	pytest .

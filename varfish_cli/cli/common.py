@@ -1,15 +1,15 @@
 """Common code for the CLI."""
 
 import json
+import sys
 import typing
 import uuid
-import sys
+
 import attrs
-
-import pydantic
 from logzero import logger
-from varfish_cli import api, common, config
+import pydantic
 
+from varfish_cli import api, common, config
 from varfish_cli.common import OutputFormat
 
 
@@ -43,6 +43,14 @@ class ListObjects(pydantic.BaseModel):
         kwargs = {}
         if self.project_uuid:
             kwargs["project_uuid"] = self.project_uuid
+        logger.info(
+            "args = %s",
+            (
+                self.common_options.varfish_server_url,
+                self.common_options.varfish_api_token.get_secret_value(),
+                self.common_options.verify_ssl,
+            ),
+        )
         res = self.callable(
             server_url=self.common_options.varfish_server_url,
             api_token=self.common_options.varfish_api_token.get_secret_value(),
@@ -96,9 +104,7 @@ class RetrieveObject(pydantic.BaseModel):
     ):
         logger.info("Configuration: %s", config)
         logger.info(f"Retrieving {self.typ} object")
-        kwargs = {
-            self.key_name: self.object_uuid
-        }
+        kwargs = {self.key_name: self.object_uuid}
         res = self.callable(
             server_url=self.common_options.varfish_server_url,
             api_token=self.common_options.varfish_api_token.get_secret_value(),

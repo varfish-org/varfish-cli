@@ -9,6 +9,10 @@ class VarFishException(BaseException):
     """Base exception class."""
 
 
+class InvalidConfiguration(VarFishException):
+    """Raised on invalid configuration."""
+
+
 class MissingFileOnImport(BaseException):
     """Raised when not all necessary files are present during import."""
 

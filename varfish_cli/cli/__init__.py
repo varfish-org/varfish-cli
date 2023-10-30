@@ -3,13 +3,13 @@
 import logging
 import typing
 
-import typer
 import logzero
-from logzero import logger
+import typer
 
 from varfish_cli import __version__
 from varfish_cli.cli import projects, varannos
 from varfish_cli.config import CommonOptions, load_config
+from varfish_cli.exceptions import InvalidConfiguration
 
 #: Paths to search the global configuration in.
 DEFAULT_PATH_VARFISHRC = "~/.varfishrc.toml"
@@ -100,6 +100,9 @@ def main(
     if toml_varfish_api_token and not varfish_api_token:
         varfish_api_token = toml_varfish_api_token
 
+    if not varfish_server_url or not varfish_api_token:
+        raise InvalidConfiguration("Need to specify server URL and API token")
+
     # Construct common options
     ctx.obj = CommonOptions(
         verbose=verbose,
@@ -108,7 +111,6 @@ def main(
         varfish_server_url=varfish_server_url,
         varfish_api_token=varfish_api_token,
     )
-    logger.info("global configuration = %s", ctx.obj.model_dump_json())
 
 
 #: Define ``typer`` object that can be called from ``__main__.py``.
