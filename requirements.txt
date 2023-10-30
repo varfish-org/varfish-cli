@@ -1,1 +1,37 @@
-requirements/base.txt
+# Base requirements
+
+# Attrs, helpful for removing boilerplate, cattr is for serialization/deserializaton.
+attrs >=21.2.0,<24.0
+cattrs >=1.7.1,<2.0
+# Easy date parsing (e.g., from API).
+python-dateutil >=2.8.1,<3.0
+
+# JSON Schema
+jsonschema >=4.4,<4.5
+
+# Easy logging.
+logzero >=1.7.0,<2.0
+
+# Compact, round-tripable configuration format.
+toml >=0.10.2,<0.11
+
+# simplejson has better encoders/decoders
+simplejson >=3.17.2,<4.0
+
+# HTTP requests for humans.
+requests >=2.25.1,<3.0
+
+# Useful progress display.
+tqdm >=4.61.1,<5.0
+
+# Tabular display.
+tabulate >=0.8.9,<0.9
+
+# Levenshtein distance.
+polyleven >=0.8,<0.9
+
+# JSON schema.
+jsonschema >=4.4.0,<4.5
+
+# Type checking
+typeguard >=2.13.3,<3.0
