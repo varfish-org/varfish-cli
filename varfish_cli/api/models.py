@@ -11,6 +11,36 @@ import cattr
 import dateutil.parser
 
 
+@unique
+class ProjectType(Enum):
+    """Enumeration of possible project types."""
+
+    #: Container for other categories or projects but not primary data.
+    CATEGORY = "CATEGORY"
+    #: Project containing primary data but no other projects.
+    PROJECT = "PROJECT"
+
+
+@attr.s(frozen=True, auto_attribs=True)
+class Project:
+    #: The project identifier.
+    sodar_uuid: uuid.UUID
+    #: Parent category UUID, if any.
+    parent: typing.Optional[uuid.UUID]
+    #: Project title.
+    title: str
+    #: Project type.
+    type: ProjectType
+    #: Project description.
+    description: str
+    #: Markdown README string.
+    readme: str
+    #: Whether public guest access is allowed.
+    public_guest_access: bool
+    #: Whether the project has been archived.
+    archive: bool
+
+
 @attr.s(frozen=True, auto_attribs=True)
 class PedigreeMember:
     """Represent a pedigree member as returned by the VarFish API."""

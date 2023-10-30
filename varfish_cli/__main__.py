@@ -13,6 +13,8 @@ from varfish_cli import __version__
 from varfish_cli.case import run as run_case
 from varfish_cli.case import setup_argparse as setup_argparse_case
 from varfish_cli.common import CommonConfig, run_nocmd
+from varfish_cli.projects import run as run_projects
+from varfish_cli.projects import setup_argparse as setup_argparse_projects
 from varfish_cli.varannos import run as run_varannos
 from varfish_cli.varannos import setup_argparse as setup_argparse_varannos
 
@@ -63,6 +65,7 @@ def setup_argparse():
     subparsers = parser.add_subparsers(dest="cmd")
 
     setup_argparse_case(subparsers.add_parser("case", help="Work with cases."))
+    setup_argparse_projects(subparsers.add_parser("projects", help="Work with projects."))
     setup_argparse_varannos(subparsers.add_parser("varannos", help="Work with varannos module."))
 
     return parser, subparsers
@@ -107,7 +110,7 @@ def main(argv=None):
     config = CommonConfig.create(args, toml_config)
 
     # Handle the actual command line.
-    cmds = {None: run_nocmd, "case": run_case, "varannos": run_varannos}
+    cmds = {None: run_nocmd, "case": run_case, "varannos": run_varannos, "projects": run_projects}
 
     res = cmds[args.cmd](
         config, toml_config, args, parser, subparsers.choices[args.cmd] if args.cmd else None
