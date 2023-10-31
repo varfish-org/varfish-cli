@@ -118,3 +118,84 @@ class RetrieveObject(typing.Generic[ModelType]):
                 json.dump(res_json, outputf, indent=2)
                 outputf.write("\n")
         logger.info("All done. Have a nice day!")
+
+
+class CreateObject(typing.Generic[ModelType]):
+    """Utility class to create one object."""
+
+    def __init__(self, model: typing.Type[ModelType]):
+        self.model = model
+
+    def run(
+        self,
+        common_options: config.CommonOptions,
+        callable: typing.Callable,
+        parent_key_name: str,
+        parent_uuid: uuid.UUID,
+        payload: typing.Any,
+        output_file: str,
+    ):
+        logger.info("Configuration: %s", config)
+        logger.info(f"Creating {self.model.__name__} object")
+        kwargs = {parent_key_name: parent_uuid}
+        res = callable(
+            server_url=common_options.varfish_server_url,
+            api_token=common_options.varfish_api_token.get_secret_value(),
+            verify_ssl=common_options.verify_ssl,
+            payload=payload,
+            **kwargs,
+        )
+        print(res)
+        res_json = api.CONVERTER.unstructure(res)
+
+        logger.info(f"{self.model.__name__} Detail")
+        logger.info("============" + "=" * len(str(self.model.__name__)))
+        if output_file == "-":
+            json.dump(res_json, sys.stdout, indent=2)
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        else:
+            with open(output_file, "wt") as outputf:
+                json.dump(res_json, outputf, indent=2)
+                outputf.write("\n")
+        logger.info("All done. Have a nice day!")
+
+
+class UpdateObject(typing.Generic[ModelType]):
+    """Utility class to update one object."""
+
+    def __init__(self, model: typing.Type[ModelType]):
+        self.model = model
+
+    def run(
+        self,
+        common_options: config.CommonOptions,
+        callable: typing.Callable,
+        object_key_name: str,
+        object_uuid: uuid.UUID,
+        payload: typing.Any,
+        output_file: str,
+    ):
+        logger.info("Configuration: %s", config)
+        logger.info(f"Updating {self.model.__name__} object")
+        kwargs = {object_key_name: object_uuid}
+        res = callable(
+            server_url=common_options.varfish_server_url,
+            api_token=common_options.varfish_api_token.get_secret_value(),
+            verify_ssl=common_options.verify_ssl,
+            payload=payload,
+            **kwargs,
+        )
+        res_json = api.CONVERTER.unstructure(res)
+
+        logger.info(f"{self.model.__name__} Detail")
+        logger.info("============" + "=" * len(str(self.model.__name__)))
+        if output_file == "-":
+            json.dump(res_json, sys.stdout, indent=2)
+            sys.stdout.write("\n")
+            sys.stdout.flush()
+        else:
+            with open(output_file, "wt") as outputf:
+                json.dump(res_json, outputf, indent=2)
+                outputf.write("\n")
+        logger.info("All done. Have a nice day!")

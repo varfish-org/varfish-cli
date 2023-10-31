@@ -2,6 +2,7 @@
 
 import json
 import typing
+import uuid
 
 import pytest
 from pytest_mock import MockerFixture
@@ -42,7 +43,7 @@ def test_project_list_empty(
 
     mocker.stopall()
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
     assert result.output == "[]\n"
 
 
@@ -75,5 +76,39 @@ def test_project_list_two_elements(
 
     mocker.stopall()
 
-    assert result.exit_code == 0
+    assert result.exit_code == 0, result.output
+    snapshot.assert_match(result.output, "result_output")
+
+
+@pytest.fixture
+def project_retrieve_result() -> typing.List[typing.Any]:
+    with open("tests/cli/data/projects_project-list.len-2.json", "rt") as inputf:
+        return json.load(inputf)[0]
+
+
+def test_project_retrieve(
+    runner: CliRunner,
+    fake_fs_configured: FakeFs,
+    requests_mock: RequestsMocker,
+    fake_conn: typing.Tuple[str, str],
+    project_retrieve_result,
+    snapshot: Snapshot,
+    mocker: MockerFixture,
+):
+    mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
+    mocker.patch("varfish_cli.config.os", fake_fs_configured.os)
+
+    project_uuid = str(uuid.uuid4())
+    host, token = fake_conn
+    m = requests_mock.get(
+        f"{host}/project/api/retrieve/{project_uuid}",
+        json=project_retrieve_result,
+        request_headers={"Authorization": f"Token {token}"},
+    )
+    _ = m
+    result = runner.invoke(app, ["--verbose", "projects", "project-retrieve", project_uuid])
+
+    mocker.stopall()
+
+    assert result.exit_code == 0, result.output
     snapshot.assert_match(result.output, "result_output")

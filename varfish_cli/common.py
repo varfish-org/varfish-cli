@@ -92,7 +92,7 @@ def write_output(
         output_json = []
         for obj in output[1:]:
             output_json.append(dict(zip(header, obj)))
-        json.dump(output_json, output_file, cls=CustomEncoder)
+        json.dump(output_json, output_file, cls=CustomEncoder, indent=2)
     else:
         output_file.write(tabulate(output[1:], headers=output[0], tablefmt="grid"))
     output_file.write("\n")
@@ -122,3 +122,12 @@ def strip_trailing_slash(s: str) -> str:
     while s.endswith("/"):
         s = s[:-1]
     return s
+
+
+def load_json(path_or_payload: str) -> typing.Any:
+    """Load JSON from file or string."""
+    if path_or_payload.startswith("@"):
+        with open(path_or_payload[1:], "rt") as inputf:
+            return json.load(inputf)
+    else:
+        return json.loads(path_or_payload)

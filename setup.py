@@ -5,8 +5,6 @@ import os.path
 
 from setuptools import find_packages, setup
 
-import versioneer
-
 
 def parse_requirements(path):
     """Parse ``requirements.txt`` at ``path``."""
@@ -58,7 +56,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/bihealth/varfish-cli",
-    version=versioneer.get_version(),
-    cmdclass=versioneer.get_cmdclass(),
+    version=__version__,
     zip_safe=False,
 )

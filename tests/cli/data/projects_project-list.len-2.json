@@ -1,50 +1,50 @@
 [
-    {
-        "title": "Test Category",
-        "type": "CATEGORY",
-        "parent": null,
-        "description": null,
-        "readme": "",
-        "public_guest_access": false,
-        "archive": false,
-        "roles": {
-            "8d09baae-88e0-4815-8399-665521ed0a24": {
-                "role": "project owner",
-                "user": {
-                    "username": "root",
-                    "name": "",
-                    "email": "",
-                    "is_superuser": true,
-                    "sodar_uuid": "d8093a2c-ac9f-4f14-bd11-23e283318b97"
-                },
-                "sodar_uuid": "8d09baae-88e0-4815-8399-665521ed0a24",
-                "inherited": false
-            }
+  {
+    "title": "Test Category",
+    "type": "CATEGORY",
+    "parent": null,
+    "description": null,
+    "readme": "",
+    "public_guest_access": false,
+    "archive": false,
+    "roles": {
+      "8d09baae-88e0-4815-8399-665521ed0a24": {
+        "role": "project owner",
+        "user": {
+          "username": "root",
+          "name": "",
+          "email": "",
+          "is_superuser": true,
+          "sodar_uuid": "d8093a2c-ac9f-4f14-bd11-23e283318b97"
         },
-        "sodar_uuid": "4071c7f5-7694-47f6-9dd9-d2834d4b0164"
+        "sodar_uuid": "8d09baae-88e0-4815-8399-665521ed0a24",
+        "inherited": false
+      }
     },
-    {
-        "title": "Test Project",
-        "type": "PROJECT",
-        "parent": "4071c7f5-7694-47f6-9dd9-d2834d4b0164",
-        "description": null,
-        "readme": "",
-        "public_guest_access": false,
-        "archive": false,
-        "roles": {
-            "dc5a378e-ce50-4d0c-aca5-84d9b2e600a0": {
-                "role": "project owner",
-                "user": {
-                    "username": "root",
-                    "name": "",
-                    "email": "",
-                    "is_superuser": true,
-                    "sodar_uuid": "d8093a2c-ac9f-4f14-bd11-23e283318b97"
-                },
-                "sodar_uuid": "dc5a378e-ce50-4d0c-aca5-84d9b2e600a0",
-                "inherited": false
-            }
+    "sodar_uuid": "4071c7f5-7694-47f6-9dd9-d2834d4b0164"
+  },
+  {
+    "title": "Test Project",
+    "type": "PROJECT",
+    "parent": "4071c7f5-7694-47f6-9dd9-d2834d4b0164",
+    "description": null,
+    "readme": "",
+    "public_guest_access": false,
+    "archive": false,
+    "roles": {
+      "dc5a378e-ce50-4d0c-aca5-84d9b2e600a0": {
+        "role": "project owner",
+        "user": {
+          "username": "root",
+          "name": "",
+          "email": "",
+          "is_superuser": true,
+          "sodar_uuid": "d8093a2c-ac9f-4f14-bd11-23e283318b97"
         },
-        "sodar_uuid": "25cd0ca4-05bd-41dc-930d-bef805e92d0f"
-    }
+        "sodar_uuid": "dc5a378e-ce50-4d0c-aca5-84d9b2e600a0",
+        "inherited": false
+      }
+    },
+    "sodar_uuid": "25cd0ca4-05bd-41dc-930d-bef805e92d0f"
+  }
 ]

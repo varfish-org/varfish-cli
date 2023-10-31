@@ -68,7 +68,8 @@ def varannoset_create(
         endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetV1])
+    print(result.json())
+    return CONVERTER.structure(result.json(), VarAnnoSetV1)
 
 
 def varannoset_retrieve(

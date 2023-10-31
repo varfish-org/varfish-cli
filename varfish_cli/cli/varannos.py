@@ -6,7 +6,7 @@ import uuid
 import typer
 
 from varfish_cli import api, common
-from varfish_cli.cli.common import ListObjects, RetrieveObject
+from varfish_cli.cli.common import ListObjects, RetrieveObject, CreateObject, UpdateObject
 from varfish_cli.common import OutputFormat
 
 #: Default fields for varannos.
@@ -49,8 +49,8 @@ def cli_varannoset_list(
     """List all Varannoset entries for the"""
     common_options: common.CommonOptions = ctx.obj
 
-    lister = ListObjects(api.VarAnnoSetV1)
-    return lister.run(
+    list_objects = ListObjects(api.VarAnnoSetV1)
+    return list_objects.run(
         common_options=common_options,
         callable=api.varannoset_list,
         output_file=output_file,
@@ -75,11 +75,69 @@ def cli_varannoset_retrieve(
     """Retrieve Varannoset by UUID"""
     common_options: common.CommonOptions = ctx.obj
 
-    retriever = RetrieveObject(api.Project)
-    return retriever.run(
+    retrieve_object = RetrieveObject(api.Project)
+    return retrieve_object.run(
         common_options=common_options,
         callable=api.varannoset_retrieve,
         key_name="varannoset_uuid",
         object_uuid=object_uuid,
+        output_file=output_file,
+    )
+
+
+@app.command("varannoset-create")
+def cli_varannoset_create(
+    ctx: typer.Context,
+    project_uuid: typing.Annotated[
+        uuid.UUID, typer.Argument(..., help="UUID of the project to create it in")
+    ],
+    payload_or_path: typing.Annotated[
+        str, typer.Argument(..., help="JSON with payload to use or @path with JSON")
+    ] = "-",
+    output_file: typing.Annotated[
+        str, typer.Option("--output-file", help="Path to file to write to")
+    ] = "-",
+):
+    """Create new Varannoset"""
+    common_options: common.CommonOptions = ctx.obj
+
+    payload = common.load_json(payload_or_path)
+
+    create_object = CreateObject(api.Project)
+    return create_object.run(
+        common_options=common_options,
+        callable=api.varannoset_create,
+        parent_key_name="project_uuid",
+        parent_uuid=project_uuid,
+        payload=payload,
+        output_file=output_file,
+    )
+
+
+@app.command("varannoset-update")
+def cli_varannoset_update(
+    ctx: typer.Context,
+    object_uuid: typing.Annotated[
+        uuid.UUID, typer.Argument(..., help="UUID of the varannoset to update")
+    ],
+    payload_or_path: typing.Annotated[
+        str, typer.Argument(..., help="JSON with payload to use or @path with JSON")
+    ] = "-",
+    output_file: typing.Annotated[
+        str, typer.Option("--output-file", help="Path to file to write to")
+    ] = "-",
+):
+    """Create new Varannoset"""
+    common_options: common.CommonOptions = ctx.obj
+
+    payload = common.load_json(payload_or_path)
+
+    update_object = UpdateObject(api.Project)
+    return update_object.run(
+        common_options=common_options,
+        callable=api.varannoset_update,
+        object_key_name="varannoset_uuid",
+        object_uuid=object_uuid,
+        payload=payload,
         output_file=output_file,
     )
