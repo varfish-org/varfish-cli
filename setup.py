@@ -30,6 +30,12 @@ with open("CHANGELOG.md") as changelog_file:
 test_requirements = parse_requirements("requirements/test.txt")
 install_requirements = parse_requirements("requirements/base.txt")
 
+package_root = os.path.abspath(os.path.dirname(__file__))
+version = {}
+with open(os.path.join(package_root, "varfish_cli/_version.py")) as fp:
+    exec(fp.read(), version)
+version = version["__version__"]
+
 setup(
     author="Manuel Holtgrewe",
     author_email=("manuel.holtgrewe@bihealth.de"),
@@ -56,6 +62,6 @@ setup(
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/bihealth/varfish-cli",
-    version=__version__,
+    version=version,
     zip_safe=False,
 )
