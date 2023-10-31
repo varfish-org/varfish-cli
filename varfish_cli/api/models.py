@@ -5,9 +5,7 @@ from enum import Enum, unique
 import typing
 import uuid
 
-import attr
-import cattr
-import dateutil.parser
+import pydantic
 
 
 @unique
@@ -20,8 +18,9 @@ class ProjectType(Enum):
     PROJECT = "PROJECT"
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class Project:
+class Project(pydantic.BaseModel):
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: The project identifier.
     sodar_uuid: uuid.UUID
     #: Parent category UUID, if any.
@@ -31,18 +30,19 @@ class Project:
     #: Project type.
     type: ProjectType
     #: Project description.
-    description: str
+    description: typing.Optional[str]
     #: Markdown README string.
-    readme: str
+    readme: typing.Optional[str]
     #: Whether public guest access is allowed.
     public_guest_access: bool
     #: Whether the project has been archived.
     archive: bool
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class PedigreeMember:
+class PedigreeMember(pydantic.BaseModel):
     """Represent a pedigree member as returned by the VarFish API."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: The name of the member.
     name: str
@@ -58,9 +58,10 @@ class PedigreeMember:
     has_gt_entries: bool
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class Case:
+class Case(pydantic.BaseModel):
     """Represent a case as returned by the VarFish API."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: The case identifier.
     sodar_uuid: uuid.UUID
@@ -127,9 +128,10 @@ class GenomeBuild(Enum):
     GRCH38 = "GRCh38"
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class CaseImportInfo:
+class CaseImportInfo(pydantic.BaseModel):
     """Case import information as returned by the VarFish API."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: Genome build
     release: GenomeBuild
@@ -156,7 +158,7 @@ class CaseImportInfo:
     #: Notes
     notes: typing.Optional[str] = None
     #: Tags
-    tags: typing.List[str] = attr.Factory(list)
+    tags: typing.List[str] = []
 
 
 class CaseVariantType(Enum):
@@ -168,9 +170,10 @@ class CaseVariantType(Enum):
     STRUCTURAL = "STRUCTURAL"
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class VariantSetImportInfo:
+class VariantSetImportInfo(pydantic.BaseModel):
     """Information on importing a set of variants."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: The genome build.
     genomebuild: GenomeBuild
@@ -189,10 +192,11 @@ class VariantSetImportInfo:
     state: VariantSetImportState = VariantSetImportState.DRAFT
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class BamQcFile:
+class BamQcFile(pydantic.BaseModel):
     """Information for BAM QC file without the payload."""
 
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: Name of the file.
     name: str
     #: MD5 sum of the file.
@@ -208,10 +212,11 @@ class BamQcFile:
     case_import_info: typing.Optional[uuid.UUID] = None
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class CaseGeneAnnotationFile:
+class CaseGeneAnnotationFile(pydantic.BaseModel):
     """Information for Gene Annotation file without the payload."""
 
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: Name of the file.
     name: str
     #: MD5 sum of the file.
@@ -227,10 +232,11 @@ class CaseGeneAnnotationFile:
     case_import_info: typing.Optional[uuid.UUID] = None
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class GenotypeFile:
+class GenotypeFile(pydantic.BaseModel):
     """Genotype file."""
 
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: Name of the file.
     name: str
     #: MD5 sum of the file.
@@ -246,10 +252,11 @@ class GenotypeFile:
     case_import_info: typing.Optional[uuid.UUID] = None
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class EffectsFile:
+class EffectsFile(pydantic.BaseModel):
     """Effects file."""
 
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: Name of the file.
     name: str
     #: MD5 sum of the file.
@@ -265,10 +272,11 @@ class EffectsFile:
     case_import_info: typing.Optional[uuid.UUID] = None
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class DatabaseInfoFile:
+class DatabaseInfoFile(pydantic.BaseModel):
     """Database information file."""
 
+    model_config = pydantic.ConfigDict(frozen=True)
+
     #: Name of the file.
     name: str
     #: MD5 sum of the file.
@@ -284,28 +292,10 @@ class DatabaseInfoFile:
     case_import_info: typing.Optional[uuid.UUID] = None
 
 
-def _setup_converter() -> cattr.Converter:
-    result = cattr.Converter()
-    result.register_structure_hook(uuid.UUID, lambda d, _: uuid.UUID(d))
-    result.register_unstructure_hook(uuid.UUID, str)
-    result.register_structure_hook(datetime.datetime, lambda d, _: dateutil.parser.parse(d))
-    result.register_unstructure_hook(
-        datetime.datetime,
-        lambda obj: obj.replace(tzinfo=datetime.timezone.utc)
-        .astimezone()
-        .replace(microsecond=0)
-        .isoformat(),
-    )
-    return result
-
-
-#: cattr Converter to use
-CONVERTER = _setup_converter()
-
-
-@attr.s(frozen=True, auto_attribs=True)
-class VarAnnoSetV1:
+class VarAnnoSetV1(pydantic.BaseModel):
     """VarAnnoSet as returned by query result"""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: The case identifier.
     sodar_uuid: uuid.UUID
@@ -326,8 +316,7 @@ class VarAnnoSetV1:
     fields: typing.List[str]
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class VarAnnoSetEntryV1:
+class VarAnnoSetEntryV1(pydantic.BaseModel):
     """VarAnnoSet as returned by query result"""
 
     #: The case identifier.

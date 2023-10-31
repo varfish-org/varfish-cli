@@ -5,10 +5,11 @@ import typing
 import uuid
 
 from logzero import logger
+import pydantic
 import requests
 
 from varfish_cli.api.common import raise_for_status
-from varfish_cli.api.models import CONVERTER, VarAnnoSetEntryV1, VarAnnoSetV1
+from varfish_cli.api.models import VarAnnoSetEntryV1, VarAnnoSetV1
 from varfish_cli.common import strip_trailing_slash
 
 #: End point for listing & creating VarAnnoSets
@@ -41,7 +42,7 @@ def varannoset_list(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetV1])
+    return pydantic.TypeAdapter(typing.List[VarAnnoSetV1]).validate_python(result.json())
 
 
 def varannoset_create(
@@ -60,11 +61,11 @@ def varannoset_create(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
+        endpoint, headers=headers, data=payload.model_dump(mode="json"), verify=verify_ssl
     )
     raise_for_status(result)
     print(result.json())
-    return CONVERTER.structure(result.json(), VarAnnoSetV1)
+    return pydantic.TypeAdapter(VarAnnoSetV1).validate_python(result.json())
 
 
 def varannoset_retrieve(
@@ -83,7 +84,7 @@ def varannoset_retrieve(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), VarAnnoSetV1)
+    return pydantic.TypeAdapter(VarAnnoSetV1).validate_python(result.json())
 
 
 def varannoset_update(
@@ -102,10 +103,10 @@ def varannoset_update(
     logger.debug("Sending PATCH request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.patch(
-        endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
+        endpoint, headers=headers, data=payload.model_dump(mode="json"), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), VarAnnoSetV1)
+    return pydantic.TypeAdapter(VarAnnoSetV1).validate_python(result.json())
 
 
 def varannoset_destroy(
@@ -142,7 +143,7 @@ def varannosetentry_list(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetEntryV1])
+    return pydantic.TypeAdapter(typing.List[VarAnnoSetEntryV1]).validate_python(result.json())
 
 
 def varannosetentry_create(
@@ -161,10 +162,10 @@ def varannosetentry_create(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
+        endpoint, headers=headers, data=payload.model_dump(mode="json"), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), VarAnnoSetEntryV1)
+    return pydantic.TypeAdapter(VarAnnoSetEntryV1).validate_python(result.json())
 
 
 def varannosetentry_retrieve(
@@ -185,7 +186,7 @@ def varannosetentry_retrieve(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), VarAnnoSetEntryV1)
+    return pydantic.TypeAdapter(VarAnnoSetEntryV1).validate_python(result.json())
 
 
 def varannosetentry_update(
@@ -206,10 +207,10 @@ def varannosetentry_update(
     logger.debug("Sending PATCH request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.patch(
-        endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
+        endpoint, headers=headers, data=payload.model_dump(mode="json"), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), VarAnnoSetEntryV1)
+    return pydantic.TypeAdapter(VarAnnoSetEntryV1).validate_python(result.json())
 
 
 def varannosetentry_destroy(

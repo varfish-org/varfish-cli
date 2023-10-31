@@ -4,10 +4,11 @@ import typing
 import uuid
 
 from logzero import logger
+import pydantic
 import requests
 
 from varfish_cli.api.common import raise_for_status
-from varfish_cli.api.models import CONVERTER, Project
+from varfish_cli.api.models import Project
 from varfish_cli.common import strip_trailing_slash
 
 ACCEPT_API_VARFISH = ""
@@ -30,7 +31,7 @@ def project_list(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[Project])
+    return pydantic.TypeAdapter(typing.List[Project]).validate_python(result.json())
 
 
 def project_retrieve(
@@ -46,4 +47,4 @@ def project_retrieve(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), Project)
+    return pydantic.TypeAdapter(Project).validate_python(result.json())
