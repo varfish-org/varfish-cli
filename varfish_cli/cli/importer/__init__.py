@@ -1,45 +1,15 @@
 """Implementation of varfish-cli subcommand "importer *"."""
 
-import enum
-import gzip
-from itertools import chain
-import json
-import os
-import re
 import sys
 import typing
 import uuid
 
-import attr
 from logzero import logger
-import polyleven
-import pydantic
-from tabulate import tabulate
 import typer
 
 from varfish_cli import api, common
-from varfish_cli.api import (
-    BamQcFile,
-    CaseGeneAnnotationFile,
-    CaseImportInfo,
-    CaseImportState,
-    CaseVariantType,
-    DatabaseInfoFile,
-    GenomeBuild,
-    GenotypeFile,
-    PedigreeMember,
-    VariantSetImportState,
-    models,
-)
+from varfish_cli.api import GenomeBuild
 from varfish_cli.cli.importer.create import CaseImporter, CaseImportOptions
-from varfish_cli.config import CommonOptions
-from varfish_cli.exceptions import (
-    InconsistentGenomeBuild,
-    InconsistentSamplesDataException,
-    MissingFileOnImport,
-    RestApiCallException,
-)
-from varfish_cli.parse_ped import DISEASE_MAP, SEX_MAP, parse_ped
 
 #: The ``Typer`` instance to use for the ``cases`` sub command.
 app = typer.Typer(no_args_is_help=True)
