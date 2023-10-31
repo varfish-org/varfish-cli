@@ -4,8 +4,10 @@ import os
 
 try:
     import tomllib
+    from tomllib import TOMLDecodeError
 except ImportError:
     import toml as tomllib
+    from tomllib import TomlDecodeError as TOMLDecodeError
 
 import typing
 
@@ -46,7 +48,7 @@ def load_config(config_path: str) -> typing.Tuple[typing.Optional[str], typing.O
         with open(config_path, "rb") as tomlf:
             try:
                 config_toml = tomllib.load(tomlf)
-            except tomllib.TOMLDecodeError as e:
+            except TOMLDecodeError as e:
                 logger.error("could not parse configuration file %s: %s", config_path, e)
                 raise typer.Exit(1)
             toml_varfish_server_url = config_toml.get("global", {}).get("varfish_server_url")
