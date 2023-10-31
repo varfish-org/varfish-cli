@@ -204,7 +204,7 @@ def case_import_info_list(
         try:
             msg = "REST API returned status code %d: %s" % (
                 result.status_code,
-                " ".join([" ".join(v) for v in result.json().values()]),
+                " ".join(map(str, result.json().values())),
             )
         except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)

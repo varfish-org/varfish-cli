@@ -10,7 +10,6 @@ import requests
 from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import CONVERTER, VarAnnoSetEntryV1, VarAnnoSetV1
 from varfish_cli.common import strip_trailing_slash
-from varfish_cli.exceptions import RestApiCallException
 
 #: End point for listing & creating VarAnnoSets
 ENDPOINT_VARANNOSET_LISTCREATE = "/varannos/api/varannoset/list-create/{project_uuid}"
