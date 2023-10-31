@@ -1,11 +1,11 @@
 """Common configuration code."""
 
 import os
+import tomllib
 import typing
 
 from logzero import logger
 import pydantic
-import tomllib
 import typer
 
 
