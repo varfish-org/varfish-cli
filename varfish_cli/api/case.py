@@ -1,11 +1,9 @@
 """Implementation of API operations on cases."""
 
-import json
 from json import JSONDecodeError
 import typing
 import uuid
 
-import attr
 from logzero import logger
 import requests
 from simplejson import JSONDecodeError as SimpleJSONDecodeError

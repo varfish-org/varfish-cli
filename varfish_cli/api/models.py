@@ -2,7 +2,6 @@
 
 import datetime
 from enum import Enum, unique
-import re
 import typing
 import uuid
 
