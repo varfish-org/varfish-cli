@@ -1,18 +1,16 @@
 """Test CLI for varannos API."""
 
-import uuid
 import json
 import typing
+import uuid
 
 import pytest
 from pytest_mock import MockerFixture
 from pytest_snapshot.plugin import Snapshot
-from requests_mock import adapter
 from requests_mock.mocker import Mocker as RequestsMocker
 from typer.testing import CliRunner
 
 from tests.conftest import FakeFs
-from varfish_cli import exceptions
 from varfish_cli.cli import app
 
 
@@ -145,6 +143,36 @@ def test_varannoset_update(
             obj_json["sodar_uuid"],
             json.dumps(obj_json),
         ],
+    )
+
+    mocker.stopall()
+
+    assert result.exit_code == 0, result.output
+    snapshot.assert_match(result.output, "result_output")
+
+
+def test_varannoset_destroy(
+    runner: CliRunner,
+    fake_fs_configured: FakeFs,
+    requests_mock: RequestsMocker,
+    fake_conn: typing.Tuple[str, str],
+    varannoset_list_result_one_elements,
+    snapshot: Snapshot,
+    mocker: MockerFixture,
+):
+    mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
+    mocker.patch("varfish_cli.config.os", fake_fs_configured.os)
+
+    obj_uuid = varannoset_list_result_one_elements[0]["sodar_uuid"]
+    host, token = fake_conn
+    m = requests_mock.delete(
+        f"{host}/varannos/api/varannoset/retrieve-update-destroy/{obj_uuid}",
+        request_headers={"Authorization": f"Token {token}"},
+    )
+    _ = m
+    result = runner.invoke(
+        app,
+        ["--verbose", "varannos", "varannoset-delete", obj_uuid],
     )
 
     mocker.stopall()

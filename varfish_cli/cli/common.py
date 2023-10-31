@@ -7,9 +7,11 @@ import uuid
 
 import attrs
 from logzero import logger
+import typer
 
 from varfish_cli import api, common, config
 from varfish_cli.common import OutputFormat
+from varfish_cli.exceptions import RestApiCallException
 
 #: Type to use for model in the helper classes below.
 ModelType = typing.TypeVar("ModelType", bound=object)
@@ -49,37 +51,41 @@ class ListObjects(typing.Generic[ModelType]):
                 common_options.verify_ssl,
             ),
         )
-        res = callable(
-            server_url=common_options.varfish_server_url,
-            api_token=common_options.varfish_api_token.get_secret_value(),
-            verify_ssl=common_options.verify_ssl,
-            **kwargs,
-        )
-
-        logger.info("Generating output")
-        header = (
-            output_fields if output_fields else [f.name for f in attrs.fields(api.VarAnnoSetV1)]
-        )
-        output = common.tabular_output(values=res, header=header)
-
-        logger.info("Writing output")
-        logger.info("==============")
-        if output_file == "-":
-            common.write_output(
-                output,
-                sys.stdout,
-                output_format,
-                output_delimiter,
+        try:
+            res = callable(
+                server_url=common_options.varfish_server_url,
+                api_token=common_options.varfish_api_token.get_secret_value(),
+                verify_ssl=common_options.verify_ssl,
+                **kwargs,
             )
-        else:
-            with open(output_file, "wt") as outputf:
+
+            logger.info("Generating output")
+            header = (
+                output_fields if output_fields else [f.name for f in attrs.fields(api.VarAnnoSetV1)]
+            )
+            output = common.tabular_output(values=res, header=header)
+
+            logger.info("Writing output")
+            logger.info("==============")
+            if output_file == "-":
                 common.write_output(
                     output,
-                    outputf,
+                    sys.stdout,
                     output_format,
                     output_delimiter,
                 )
-        logger.info("All done. Have a nice day!")
+            else:
+                with open(output_file, "wt") as outputf:
+                    common.write_output(
+                        output,
+                        outputf,
+                        output_format,
+                        output_delimiter,
+                    )
+            logger.info("All done. Have a nice day!")
+        except RestApiCallException as e:
+            logger.error("%s", e)
+            raise typer.Exit(f"Error: {e}") from e
 
 
 class RetrieveObject(typing.Generic[ModelType]):
@@ -96,28 +102,32 @@ class RetrieveObject(typing.Generic[ModelType]):
         object_uuid: uuid.UUID,
         output_file: str,
     ):
-        logger.info("Configuration: %s", config)
+        logger.info("Configuration: %s", common_options)
         logger.info(f"Retrieving {self.model.__name__} object")
         kwargs = {key_name: object_uuid}
-        res = callable(
-            server_url=common_options.varfish_server_url,
-            api_token=common_options.varfish_api_token.get_secret_value(),
-            verify_ssl=common_options.verify_ssl,
-            **kwargs,
-        )
-        res_json = api.CONVERTER.unstructure(res)
+        try:
+            res = callable(
+                server_url=common_options.varfish_server_url,
+                api_token=common_options.varfish_api_token.get_secret_value(),
+                verify_ssl=common_options.verify_ssl,
+                **kwargs,
+            )
+            res_json = api.CONVERTER.unstructure(res)
 
-        logger.info(f"{self.model.__name__} Detail")
-        logger.info("============" + "=" * len(str(self.model.__name__)))
-        if output_file == "-":
-            json.dump(res_json, sys.stdout, indent=2)
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-        else:
-            with open(output_file, "wt") as outputf:
-                json.dump(res_json, outputf, indent=2)
-                outputf.write("\n")
-        logger.info("All done. Have a nice day!")
+            logger.info(f"{self.model.__name__} Detail")
+            logger.info("============" + "=" * len(str(self.model.__name__)))
+            if output_file == "-":
+                json.dump(res_json, sys.stdout, indent=2)
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            else:
+                with open(output_file, "wt") as outputf:
+                    json.dump(res_json, outputf, indent=2)
+                    outputf.write("\n")
+            logger.info("All done. Have a nice day!")
+        except RestApiCallException as e:
+            logger.error("%s", e)
+            raise typer.Exit(f"Error: {e}") from e
 
 
 class CreateObject(typing.Generic[ModelType]):
@@ -135,30 +145,33 @@ class CreateObject(typing.Generic[ModelType]):
         payload: typing.Any,
         output_file: str,
     ):
-        logger.info("Configuration: %s", config)
+        logger.info("Configuration: %s", common_options)
         logger.info(f"Creating {self.model.__name__} object")
         kwargs = {parent_key_name: parent_uuid}
-        res = callable(
-            server_url=common_options.varfish_server_url,
-            api_token=common_options.varfish_api_token.get_secret_value(),
-            verify_ssl=common_options.verify_ssl,
-            payload=payload,
-            **kwargs,
-        )
-        print(res)
-        res_json = api.CONVERTER.unstructure(res)
+        try:
+            res = callable(
+                server_url=common_options.varfish_server_url,
+                api_token=common_options.varfish_api_token.get_secret_value(),
+                verify_ssl=common_options.verify_ssl,
+                payload=payload,
+                **kwargs,
+            )
+            res_json = api.CONVERTER.unstructure(res)
 
-        logger.info(f"{self.model.__name__} Detail")
-        logger.info("============" + "=" * len(str(self.model.__name__)))
-        if output_file == "-":
-            json.dump(res_json, sys.stdout, indent=2)
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-        else:
-            with open(output_file, "wt") as outputf:
-                json.dump(res_json, outputf, indent=2)
-                outputf.write("\n")
-        logger.info("All done. Have a nice day!")
+            logger.info(f"{self.model.__name__} Detail")
+            logger.info("============" + "=" * len(str(self.model.__name__)))
+            if output_file == "-":
+                json.dump(res_json, sys.stdout, indent=2)
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            else:
+                with open(output_file, "wt") as outputf:
+                    json.dump(res_json, outputf, indent=2)
+                    outputf.write("\n")
+            logger.info("All done. Have a nice day!")
+        except RestApiCallException as e:
+            logger.error("%s", e)
+            raise typer.Exit(f"Error: {e}") from e
 
 
 class UpdateObject(typing.Generic[ModelType]):
@@ -176,26 +189,59 @@ class UpdateObject(typing.Generic[ModelType]):
         payload: typing.Any,
         output_file: str,
     ):
-        logger.info("Configuration: %s", config)
+        logger.info("Configuration: %s", common_options)
         logger.info(f"Updating {self.model.__name__} object")
         kwargs = {object_key_name: object_uuid}
-        res = callable(
-            server_url=common_options.varfish_server_url,
-            api_token=common_options.varfish_api_token.get_secret_value(),
-            verify_ssl=common_options.verify_ssl,
-            payload=payload,
-            **kwargs,
-        )
-        res_json = api.CONVERTER.unstructure(res)
+        try:
+            res = callable(
+                server_url=common_options.varfish_server_url,
+                api_token=common_options.varfish_api_token.get_secret_value(),
+                verify_ssl=common_options.verify_ssl,
+                payload=payload,
+                **kwargs,
+            )
+            res_json = api.CONVERTER.unstructure(res)
 
-        logger.info(f"{self.model.__name__} Detail")
-        logger.info("============" + "=" * len(str(self.model.__name__)))
-        if output_file == "-":
-            json.dump(res_json, sys.stdout, indent=2)
-            sys.stdout.write("\n")
-            sys.stdout.flush()
-        else:
-            with open(output_file, "wt") as outputf:
-                json.dump(res_json, outputf, indent=2)
-                outputf.write("\n")
-        logger.info("All done. Have a nice day!")
+            logger.info(f"{self.model.__name__} Detail")
+            logger.info("============" + "=" * len(str(self.model.__name__)))
+            if output_file == "-":
+                json.dump(res_json, sys.stdout, indent=2)
+                sys.stdout.write("\n")
+                sys.stdout.flush()
+            else:
+                with open(output_file, "wt") as outputf:
+                    json.dump(res_json, outputf, indent=2)
+                    outputf.write("\n")
+            logger.info("All done. Have a nice day!")
+        except RestApiCallException as e:
+            logger.error("%s", e)
+            raise typer.Exit(f"Error: {e}") from e
+
+
+class DeleteObject(typing.Generic[ModelType]):
+    """Utility class to delete one object."""
+
+    def __init__(self, model: typing.Type[ModelType]):
+        self.model = model
+
+    def run(
+        self,
+        common_options: config.CommonOptions,
+        callable: typing.Callable,
+        object_key_name: str,
+        object_uuid: uuid.UUID,
+    ):
+        logger.info("Configuration: %s", common_options)
+        logger.info(f"Deleting {self.model.__name__} object")
+        kwargs = {object_key_name: object_uuid}
+        try:
+            callable(
+                server_url=common_options.varfish_server_url,
+                api_token=common_options.varfish_api_token.get_secret_value(),
+                verify_ssl=common_options.verify_ssl,
+                **kwargs,
+            )
+            logger.info("All done. Have a nice day!")
+        except RestApiCallException as e:
+            logger.error("%s", e)
+            raise typer.Exit(f"Error: {e}") from e

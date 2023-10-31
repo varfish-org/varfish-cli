@@ -1,11 +1,8 @@
 """Basic CLI tests"""
 
-import json
-import typing
 
 import pytest
 from pytest_mock import MockerFixture
-from pytest_snapshot.plugin import Snapshot
 from requests_mock import adapter
 from requests_mock.mocker import Mocker as RequestsMocker
 from typer.testing import CliRunner

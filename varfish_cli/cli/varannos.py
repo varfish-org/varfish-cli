@@ -6,7 +6,13 @@ import uuid
 import typer
 
 from varfish_cli import api, common
-from varfish_cli.cli.common import ListObjects, RetrieveObject, CreateObject, UpdateObject
+from varfish_cli.cli.common import (
+    CreateObject,
+    DeleteObject,
+    ListObjects,
+    RetrieveObject,
+    UpdateObject,
+)
 from varfish_cli.common import OutputFormat
 
 #: Default fields for varannos.
@@ -75,7 +81,7 @@ def cli_varannoset_retrieve(
     """Retrieve Varannoset by UUID"""
     common_options: common.CommonOptions = ctx.obj
 
-    retrieve_object = RetrieveObject(api.Project)
+    retrieve_object = RetrieveObject(api.VarAnnoSetV1)
     return retrieve_object.run(
         common_options=common_options,
         callable=api.varannoset_retrieve,
@@ -103,7 +109,7 @@ def cli_varannoset_create(
 
     payload = common.load_json(payload_or_path)
 
-    create_object = CreateObject(api.Project)
+    create_object = CreateObject(api.VarAnnoSetV1)
     return create_object.run(
         common_options=common_options,
         callable=api.varannoset_create,
@@ -132,7 +138,7 @@ def cli_varannoset_update(
 
     payload = common.load_json(payload_or_path)
 
-    update_object = UpdateObject(api.Project)
+    update_object = UpdateObject(api.VarAnnoSetV1)
     return update_object.run(
         common_options=common_options,
         callable=api.varannoset_update,
@@ -140,4 +146,23 @@ def cli_varannoset_update(
         object_uuid=object_uuid,
         payload=payload,
         output_file=output_file,
+    )
+
+
+@app.command("varannoset-delete")
+def cli_varannoset_delete(
+    ctx: typer.Context,
+    object_uuid: typing.Annotated[
+        uuid.UUID, typer.Argument(..., help="UUID of the varannoset to delete")
+    ],
+):
+    """Create new Varannoset"""
+    common_options: common.CommonOptions = ctx.obj
+
+    delete_object = DeleteObject(api.VarAnnoSetV1)
+    return delete_object.run(
+        common_options=common_options,
+        callable=api.varannoset_destroy,
+        object_key_name="varannoset_uuid",
+        object_uuid=object_uuid,
     )
