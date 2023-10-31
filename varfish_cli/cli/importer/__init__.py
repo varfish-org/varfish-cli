@@ -27,7 +27,6 @@ def run(
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
 ):
-    # config, toml_config, args, _parser, _subparser, file=sys.stdout):
     """List case import infos."""
     common_options: common.CommonConfig = ctx.obj
     logger.info("Listing CaseImportInfo records")
