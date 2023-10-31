@@ -76,7 +76,7 @@ class ListObjects(typing.Generic[ModelType]):
                         output_delimiter,
                     )
             logger.info("All done. Have a nice day!")
-        except RestApiCallException as e:
+        except RestApiCallException as e:  # pragma: no cover
             logger.error("%s", e)
             raise typer.Exit(f"Error: {e}") from e
 
@@ -118,7 +118,7 @@ class RetrieveObject(typing.Generic[ModelType]):
                     json.dump(res_json, outputf, indent=2)
                     outputf.write("\n")
             logger.info("All done. Have a nice day!")
-        except RestApiCallException as e:
+        except RestApiCallException as e:  # pragma: no cover
             logger.error("%s", e)
             raise typer.Exit(f"Error: {e}") from e
 
@@ -162,7 +162,7 @@ class CreateObject(typing.Generic[ModelType]):
                     json.dump(res_json, outputf, indent=2)
                     outputf.write("\n")
             logger.info("All done. Have a nice day!")
-        except RestApiCallException as e:
+        except RestApiCallException as e:  # pragma: no cover
             logger.error("%s", e)
             raise typer.Exit(f"Error: {e}") from e
 
@@ -206,7 +206,7 @@ class UpdateObject(typing.Generic[ModelType]):
                     json.dump(res_json, outputf, indent=2)
                     outputf.write("\n")
             logger.info("All done. Have a nice day!")
-        except RestApiCallException as e:
+        except RestApiCallException as e:  # pragma: no cover
             logger.error("%s", e)
             raise typer.Exit(f"Error: {e}") from e
 
@@ -235,6 +235,6 @@ class DeleteObject(typing.Generic[ModelType]):
                 **kwargs,
             )
             logger.info("All done. Have a nice day!")
-        except RestApiCallException as e:
+        except RestApiCallException as e:  # pragma: no cover
             logger.error("%s", e)
             raise typer.Exit(f"Error: {e}") from e
