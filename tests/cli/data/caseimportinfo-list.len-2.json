@@ -1,0 +1,203 @@
+[
+  {
+    "sodar_uuid": "8adbf84e-adb2-4c5d-9b5a-2a8194307b79",
+    "date_created": "2023-06-26T14:57:51.383539Z",
+    "date_modified": "2023-06-26T15:00:30.749080Z",
+    "owner": "root",
+    "release": "GRCh37",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "name": "NA12878",
+    "index": "NA12878-N1-DNA1-WES1",
+    "pedigree": [
+      {
+        "sex": 2,
+        "father": "NA12891-N1-DNA1-WES1",
+        "mother": "NA12892-N1-DNA1-WES1",
+        "name": "NA12878-N1-DNA1-WES1",
+        "affected": 2,
+        "has_gt_entries": true
+      },
+      {
+        "sex": 1,
+        "father": "0",
+        "mother": "0",
+        "name": "NA12891-N1-DNA1-WES1",
+        "affected": 1,
+        "has_gt_entries": true
+      },
+      {
+        "sex": 2,
+        "father": "0",
+        "mother": "0",
+        "name": "NA12892-N1-DNA1-WES1",
+        "affected": 1,
+        "has_gt_entries": true
+      }
+    ],
+    "notes": null,
+    "state": "imported",
+    "tags": [],
+    "bam_qc_files": [
+      {
+        "sodar_uuid": "1c0ce8e3-3a39-43f3-954d-f16ebf244ff5",
+        "date_created": "2023-06-26T14:57:51.689137Z",
+        "date_modified": "2023-06-26T14:57:51.689149Z",
+        "case_import_info": "8adbf84e-adb2-4c5d-9b5a-2a8194307b79",
+        "name": "bwa.gatk_hc.varfish_annotated.NA12878-N1-DNA1-WES1.bam-qc.tsv.gz",
+        "md5": "4afcd84e8953a83e63d8b2a92036e239"
+      }
+    ],
+    "variant_sets": [
+      {
+        "sodar_uuid": "104f900b-fa9c-4bd5-a119-35544293fe7f",
+        "date_created": "2023-06-26T14:57:51.953941Z",
+        "date_modified": "2023-06-26T15:00:30.748115Z",
+        "genomebuild": "GRCh37",
+        "case_import_info": "8adbf84e-adb2-4c5d-9b5a-2a8194307b79",
+        "variant_type": "SMALL",
+        "genotype_files": [
+          {
+            "sodar_uuid": "c515aa43-6392-46f6-b5c9-e66dc358a71d",
+            "date_created": "2023-06-26T14:57:52.424494Z",
+            "date_modified": "2023-06-26T14:57:52.424506Z",
+            "variant_set_import_info": "104f900b-fa9c-4bd5-a119-35544293fe7f",
+            "name": "bwa.gatk_hc.varfish_annotated.NA12878-N1-DNA1-WES1.gts.tsv.gz",
+            "md5": "ef58889f1c5b479765ef8e1370f2cc43"
+          }
+        ],
+        "effect_files": [],
+        "db_info_files": [
+          {
+            "sodar_uuid": "73f17524-2890-474c-85c6-7c02fc2e488e",
+            "date_created": "2023-06-26T14:57:52.725470Z",
+            "date_modified": "2023-06-26T14:57:52.725483Z",
+            "variant_set_import_info": "104f900b-fa9c-4bd5-a119-35544293fe7f",
+            "name": "bwa.gatk_hc.varfish_annotated.NA12878-N1-DNA1-WES1.db-infos.tsv.gz",
+            "md5": "d1b45661760c90599ab69597b74ba22a"
+          }
+        ],
+        "state": "imported"
+      }
+    ]
+  },
+  {
+    "sodar_uuid": "539fca3a-554f-4595-bfb3-b692f8ddef9e",
+    "date_created": "2023-06-26T15:15:08.229886Z",
+    "date_modified": "2023-06-26T15:21:27.204730Z",
+    "owner": "root",
+    "release": "GRCh37",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "name": "Case_3_index",
+    "index": "Case_3_index-N1-DNA1-WGS1",
+    "pedigree": [
+      {
+        "sex": 1,
+        "father": "Case_3_father-N1-DNA1-WGS1",
+        "mother": "Case_3_mother-N1-DNA1-WGS1",
+        "name": "Case_3_index-N1-DNA1-WGS1",
+        "affected": 2,
+        "has_gt_entries": true
+      },
+      {
+        "sex": 1,
+        "father": "0",
+        "mother": "0",
+        "name": "Case_3_father-N1-DNA1-WGS1",
+        "affected": 1,
+        "has_gt_entries": true
+      },
+      {
+        "sex": 2,
+        "father": "0",
+        "mother": "0",
+        "name": "Case_3_mother-N1-DNA1-WGS1",
+        "affected": 1,
+        "has_gt_entries": true
+      }
+    ],
+    "notes": null,
+    "state": "imported",
+    "tags": [],
+    "bam_qc_files": [
+      {
+        "sodar_uuid": "84ed9997-0230-49c9-bcb5-db6d2589733e",
+        "date_created": "2023-06-26T15:15:08.508094Z",
+        "date_modified": "2023-06-26T15:15:08.508106Z",
+        "case_import_info": "539fca3a-554f-4595-bfb3-b692f8ddef9e",
+        "name": "bwa.gatk_hc.varfish_annotated.Case_3_index-N1-DNA1-WGS1.bam-qc.tsv.gz",
+        "md5": "3d481a38f36fb7310c6d190a348bc08a"
+      }
+    ],
+    "variant_sets": [
+      {
+        "sodar_uuid": "c8d5d9e3-8f61-4693-88fe-71df4bf88332",
+        "date_created": "2023-06-26T15:15:08.824696Z",
+        "date_modified": "2023-06-26T15:21:26.139559Z",
+        "genomebuild": "GRCh37",
+        "case_import_info": "539fca3a-554f-4595-bfb3-b692f8ddef9e",
+        "variant_type": "SMALL",
+        "genotype_files": [
+          {
+            "sodar_uuid": "33756a89-49c2-4633-812e-7950abf20fb5",
+            "date_created": "2023-06-26T15:15:09.619232Z",
+            "date_modified": "2023-06-26T15:15:09.619248Z",
+            "variant_set_import_info": "c8d5d9e3-8f61-4693-88fe-71df4bf88332",
+            "name": "bwa.gatk_hc.varfish_annotated.Case_3_index-N1-DNA1-WGS1.gts.tsv.gz",
+            "md5": "5b2194f3947e5c29be9e20914d2e4fa7"
+          }
+        ],
+        "effect_files": [],
+        "db_info_files": [
+          {
+            "sodar_uuid": "218ea3a1-40a5-4ac2-8f0b-9bb00f3e44c2",
+            "date_created": "2023-06-26T15:15:10.041877Z",
+            "date_modified": "2023-06-26T15:15:10.041890Z",
+            "variant_set_import_info": "c8d5d9e3-8f61-4693-88fe-71df4bf88332",
+            "name": "bwa.gatk_hc.varfish_annotated.Case_3_index-N1-DNA1-WGS1.db-infos.tsv.gz",
+            "md5": "672e1b6fbc2504ff00fc02c0dc1249e7"
+          }
+        ],
+        "state": "imported"
+      },
+      {
+        "sodar_uuid": "dd7334e8-5e14-4e3c-8339-0884f15a329c",
+        "date_created": "2023-06-26T15:15:10.565490Z",
+        "date_modified": "2023-06-26T15:21:27.203768Z",
+        "genomebuild": "GRCh37",
+        "case_import_info": "539fca3a-554f-4595-bfb3-b692f8ddef9e",
+        "variant_type": "STRUCTURAL",
+        "genotype_files": [
+          {
+            "sodar_uuid": "788d10a8-8d1c-4b71-b988-4a898558805d",
+            "date_created": "2023-06-26T15:15:10.921883Z",
+            "date_modified": "2023-06-26T15:15:10.921896Z",
+            "variant_set_import_info": "dd7334e8-5e14-4e3c-8339-0884f15a329c",
+            "name": "bwa.delly2.varfish_annotated.Case_3_index-N1-DNA1-WGS1.gts.tsv.gz",
+            "md5": "f078f61a6d9804977219b5e13c833d95"
+          }
+        ],
+        "effect_files": [
+          {
+            "sodar_uuid": "36fa00d9-0eb6-453b-a8f3-6f7e21c7c025",
+            "date_created": "2023-06-26T15:15:11.291004Z",
+            "date_modified": "2023-06-26T15:15:11.291017Z",
+            "variant_set_import_info": "dd7334e8-5e14-4e3c-8339-0884f15a329c",
+            "name": "bwa.delly2.varfish_annotated.Case_3_index-N1-DNA1-WGS1.feature-effects.tsv.gz",
+            "md5": "43366a1f429de7378b1d434f2755ddff"
+          }
+        ],
+        "db_info_files": [
+          {
+            "sodar_uuid": "71211f79-62f9-400b-83ae-57a15e4fe6b8",
+            "date_created": "2023-06-26T15:15:11.613705Z",
+            "date_modified": "2023-06-26T15:15:11.613718Z",
+            "variant_set_import_info": "dd7334e8-5e14-4e3c-8339-0884f15a329c",
+            "name": "bwa.delly2.varfish_annotated.Case_3_index-N1-DNA1-WGS1.db-infos.tsv.gz",
+            "md5": "9a5a789658eb339b9d1655c1acb7bc65"
+          }
+        ],
+        "state": "imported"
+      }
+    ]
+  }
+]

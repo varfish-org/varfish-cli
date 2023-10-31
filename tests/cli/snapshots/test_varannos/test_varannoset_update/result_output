@@ -1,0 +1,13 @@
+{
+  "sodar_uuid": "e211747f-2a50-4a65-b192-c96bc2e111fa",
+  "date_created": "2023-10-31T08:15:15+00:00",
+  "date_modified": "2023-10-31T08:15:15+00:00",
+  "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+  "title": "my title",
+  "description": "None",
+  "release": "GRCh37",
+  "fields": [
+    "pathogenicity",
+    "notes"
+  ]
+}

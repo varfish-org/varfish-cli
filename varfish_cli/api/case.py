@@ -1,29 +1,24 @@
 """Implementation of API operations on cases."""
 
-import json
 from json import JSONDecodeError
 import typing
 import uuid
 
-import attr
 from logzero import logger
 import requests
 from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
 from varfish_cli.api import models
+from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import (
     CONVERTER,
     BamQcFile,
     Case,
     CaseGeneAnnotationFile,
     CaseImportInfo,
-    CaseQueryResultV1,
-    CaseQueryV1,
     DatabaseInfoFile,
     EffectsFile,
     GenotypeFile,
-    QueryShortcutsResultV1,
-    SmallVariantV1,
     VariantSetImportInfo,
 )
 from varfish_cli.common import strip_trailing_slash
@@ -116,7 +111,9 @@ ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT = (
 )
 
 
-def _construct_rest_api_call_exception(response: requests.Response) -> RestApiCallException:
+def _construct_rest_api_call_exception(
+    response: requests.Response,
+) -> RestApiCallException:  # pragma: no cover
     try:
         msg = "REST API returned status code %d: %s" % (
             response.status_code,
@@ -135,7 +132,7 @@ def _paginated_request(endpoint, result_data=None, **kwargs):
         result_data = []
 
     result = requests.get(endpoint, **kwargs)
-    result.raise_for_status()
+    raise_for_status(result)
 
     result_json = result.json()
     if "results" in result_json and "next" in result_json:
@@ -175,7 +172,7 @@ def case_retrieve(
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    result.raise_for_status()
+    raise_for_status(result)
     return CONVERTER.structure(result.json(), CaseImportInfo)
 
 
@@ -203,7 +200,7 @@ def case_import_info_list(
         try:
             msg = "REST API returned status code %d: %s" % (
                 result.status_code,
-                " ".join([" ".join(v) for v in result.json().values()]),
+                " ".join(map(str, result.json().values())),
             )
         except (JSONDecodeError, SimpleJSONDecodeError):
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
@@ -850,149 +847,3 @@ def db_info_file_destroy(
         except JSONDecodeError:
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
-
-
-def small_var_query_list(
-    server_url: str, api_token: str, case_uuid: uuid.UUID, verify_ssl: bool = True
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_LIST.format(case_uuid=case_uuid))
-    logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return CONVERTER.structure(result.json(), typing.List[CaseQueryResultV1])
-
-
-def small_var_query_create(
-    server_url: str,
-    api_token: str,
-    case_uuid: uuid.UUID,
-    case_query: models.CaseQueryV1,
-    verify_ssl: bool = True,
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_CREATE.format(case_uuid=case_uuid))
-    logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    logger.debug("data = %s", json.dumps(CONVERTER.unstructure(case_query), indent="  "))
-    result = requests.post(
-        endpoint, json=CONVERTER.unstructure(case_query), headers=headers, verify=verify_ssl
-    )
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return CONVERTER.structure(result.json(), CaseQueryV1)
-
-
-def small_var_query_retrieve(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid))
-    logger.debug("Sending POST request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return result.json()
-
-
-def small_var_query_status(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_STATUS.format(query_uuid=query_uuid))
-    logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return result.json()
-
-
-def small_var_query_update(
-    server_url: str,
-    api_token: str,
-    query_uuid: uuid.UUID,
-    case_query: models.CaseQueryV1,
-    verify_ssl: bool = True,
-) -> typing.Dict[str, typing.Any]:
-    headers = {"Authorization": "Token %s" % api_token}
-
-    server_url = strip_trailing_slash(server_url)
-    endpoint_get = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_RETRIEVE.format(query_uuid=query_uuid))
-    logger.debug("Sending GET request to end point %s", endpoint_get)
-    result_get = requests.get(endpoint_get, headers=headers, verify=verify_ssl)
-    if not result_get.ok:
-        raise _construct_rest_api_call_exception(result_get)
-
-    endpoint_put = "%s%s" % (server_url, ENDPOINT_CASE_QUERY_UPDATE.format(query_uuid=query_uuid))
-    logger.debug("Sending PUT request to end point %s", endpoint_put)
-    if case_query.public is None:
-        case_query = attr.evolve(case_query, public=result_get.json()["public"])
-    if not case_query.name:
-        case_query = attr.evolve(case_query, name="")
-    result_put = requests.put(
-        endpoint_put, data=CONVERTER.unstructure(case_query), headers=headers, verify=verify_ssl
-    )
-    if not result_put.ok:
-        raise _construct_rest_api_call_exception(result_put)
-    return result_put.json()
-
-
-def small_var_query_fetch_results(
-    server_url: str, api_token: str, query_uuid: uuid.UUID, verify_ssl: bool = True
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_FETCH_RESULTS.format(query_uuid=query_uuid),
-    )
-    logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return CONVERTER.structure(result.json(), typing.List[SmallVariantV1])
-
-
-def small_var_query_settings_shortcut(
-    server_url: str,
-    api_token: str,
-    case_uuid: uuid.UUID,
-    database: str,
-    quick_preset: str,
-    inheritance: typing.Optional[str] = None,
-    frequency: typing.Optional[str] = None,
-    impact: typing.Optional[str] = None,
-    quality: typing.Optional[str] = None,
-    chromosomes: typing.Optional[str] = None,
-    flags_etc: typing.Optional[str] = None,
-    verify_ssl: bool = True,
-) -> typing.Dict[str, typing.Any]:
-    server_url = strip_trailing_slash(server_url)
-    endpoint = "%s%s" % (
-        server_url,
-        ENDPOINT_CASE_QUERY_SETTINGS_SHORTCUT.format(case_uuid=case_uuid),
-    )
-    logger.debug("Sending GET request to end point %s", endpoint)
-    headers = {"Authorization": "Token %s" % api_token}
-    params = {"database": database, "quick_preset": quick_preset}
-    params.pop("database")  # TODO: REMOVE ME
-    if inheritance:
-        params["inheritance"] = inheritance
-    if frequency:
-        params["frequency"] = frequency
-    if impact:
-        params["impact"] = impact
-    if quality:
-        params["quality"] = quality
-    if chromosomes:
-        params["chromosomes"] = chromosomes
-    if flags_etc:
-        params["flags_etc"] = flags_etc
-    result = requests.get(endpoint, headers=headers, params=params, verify=verify_ssl)
-    if not result.ok:
-        raise _construct_rest_api_call_exception(result)
-    return CONVERTER.structure(result.json(), QueryShortcutsResultV1)

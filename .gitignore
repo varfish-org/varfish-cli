@@ -1,3 +1,6 @@
+# Root Pipfile created by VS Code
+/Pipfile*
+
 # Emacs
 *~
 
@@ -57,6 +60,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+coverage.lcov
 
 # Translations
 *.mo

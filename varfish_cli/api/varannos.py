@@ -7,9 +7,9 @@ import uuid
 from logzero import logger
 import requests
 
+from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import CONVERTER, VarAnnoSetEntryV1, VarAnnoSetV1
 from varfish_cli.common import strip_trailing_slash
-from varfish_cli.exceptions import RestApiCallException
 
 #: End point for listing & creating VarAnnoSets
 ENDPOINT_VARANNOSET_LISTCREATE = "/varannos/api/varannoset/list-create/{project_uuid}"
@@ -23,11 +23,6 @@ ENDPOINT_VARANNOSETENTRY_LISTCREATE = "/varannos/api/varannosetentry/list-create
 ENDPOINT_VARANNOSETENTRY_RETRIEVEUPDATEDESTROY = (
     "/varannos/api/varannosetentry/retrieve-update-destroy/{varannosetentry_uuid}"
 )
-
-
-def raise_for_status(response):
-    if not response.ok:
-        raise RestApiCallException(f"Problem with API call: {response.text}.")
 
 
 def varannoset_list(
@@ -68,7 +63,8 @@ def varannoset_create(
         endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetV1])
+    print(result.json())
+    return CONVERTER.structure(result.json(), VarAnnoSetV1)
 
 
 def varannoset_retrieve(
@@ -168,7 +164,7 @@ def varannosetentry_create(
         endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetEntryV1])
+    return CONVERTER.structure(result.json(), VarAnnoSetEntryV1)
 
 
 def varannosetentry_retrieve(

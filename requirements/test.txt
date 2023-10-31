@@ -9,6 +9,7 @@ pytest-runner >=2.11.1
 pytest-cache >=1.0
 pytest-cov >=2.4.0
 pytest-mock >=2.0.0
+pytest-snapshot >=0.9,<0.10
 
 # Faking of file systems
 pyfakefs >=3.7.1

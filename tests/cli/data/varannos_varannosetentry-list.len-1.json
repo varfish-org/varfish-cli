@@ -1,0 +1,18 @@
+[
+  {
+    "sodar_uuid": "4a3a96ae-ddd8-4e9f-897f-5fbbadfedad5",
+    "date_created": "2023-10-31T09:02:26+01:00",
+    "date_modified": "2023-10-31T09:02:26+01:00",
+    "varannoset": "0a30d59b-7257-43d1-8964-2a2ac50af7f2",
+    "release": "GRCh37",
+    "chromosome": "1",
+    "start": 100,
+    "end": 100,
+    "reference": "A",
+    "alternative": "T",
+    "payload": {
+      "pathogenic": "likely-pathogenic",
+      "notes": "TEST"
+    }
+  }
+]
