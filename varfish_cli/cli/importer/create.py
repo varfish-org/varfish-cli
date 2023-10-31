@@ -12,12 +12,11 @@ import uuid
 
 import attr
 from logzero import logger
-import pydantic
 import polyleven
+import pydantic
 from tabulate import tabulate
-import typer
 
-from varfish_cli import api, common
+from varfish_cli import api
 from varfish_cli.api import (
     BamQcFile,
     CaseGeneAnnotationFile,
@@ -41,7 +40,6 @@ from varfish_cli.exceptions import (
     RestApiCallException,
 )
 from varfish_cli.parse_ped import DISEASE_MAP, SEX_MAP, parse_ped
-from varfish_cli.cli.importer import app
 
 #: Regular expressions of suffixes to remove.
 REMOVE_SUFFIX_RES = (r"-N.-DNA.-.*$",)
@@ -188,7 +186,6 @@ class PathWithTimestamp:
     @property
     def basename(self):
         return os.path.basename(self.path)
-
 
 
 class FileType(enum.Enum):
@@ -361,7 +358,7 @@ class CaseImporter:
     def _purge_old_files(self, case_import_info: CaseImportInfo, good_md5s: typing.Collection[str]):
         bam_qc_files = api.bam_qc_file_list(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             case_import_info_uuid=case_import_info.sodar_uuid,
             verify_ssl=self.common_options.verify_ssl,
         )
@@ -369,7 +366,7 @@ class CaseImporter:
             if bam_qc_file.md5 not in good_md5s:
                 api.bam_qc_file_destroy(
                     server_url=self.common_options.varfish_server_url,
-                    api_token=self.common_options.varfish_api_token,
+                    api_token=self.common_options.varfish_api_token.get_secret_value(),
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     bam_qc_file_uuid=bam_qc_file.sodar_uuid,
                     verify_ssl=self.common_options.verify_ssl,
@@ -377,14 +374,14 @@ class CaseImporter:
 
         variant_sets = api.variant_set_import_info_list(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             case_import_info_uuid=case_import_info.sodar_uuid,
             verify_ssl=self.common_options.verify_ssl,
         )
         for variant_set in variant_sets:
             genotype_files = api.genotype_file_list(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
                 verify_ssl=self.common_options.verify_ssl,
             )
@@ -392,14 +389,14 @@ class CaseImporter:
                 if gt_file.md5 not in good_md5s:
                     api.genotype_file_destroy(
                         server_url=self.common_options.varfish_server_url,
-                        api_token=self.common_options.varfish_api_token,
+                        api_token=self.common_options.varfish_api_token.get_secret_value(),
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         genotype_file_uuid=gt_file.sodar_uuid,
                         verify_ssl=self.common_options.verify_ssl,
                     )
             effect_files = api.effects_file_list(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
                 verify_ssl=self.common_options.verify_ssl,
             )
@@ -407,14 +404,14 @@ class CaseImporter:
                 if eff_file.md5 not in good_md5s:
                     api.effects_file_destroy(
                         server_url=self.common_options.varfish_server_url,
-                        api_token=self.common_options.varfish_api_token,
+                        api_token=self.common_options.varfish_api_token.get_secret_value(),
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         effects_file_uuid=eff_file.sodar_uuid,
                         verify_ssl=self.common_options.verify_ssl,
                     )
             db_info_files = api.db_info_file_list(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
                 verify_ssl=self.common_options.verify_ssl,
             )
@@ -422,7 +419,7 @@ class CaseImporter:
                 if db_info_file.md5 not in good_md5s:
                     api.db_info_file_destroy(
                         server_url=self.common_options.varfish_server_url,
-                        api_token=self.common_options.varfish_api_token,
+                        api_token=self.common_options.varfish_api_token.get_secret_value(),
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         db_info_file_uuid=db_info_file.sodar_uuid,
                         verify_ssl=self.common_options.verify_ssl,
@@ -507,10 +504,10 @@ class CaseImporter:
                 header = inputf.readline().splitlines(keepends=False)[0].split("\t")
                 line = inputf.readline().splitlines(keepends=False)[0].split("\t")
                 rec = dict(zip(header, line))
-                if rec["release"] != self.options.genomebuild:
+                if rec["release"] != self.options.genomebuild.value:
                     raise InconsistentGenomeBuild(
                         "Inconsistent genome build from file (%s): %s and from args: %s"
-                        % (path_gt.path, rec["release"], self.options.genomebuild)
+                        % (path_gt.path, rec["release"], self.options.genomebuild.value)
                     )
 
     def _create_case_import_info(self):
@@ -540,7 +537,7 @@ class CaseImporter:
 
         for case_info in api.case_import_info_list(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             project_uuid=self.options.project_uuid,
             verify_ssl=self.common_options.verify_ssl,
         ):
@@ -562,22 +559,20 @@ class CaseImporter:
                     logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
                         server_url=self.common_options.varfish_server_url,
-                        api_token=self.common_options.varfish_api_token,
+                        api_token=self.common_options.varfish_api_token.get_secret_value(),
                         project_uuid=self.options.project_uuid,
                         case_import_info_uuid=case_info.sodar_uuid,
                         data=case_info,
                         verify_ssl=self.common_options.verify_ssl,
                     )
                     return case_info
-                elif (
-                    case_info.state == CaseImportState.DRAFT and not self.options.force_fresh
-                ):
+                elif case_info.state == CaseImportState.DRAFT and not self.options.force_fresh:
                     logger.info("Found existing case draft info: %s", case_info)
                     return case_info
         # else: found no match
         return api.case_import_info_create(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             project_uuid=self.options.project_uuid,
             data=models.CaseImportInfo(
                 release=GenomeBuild(self.options.genomebuild),
@@ -689,7 +684,7 @@ class CaseImporter:
         md5 = self._load_md5(path + ".md5")
         for file_obj in api_list_func(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             **{func_uuid_arg: uuid_value},
             verify_ssl=self.common_options.verify_ssl,
         ):
@@ -701,7 +696,7 @@ class CaseImporter:
             with open(path, "rb") as handle:
                 api_create_func(
                     server_url=self.common_options.varfish_server_url,
-                    api_token=self.common_options.varfish_api_token,
+                    api_token=self.common_options.varfish_api_token.get_secret_value(),
                     **{func_uuid_arg: uuid_value},
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
@@ -769,7 +764,7 @@ class CaseImporter:
             ]
             api.variant_set_import_info_update(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
@@ -807,7 +802,7 @@ class CaseImporter:
             ]
             api.variant_set_import_info_update(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
@@ -823,7 +818,7 @@ class CaseImporter:
 
         for variant_set_info in api.variant_set_import_info_list(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             case_import_info_uuid=case_import_info.sodar_uuid,
             verify_ssl=self.common_options.verify_ssl,
         ):
@@ -843,7 +838,7 @@ class CaseImporter:
                 logger.info("Updating state existing variant set draft info: %s", variant_set_info)
                 api.variant_set_import_info_update(
                     server_url=self.common_options.varfish_server_url,
-                    api_token=self.common_options.varfish_api_token,
+                    api_token=self.common_options.varfish_api_token.get_secret_value(),
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     variant_set_import_info_uuid=variant_set_info.sodar_uuid,
                     data=variant_set_info,
@@ -859,7 +854,7 @@ class CaseImporter:
         else:  # found no match
             return api.variant_set_import_info_create(
                 server_url=self.common_options.varfish_server_url,
-                api_token=self.common_options.varfish_api_token,
+                api_token=self.common_options.varfish_api_token.get_secret_value(),
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 data=models.VariantSetImportInfo(
                     genomebuild=GenomeBuild(self.options.genomebuild),
@@ -872,66 +867,9 @@ class CaseImporter:
         """Submit the case import."""
         return api.case_import_info_update(
             server_url=self.common_options.varfish_server_url,
-            api_token=self.common_options.varfish_api_token,
+            api_token=self.common_options.varfish_api_token.get_secret_value(),
             project_uuid=self.options.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
             data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
             verify_ssl=self.common_options.verify_ssl,
         )
-
-
-@app.command("caseimportinfo-create")
-def cli_caseimportinfo_create(
-    ctx: typer.Context,
-    project_uuid: typing.Annotated[
-        uuid.UUID, typer.Argument(..., help="UUID of project to list cases for")
-    ],
-    paths: typing.Annotated[
-        typing.List[str],
-        typer.Argument(..., help="Path(s) to files to use for the import. Must include PED, and annotation TSV files"),
-    ] = None,
-    strip_family_regex: typing.Annotated[
-        str, typer.Option("--strip-family-regex", help="Regular expression to process family name with")
-    ] = "^FAM_",
-    case_name_suffix: typing.Annotated[
-        str, typer.Option("--case-name-suffix", help="Suffix to append to case name")
-    ] = "",
-    force_fresh: typing.Annotated[
-        bool,
-        typer.Option(
-            "--force-fresh/--no-force-fresh",
-            help="Force using fresh case import even if old draft found",
-        ),
-    ] = False,
-    resubmit: typing.Annotated[
-        bool,
-        typer.Option(
-            "--resubmit/--no-resubmit",
-            help="Force resubmission of cases in submit state",
-        ),
-    ] = False,
-    genomebuild: typing.Annotated[
-        GenomeBuild,
-        typer.Option(
-            "--genomebuild",
-            help="The genome build (GRCh37/GRCh38) of this case, defaults to GRCh37.",
-        ),
-    ] = GenomeBuild.GRCH37,
-):
-    logger.info("Creating CaseImportInfo object...")
-    common_options: common.CommonConfig = ctx.obj
-    case_importer = CaseImporter(
-        options=CaseImportOptions(
-            paths=paths,
-            genomebuild=genomebuild,
-            strip_family_regex=strip_family_regex,
-            case_name_suffix=case_name_suffix,
-            force_fresh=force_fresh,
-            resubmit=resubmit,
-            project_uuid=project_uuid,
-            case_name_suffix=case_name_suffix,
-        ),
-        common_options=common_options
-    )
-    case_importer.run()
-    logger.info("All done. Have a nice day!")

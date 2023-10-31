@@ -1,13 +1,45 @@
 """Implementation of varfish-cli subcommand "importer *"."""
 
+import enum
+import gzip
+from itertools import chain
+import json
+import os
+import re
 import sys
 import typing
 import uuid
 
+import attr
 from logzero import logger
+import polyleven
+import pydantic
+from tabulate import tabulate
 import typer
 
 from varfish_cli import api, common
+from varfish_cli.api import (
+    BamQcFile,
+    CaseGeneAnnotationFile,
+    CaseImportInfo,
+    CaseImportState,
+    CaseVariantType,
+    DatabaseInfoFile,
+    GenomeBuild,
+    GenotypeFile,
+    PedigreeMember,
+    VariantSetImportState,
+    models,
+)
+from varfish_cli.cli.importer.create import CaseImporter, CaseImportOptions
+from varfish_cli.config import CommonOptions
+from varfish_cli.exceptions import (
+    InconsistentGenomeBuild,
+    InconsistentSamplesDataException,
+    MissingFileOnImport,
+    RestApiCallException,
+)
+from varfish_cli.parse_ped import DISEASE_MAP, SEX_MAP, parse_ped
 
 #: The ``Typer`` instance to use for the ``cases`` sub command.
 app = typer.Typer(no_args_is_help=True)
@@ -86,4 +118,64 @@ def run(
         with open(output_file, "wt") as outputf:
             do_print(outputf)
 
+    logger.info("All done. Have a nice day!")
+
+
+@app.command("caseimportinfo-create")
+def cli_caseimportinfo_create(
+    ctx: typer.Context,
+    project_uuid: typing.Annotated[
+        uuid.UUID, typer.Argument(..., help="UUID of project to list cases for")
+    ],
+    paths: typing.Annotated[
+        typing.List[str],
+        typer.Argument(
+            ...,
+            help="Path(s) to files to use for the import. Must include PED, and annotation TSV files",
+        ),
+    ] = None,
+    strip_family_regex: typing.Annotated[
+        str,
+        typer.Option("--strip-family-regex", help="Regular expression to process family name with"),
+    ] = "^FAM_",
+    case_name_suffix: typing.Annotated[
+        str, typer.Option("--case-name-suffix", help="Suffix to append to case name")
+    ] = "",
+    force_fresh: typing.Annotated[
+        bool,
+        typer.Option(
+            "--force-fresh/--no-force-fresh",
+            help="Force using fresh case import even if old draft found",
+        ),
+    ] = False,
+    resubmit: typing.Annotated[
+        bool,
+        typer.Option(
+            "--resubmit/--no-resubmit",
+            help="Force resubmission of cases in submit state",
+        ),
+    ] = False,
+    genomebuild: typing.Annotated[
+        GenomeBuild,
+        typer.Option(
+            "--genomebuild",
+            help="The genome build (GRCh37/GRCh38) of this case, defaults to GRCh37.",
+        ),
+    ] = GenomeBuild.GRCH37.value,
+):
+    logger.info("Creating CaseImportInfo object...")
+    common_options: common.CommonConfig = ctx.obj
+    case_importer = CaseImporter(
+        options=CaseImportOptions(
+            paths=paths,
+            genomebuild=genomebuild,
+            strip_family_regex=strip_family_regex,
+            case_name_suffix=case_name_suffix,
+            force_fresh=force_fresh,
+            resubmit=resubmit,
+            project_uuid=project_uuid,
+        ),
+        common_options=common_options,
+    )
+    case_importer.run()
     logger.info("All done. Have a nice day!")
