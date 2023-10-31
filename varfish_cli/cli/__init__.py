@@ -7,7 +7,7 @@ import logzero
 import typer
 
 from varfish_cli import __version__
-from varfish_cli.cli import projects, varannos
+from varfish_cli.cli import cases, projects, varannos
 from varfish_cli.config import CommonOptions, load_config
 from varfish_cli.exceptions import InvalidConfiguration
 
@@ -26,8 +26,9 @@ def version_callback(value: bool):
 app = typer.Typer(no_args_is_help=True)
 
 # Register all sub commands.
-app.add_typer(varannos.app, name="varannos", help="Varannos-related subcommands")
-app.add_typer(projects.app, name="projects", help="Project-related subcommands")
+app.add_typer(varannos.app, name="varannos", help="Subcommands for 'varannos' API")
+app.add_typer(projects.app, name="projects", help="Subcommands for 'project' API")
+app.add_typer(cases.app, name="cases", help="Subcommands for 'cases' API")
 
 
 @app.command("version")

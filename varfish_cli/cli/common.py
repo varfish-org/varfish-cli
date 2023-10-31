@@ -44,14 +44,6 @@ class ListObjects(typing.Generic[ModelType]):
         kwargs = {}
         if parent_uuid:
             kwargs[parent_key] = parent_uuid
-        logger.info(
-            "args = %s",
-            (
-                common_options.varfish_server_url,
-                common_options.varfish_api_token.get_secret_value(),
-                common_options.verify_ssl,
-            ),
-        )
         try:
             res = callable(
                 server_url=common_options.varfish_server_url,

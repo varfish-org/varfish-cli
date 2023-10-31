@@ -1,4 +1,4 @@
-"""Implementation of varfish-cli subcommand "projects *"."""
+"""Implementation of varfish-cli subcommand "cases *"."""
 
 import typing
 import uuid
@@ -10,23 +10,22 @@ from varfish_cli.cli.common import ListObjects, RetrieveObject
 from varfish_cli.common import OutputFormat
 
 #: Default fields for projects.
-DEFAULT_FIELDS_PROJECT: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str, ...]]] = {
-    OutputFormat.TABLE.value: (
-        "sodar_uuid",
-        "type",
-        "title",
-    ),
+DEFAULT_FIELDS_CASE: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str, ...]]] = {
+    OutputFormat.TABLE.value: ("sodar_uuid", "name", "index", "members"),
     OutputFormat.CSV.value: None,
     OutputFormat.JSON.value: None,
 }
 
-#: The ``Typer`` instance to use for the ``projects`` sub command.
+#: The ``Typer`` instance to use for the ``cases`` sub command.
 app = typer.Typer(no_args_is_help=True)
 
 
-@app.command("project-list")
-def cli_project_list(
+@app.command("case-list")
+def cli_case_list(
     ctx: typer.Context,
+    project_uuid: typing.Annotated[
+        uuid.UUID, typer.Argument(..., help="UUID of project to list cases for")
+    ],
     output_file: typing.Annotated[
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
@@ -40,23 +39,24 @@ def cli_project_list(
         typing.Optional[typing.List[str]], typer.Option("--output-fields", help="Output fields")
     ] = None,
 ):
-    """List all projects"""
+    """List all Case entries for the"""
     common_options: common.CommonOptions = ctx.obj
 
-    lister = ListObjects(api.Project)
-    return lister.run(
+    list_objects = ListObjects(api.Case)
+    return list_objects.run(
         common_options=common_options,
-        callable=api.project_list,
+        callable=api.case_list,
         output_file=output_file,
         output_format=output_format,
         output_delimiter=output_delimiter,
         output_fields=output_fields,
-        default_fields=DEFAULT_FIELDS_PROJECT,
+        parent_uuid=project_uuid,
+        default_fields=DEFAULT_FIELDS_CASE,
     )
 
 
-@app.command("project-retrieve")
-def cli_project_retrieve(
+@app.command("case-retrieve")
+def cli_case_retrieve(
     ctx: typer.Context,
     object_uuid: typing.Annotated[
         uuid.UUID, typer.Argument(..., help="UUID of the object to retrieve")
@@ -65,14 +65,14 @@ def cli_project_retrieve(
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
 ):
-    """Retrieve project by UUID"""
+    """Retrieve Case by UUID"""
     common_options: common.CommonOptions = ctx.obj
 
-    retriever = RetrieveObject(api.Project)
-    return retriever.run(
+    retrieve_object = RetrieveObject(api.Case)
+    return retrieve_object.run(
         common_options=common_options,
-        callable=api.project_retrieve,
-        key_name="project_uuid",
+        callable=api.case_retrieve,
+        key_name="case_uuid",
         object_uuid=object_uuid,
         output_file=output_file,
     )

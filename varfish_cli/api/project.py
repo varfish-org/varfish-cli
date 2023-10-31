@@ -6,8 +6,8 @@ import uuid
 from logzero import logger
 import requests
 
+from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import CONVERTER, Project
-from varfish_cli.api.varannos import raise_for_status
 from varfish_cli.common import strip_trailing_slash
 
 ACCEPT_API_VARFISH = ""

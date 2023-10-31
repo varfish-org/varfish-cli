@@ -7,6 +7,7 @@ import uuid
 from logzero import logger
 import requests
 
+from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import CONVERTER, VarAnnoSetEntryV1, VarAnnoSetV1
 from varfish_cli.common import strip_trailing_slash
 from varfish_cli.exceptions import RestApiCallException
@@ -23,11 +24,6 @@ ENDPOINT_VARANNOSETENTRY_LISTCREATE = "/varannos/api/varannosetentry/list-create
 ENDPOINT_VARANNOSETENTRY_RETRIEVEUPDATEDESTROY = (
     "/varannos/api/varannosetentry/retrieve-update-destroy/{varannosetentry_uuid}"
 )
-
-
-def raise_for_status(response):
-    if not response.ok:  # pragma: no cover
-        raise RestApiCallException(f"Problem with API call: {response.text}.")
 
 
 def varannoset_list(

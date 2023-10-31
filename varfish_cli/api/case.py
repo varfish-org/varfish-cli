@@ -11,6 +11,7 @@ import requests
 from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
 from varfish_cli.api import models
+from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import (
     CONVERTER,
     BamQcFile,
@@ -135,7 +136,7 @@ def _paginated_request(endpoint, result_data=None, **kwargs):
         result_data = []
 
     result = requests.get(endpoint, **kwargs)
-    result.raise_for_status()
+    raise_for_status(result)
 
     result_json = result.json()
     if "results" in result_json and "next" in result_json:
@@ -175,7 +176,7 @@ def case_retrieve(
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
-    result.raise_for_status()
+    raise_for_status(result)
     return CONVERTER.structure(result.json(), CaseImportInfo)
 
 

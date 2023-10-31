@@ -76,13 +76,17 @@ class Case:
     #: List of pedigree members.
     pedigree: typing.List[PedigreeMember]
     #: Number of small variants in case.
-    num_small_vars: typing.Optional[int]
+    num_small_vars: typing.Optional[int] = None
     #: Number of SVs in case.
-    num_svs: typing.Optional[int]
+    num_svs: typing.Optional[int] = None
     #: Cusom User Notes
     notes: typing.Optional[str] = None
     #: Status of case. Can be either "active" "closed-<solved|unsolved>" or "initial"
     status: typing.Optional[str] = None
+
+    @property
+    def members(self):
+        return [m.name for m in self.pedigree]
 
 
 class CaseImportState(Enum):
