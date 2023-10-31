@@ -12,6 +12,7 @@ import uuid
 
 import attr
 from logzero import logger
+import pydantic
 import polyleven
 from tabulate import tabulate
 import typer
@@ -30,6 +31,7 @@ from varfish_cli.api import (
     VariantSetImportState,
     models,
 )
+from varfish_cli.config import CommonOptions
 
 #: Regular expressions of suffixes to remove.
 from varfish_cli.exceptions import (
@@ -188,6 +190,7 @@ class PathWithTimestamp:
         return os.path.basename(self.path)
 
 
+
 class FileType(enum.Enum):
     """Enumeration for known file types."""
 
@@ -271,6 +274,16 @@ class FileTypeGuesser:
         return arr == EXPECTED_GENE_ANNOTATIONS
 
 
+class CaseImportOptions(pydantic.BaseModel):
+    paths: typing.List[str]
+    genomebuild: GenomeBuild
+    strip_family_regex: str
+    project_uuid: uuid.UUID
+    resubmit: bool
+    force_fresh: bool
+    case_name_suffix: str
+
+
 class CaseImporter:
     """Implementation of an idempotent case importer.
 
@@ -280,13 +293,11 @@ class CaseImporter:
     does not match.  Otherwise, it is kept intact.  Finally, start the import by updating its status.
     """
 
-    def __init__(self, config: CaseCreateImportInfoConfig):
-        #: Configuration of ``case create`` command.
-        self.create_config = config
-        #: Configuration of ``case`` command.
-        self.case_config = self.create_config.case_config
-        #: Global CLI configuration.
-        self.global_config = self.case_config.global_config
+    def __init__(self, options: CaseImportOptions, common_options: CommonOptions):
+        #: Local configuration.
+        self.options = options
+        #: Common configuration.
+        self.common_options = common_options
 
         #: The path to the pedigree file to parse.
         self.path_ped: typing.Optional[PathWithTimestamp] = None
@@ -309,7 +320,7 @@ class CaseImporter:
         self.pedigree: typing.List[PedigreeMember] = None
 
     def _log_exception(self, e):
-        logger.exception(e, exc_info=self.global_config.verbose)
+        logger.exception(e, exc_info=self.common_options.verbose)
 
     def run(self):
         logger.info("Starting new case import ...")
@@ -349,72 +360,72 @@ class CaseImporter:
 
     def _purge_old_files(self, case_import_info: CaseImportInfo, good_md5s: typing.Collection[str]):
         bam_qc_files = api.bam_qc_file_list(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         )
         for bam_qc_file in bam_qc_files:
             if bam_qc_file.md5 not in good_md5s:
                 api.bam_qc_file_destroy(
-                    server_url=self.global_config.varfish_server_url,
-                    api_token=self.global_config.varfish_api_token,
+                    server_url=self.common_options.varfish_server_url,
+                    api_token=self.common_options.varfish_api_token,
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     bam_qc_file_uuid=bam_qc_file.sodar_uuid,
-                    verify_ssl=self.global_config.verify_ssl,
+                    verify_ssl=self.common_options.verify_ssl,
                 )
 
         variant_sets = api.variant_set_import_info_list(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         )
         for variant_set in variant_sets:
             genotype_files = api.genotype_file_list(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
             for gt_file in genotype_files:
                 if gt_file.md5 not in good_md5s:
                     api.genotype_file_destroy(
-                        server_url=self.global_config.varfish_server_url,
-                        api_token=self.global_config.varfish_api_token,
+                        server_url=self.common_options.varfish_server_url,
+                        api_token=self.common_options.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         genotype_file_uuid=gt_file.sodar_uuid,
-                        verify_ssl=self.global_config.verify_ssl,
+                        verify_ssl=self.common_options.verify_ssl,
                     )
             effect_files = api.effects_file_list(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
             for eff_file in effect_files:
                 if eff_file.md5 not in good_md5s:
                     api.effects_file_destroy(
-                        server_url=self.global_config.varfish_server_url,
-                        api_token=self.global_config.varfish_api_token,
+                        server_url=self.common_options.varfish_server_url,
+                        api_token=self.common_options.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         effects_file_uuid=eff_file.sodar_uuid,
-                        verify_ssl=self.global_config.verify_ssl,
+                        verify_ssl=self.common_options.verify_ssl,
                     )
             db_info_files = api.db_info_file_list(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 variant_set_import_info_uuid=variant_set.sodar_uuid,
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
             for db_info_file in db_info_files:
                 if db_info_file.md5 not in good_md5s:
                     api.db_info_file_destroy(
-                        server_url=self.global_config.varfish_server_url,
-                        api_token=self.global_config.varfish_api_token,
+                        server_url=self.common_options.varfish_server_url,
+                        api_token=self.common_options.varfish_api_token,
                         variant_set_import_info_uuid=variant_set.sodar_uuid,
                         db_info_file_uuid=db_info_file.sodar_uuid,
-                        verify_ssl=self.global_config.verify_ssl,
+                        verify_ssl=self.common_options.verify_ssl,
                     )
 
     def _split_files_by_role(self):  # noqa
@@ -429,7 +440,7 @@ class CaseImporter:
             FileType.EFFECTS_SV: self.paths_effect_sv,
         }
 
-        for path in self.create_config.paths:
+        for path in self.options.paths:
             guessed = FileTypeGuesser().guess(path)
             if guessed == FileType.PED:
                 if self.path_ped:
@@ -496,17 +507,17 @@ class CaseImporter:
                 header = inputf.readline().splitlines(keepends=False)[0].split("\t")
                 line = inputf.readline().splitlines(keepends=False)[0].split("\t")
                 rec = dict(zip(header, line))
-                if rec["release"] != self.create_config.genomebuild:
+                if rec["release"] != self.options.genomebuild:
                     raise InconsistentGenomeBuild(
                         "Inconsistent genome build from file (%s): %s and from args: %s"
-                        % (path_gt.path, rec["release"], self.create_config.genomebuild)
+                        % (path_gt.path, rec["release"], self.options.genomebuild)
                     )
 
     def _create_case_import_info(self):
         """Create case if necessary."""
 
         def strip_suffix(x):
-            for pattern in [self.create_config.strip_family_regex] + list(REMOVE_SUFFIX_RES):
+            for pattern in [self.options.strip_family_regex] + list(REMOVE_SUFFIX_RES):
                 x = re.sub(pattern, "", x)
             return x
 
@@ -528,16 +539,16 @@ class CaseImporter:
         )
 
         for case_info in api.case_import_info_list(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
-            project_uuid=self.create_config.project_uuid,
-            verify_ssl=self.global_config.verify_ssl,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
+            project_uuid=self.options.project_uuid,
+            verify_ssl=self.common_options.verify_ssl,
         ):
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
                 # Make sure to update index and pedigree to current value.
                 case_info = attr.assoc(case_info, index=index, pedigree=self.pedigree)
-                if self.create_config.resubmit and case_info.state in (
+                if self.options.resubmit and case_info.state in (
                     CaseImportState.SUBMITTED,
                     CaseImportState.IMPORTED,
                     CaseImportState.FAILED,
@@ -545,36 +556,36 @@ class CaseImporter:
                     logger.info("Case is submitted and --resubmit given, marking as draft.")
                     case_info = attr.assoc(
                         case_info,
-                        release=GenomeBuild(self.create_config.genomebuild),
+                        release=GenomeBuild(self.options.genomebuild),
                         state=CaseImportState.DRAFT,
                     )
                     logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
-                        server_url=self.global_config.varfish_server_url,
-                        api_token=self.global_config.varfish_api_token,
-                        project_uuid=self.create_config.project_uuid,
+                        server_url=self.common_options.varfish_server_url,
+                        api_token=self.common_options.varfish_api_token,
+                        project_uuid=self.options.project_uuid,
                         case_import_info_uuid=case_info.sodar_uuid,
                         data=case_info,
-                        verify_ssl=self.global_config.verify_ssl,
+                        verify_ssl=self.common_options.verify_ssl,
                     )
                     return case_info
                 elif (
-                    case_info.state == CaseImportState.DRAFT and not self.create_config.force_fresh
+                    case_info.state == CaseImportState.DRAFT and not self.options.force_fresh
                 ):
                     logger.info("Found existing case draft info: %s", case_info)
                     return case_info
         # else: found no match
         return api.case_import_info_create(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
-            project_uuid=self.create_config.project_uuid,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
+            project_uuid=self.options.project_uuid,
             data=models.CaseImportInfo(
-                release=GenomeBuild(self.create_config.genomebuild),
+                release=GenomeBuild(self.options.genomebuild),
                 name=name,
                 index=index,
                 pedigree=self.pedigree,
             ),
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         )
 
     def _check_genotypes(self):
@@ -642,7 +653,7 @@ class CaseImporter:
                     )
                 )
 
-        case_name += self.create_config.case_name_suffix
+        case_name += self.options.case_name_suffix
 
         return case_name, pedigree
 
@@ -677,10 +688,10 @@ class CaseImporter:
         """Perform file upload through the API."""
         md5 = self._load_md5(path + ".md5")
         for file_obj in api_list_func(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
             **{func_uuid_arg: uuid_value},
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         ):
             if file_obj.md5 == md5:
                 logger.debug("- found %s with md5 %s", obj_type, md5)
@@ -689,12 +700,12 @@ class CaseImporter:
             logger.info("- uploading %s %s", obj_type, path)
             with open(path, "rb") as handle:
                 api_create_func(
-                    server_url=self.global_config.varfish_server_url,
-                    api_token=self.global_config.varfish_api_token,
+                    server_url=self.common_options.varfish_server_url,
+                    api_token=self.common_options.varfish_api_token,
                     **{func_uuid_arg: uuid_value},
                     data=file_type(name=os.path.basename(path), md5=md5),
                     files={"file": handle},
-                    verify_ssl=self.global_config.verify_ssl,
+                    verify_ssl=self.common_options.verify_ssl,
                 )
                 return md5
 
@@ -757,12 +768,12 @@ class CaseImporter:
                 for path in self.paths_database_info
             ]
             api.variant_set_import_info_update(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
 
         if self.paths_genotype_sv:
@@ -795,12 +806,12 @@ class CaseImporter:
                 for path in self.paths_database_info_sv
             ]
             api.variant_set_import_info_update(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
                 data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
 
         return good_md5s
@@ -811,14 +822,14 @@ class CaseImporter:
         """Create variant set import info necessary."""
 
         for variant_set_info in api.variant_set_import_info_list(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
             case_import_info_uuid=case_import_info.sodar_uuid,
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         ):
             if not variant_set_info.variant_type == variant_type:
                 continue
-            if self.create_config.resubmit and variant_set_info.state in (
+            if self.options.resubmit and variant_set_info.state in (
                 VariantSetImportState.UPLOADED,
                 VariantSetImportState.IMPORTED,
                 VariantSetImportState.FAILED,
@@ -826,46 +837,46 @@ class CaseImporter:
                 logger.info("Variant set is submitted and --resubmit given, marking as draft.")
                 variant_set_info = attr.assoc(
                     variant_set_info,
-                    genomebuild=GenomeBuild(self.create_config.genomebuild),
+                    genomebuild=GenomeBuild(self.options.genomebuild),
                     state=VariantSetImportState.DRAFT,
                 )
                 logger.info("Updating state existing variant set draft info: %s", variant_set_info)
                 api.variant_set_import_info_update(
-                    server_url=self.global_config.varfish_server_url,
-                    api_token=self.global_config.varfish_api_token,
+                    server_url=self.common_options.varfish_server_url,
+                    api_token=self.common_options.varfish_api_token,
                     case_import_info_uuid=case_import_info.sodar_uuid,
                     variant_set_import_info_uuid=variant_set_info.sodar_uuid,
                     data=variant_set_info,
-                    verify_ssl=self.global_config.verify_ssl,
+                    verify_ssl=self.common_options.verify_ssl,
                 )
                 return variant_set_info
             elif (
                 variant_set_info.state == VariantSetImportState.DRAFT
-                and not self.create_config.force_fresh
+                and not self.options.force_fresh
             ):
                 logger.info("Found existing variant_set draft info: %s", variant_set_info)
                 return variant_set_info
         else:  # found no match
             return api.variant_set_import_info_create(
-                server_url=self.global_config.varfish_server_url,
-                api_token=self.global_config.varfish_api_token,
+                server_url=self.common_options.varfish_server_url,
+                api_token=self.common_options.varfish_api_token,
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 data=models.VariantSetImportInfo(
-                    genomebuild=GenomeBuild(self.create_config.genomebuild),
+                    genomebuild=GenomeBuild(self.options.genomebuild),
                     variant_type=variant_type,
                 ),
-                verify_ssl=self.global_config.verify_ssl,
+                verify_ssl=self.common_options.verify_ssl,
             )
 
     def _submit_import(self, case_import_info: models.CaseImportInfo):
         """Submit the case import."""
         return api.case_import_info_update(
-            server_url=self.global_config.varfish_server_url,
-            api_token=self.global_config.varfish_api_token,
-            project_uuid=self.create_config.project_uuid,
+            server_url=self.common_options.varfish_server_url,
+            api_token=self.common_options.varfish_api_token,
+            project_uuid=self.options.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
             data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
-            verify_ssl=self.global_config.verify_ssl,
+            verify_ssl=self.common_options.verify_ssl,
         )
 
 
@@ -910,12 +921,17 @@ def cli_caseimportinfo_create(
     logger.info("Creating CaseImportInfo object...")
     common_options: common.CommonConfig = ctx.obj
     case_importer = CaseImporter(
-
+        options=CaseImportOptions(
+            paths=paths,
+            genomebuild=genomebuild,
+            strip_family_regex=strip_family_regex,
+            case_name_suffix=case_name_suffix,
+            force_fresh=force_fresh,
+            resubmit=resubmit,
+            project_uuid=project_uuid,
+            case_name_suffix=case_name_suffix,
+        ),
+        common_options=common_options
     )
     case_importer.run()
     logger.info("All done. Have a nice day!")
-
-def run(config, toml_config, args, _parser, _subparser, _file=sys.stdout):
-    """Run case import create command."""
-    config = CaseCreateImportInfoConfig.create(args, config, toml_config)
-    return CaseImporter(config).run()
