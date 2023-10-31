@@ -32,7 +32,8 @@ class ListObjects(typing.Generic[ModelType]):
         output_delimiter: str,
         default_fields: typing.Dict[str, typing.Optional[typing.Tuple[str, ...]]],
         output_fields: typing.Optional[typing.List[str]] = None,
-        project_uuid: typing.Optional[uuid.UUID] = None,
+        parent_uuid: typing.Optional[uuid.UUID] = None,
+        parent_key: str = "project_uuid",
     ):
         all_fields = [f.name for f in attrs.fields(self.model)]
         output_fields: typing.List[str] = (
@@ -41,8 +42,8 @@ class ListObjects(typing.Generic[ModelType]):
 
         logger.info(f"Listing {self.model.__name__} records")
         kwargs = {}
-        if project_uuid:
-            kwargs["project_uuid"] = project_uuid
+        if parent_uuid:
+            kwargs[parent_key] = parent_uuid
         logger.info(
             "args = %s",
             (

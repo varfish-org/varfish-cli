@@ -60,6 +60,7 @@ nosetests.xml
 coverage.xml
 *.cover
 .hypothesis/
+coverage.lcov
 
 # Translations
 *.mo

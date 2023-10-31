@@ -26,7 +26,7 @@ ENDPOINT_VARANNOSETENTRY_RETRIEVEUPDATEDESTROY = (
 
 
 def raise_for_status(response):
-    if not response.ok:
+    if not response.ok:  # pragma: no cover
         raise RestApiCallException(f"Problem with API call: {response.text}.")
 
 
@@ -169,7 +169,7 @@ def varannosetentry_create(
         endpoint, headers=headers, data=CONVERTER.unstructure(payload), verify=verify_ssl
     )
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), typing.List[VarAnnoSetEntryV1])
+    return CONVERTER.structure(result.json(), VarAnnoSetEntryV1)
 
 
 def varannosetentry_retrieve(
