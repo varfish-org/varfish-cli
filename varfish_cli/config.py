@@ -1,7 +1,12 @@
 """Common configuration code."""
 
 import os
-import tomllib
+
+try:
+    import tomllib
+except ImportError:
+    import toml as tomllib
+
 import typing
 
 from logzero import logger
