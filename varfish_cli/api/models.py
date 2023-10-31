@@ -66,9 +66,9 @@ class Case(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: uuid.UUID
     #: Date of creation.
-    date_created: datetime.datetime
+    date_created: pydantic.AwareDatetime
     #: Date of last modification.
-    date_modified: datetime.datetime
+    date_modified: pydantic.AwareDatetime
     #: Name of the case.
     name: str
     #: Name of the index individual.
@@ -146,9 +146,9 @@ class CaseImportInfo(pydantic.BaseModel):
     #: Owner.
     owner: typing.Optional[str] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the remote project
     project: typing.Optional[uuid.UUID] = None
     #: UUID of the remote case.
@@ -183,9 +183,9 @@ class VariantSetImportInfo(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
     #: State.
@@ -205,9 +205,9 @@ class BamQcFile(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
 
@@ -225,9 +225,9 @@ class CaseGeneAnnotationFile(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
 
@@ -245,9 +245,9 @@ class GenotypeFile(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
 
@@ -265,9 +265,9 @@ class EffectsFile(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
 
@@ -285,9 +285,9 @@ class DatabaseInfoFile(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: typing.Optional[uuid.UUID] = None
     #: Date of creation.
-    date_created: typing.Optional[datetime.datetime] = None
+    date_created: typing.Optional[pydantic.AwareDatetime] = None
     #: Date of last modification.
-    date_modified: typing.Optional[datetime.datetime] = None
+    date_modified: typing.Optional[pydantic.AwareDatetime] = None
     #: UUID of the linked ``CaseImportInfo``.
     case_import_info: typing.Optional[uuid.UUID] = None
 
@@ -300,9 +300,9 @@ class VarAnnoSetV1(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: uuid.UUID
     #: Date of creation.
-    date_created: datetime.datetime
+    date_created: pydantic.AwareDatetime
     #: Date of last modification.
-    date_modified: datetime.datetime
+    date_modified: pydantic.AwareDatetime
 
     #: Project UUID.
     project: uuid.UUID
@@ -322,9 +322,9 @@ class VarAnnoSetEntryV1(pydantic.BaseModel):
     #: The case identifier.
     sodar_uuid: uuid.UUID
     #: Date of creation.
-    date_created: datetime.datetime
+    date_created: pydantic.AwareDatetime
     #: Date of last modification.
-    date_modified: datetime.datetime
+    date_modified: pydantic.AwareDatetime
 
     #: VarAnnoSet UUID.
     varannoset: uuid.UUID
