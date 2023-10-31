@@ -45,9 +45,9 @@ def load_config(config_path: str) -> typing.Tuple[typing.Optional[str], typing.O
         logger.info("could not find configuration file %s.", config_path)
     else:
         logger.debug("loading configuration from %s", config_path)
-        with open(config_path, "rb") as tomlf:
+        with open(config_path, "rt") as tomlf:
             try:
-                config_toml = tomllib.load(tomlf)
+                config_toml = tomllib.loads(tomlf.read())
             except TOMLDecodeError as e:
                 logger.error("could not parse configuration file %s: %s", config_path, e)
                 raise typer.Exit(1)
