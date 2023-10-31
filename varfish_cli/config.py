@@ -7,7 +7,7 @@ try:
     from tomllib import TOMLDecodeError
 except ImportError:
     import toml as tomllib
-    from tomllib import TomlDecodeError as TOMLDecodeError
+    from toml import TomlDecodeError as TOMLDecodeError
 
 import typing
 
