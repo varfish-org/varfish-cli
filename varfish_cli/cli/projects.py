@@ -1,4 +1,4 @@
-"""Implementation of varfish-cli subcommand 'projects'."""
+"""Implementation of varfish-cli subcommand "projects *"."""
 
 import typing
 import uuid
@@ -43,17 +43,15 @@ def cli_list(
     """List all projects"""
     common_options: common.CommonOptions = ctx.obj
 
-    lister = ListObjects(
-        common_options=common_options,
-        typ=api.Project,
-        default_fields=DEFAULT_FIELDS,
-        callable=api.project_list,
-    )
+    lister = ListObjects(api.Project)
     return lister.run(
+        common_options=common_options,
+        callable=api.project_list,
         output_file=output_file,
         output_format=output_format,
         output_delimiter=output_delimiter,
         output_fields=output_fields,
+        default_fields=DEFAULT_FIELDS,
     )
 
 
@@ -67,15 +65,14 @@ def cli_retrieve(
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
 ):
+    """Retrieve project by UUID"""
     common_options: common.CommonOptions = ctx.obj
 
-    retriever = RetrieveObject(
+    retriever = RetrieveObject(api.Project)
+    return retriever.run(
         common_options=common_options,
-        typ=api.Project,
+        callable=api.project_retrieve,
         key_name="project_uuid",
         object_uuid=object_uuid,
-        callable=api.project_retrieve,
-    )
-    return retriever.run(
         output_file=output_file,
     )

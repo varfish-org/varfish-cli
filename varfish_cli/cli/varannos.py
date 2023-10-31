@@ -10,8 +10,8 @@ from varfish_cli.cli.common import ListObjects, RetrieveObject
 from varfish_cli.common import OutputFormat
 
 #: Default fields for varannos.
-DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = {
-    OutputFormat.TABLE: (
+DEFAULT_FIELDS: typing.Dict[str, typing.Optional[typing.Tuple[str]]] = {
+    OutputFormat.TABLE.value: (
         "sodar_uuid",
         "date_modified",
         "project",
@@ -19,8 +19,8 @@ DEFAULT_FIELDS: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str]]] = 
         "release",
         "fields",
     ),
-    OutputFormat.CSV: None,
-    OutputFormat.JSON: None,
+    OutputFormat.CSV.value: None,
+    OutputFormat.JSON.value: None,
 }
 
 #: The ``Typer`` instance to use for the ``varannos`` sub command.
@@ -49,18 +49,16 @@ def cli_varannoset_list(
     """List all Varannoset entries for the"""
     common_options: common.CommonOptions = ctx.obj
 
-    lister = ListObjects(
-        common_options=common_options,
-        typ=api.VarAnnoSetV1,
-        default_fields=DEFAULT_FIELDS,
-        project_uuid=project_uuid,
-        callable=api.varannoset_list,
-    )
+    lister = ListObjects(api.VarAnnoSetV1)
     return lister.run(
+        common_options=common_options,
+        callable=api.varannoset_list,
         output_file=output_file,
         output_format=output_format,
         output_delimiter=output_delimiter,
         output_fields=output_fields,
+        project_uuid=project_uuid,
+        default_fields=DEFAULT_FIELDS,
     )
 
 
@@ -74,15 +72,14 @@ def cli_varannoset_retrieve(
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
 ):
+    """Retrieve Varannoset by UUID"""
     common_options: common.CommonOptions = ctx.obj
 
-    retriever = RetrieveObject(
+    retriever = RetrieveObject(api.Project)
+    return retriever.run(
         common_options=common_options,
-        typ=api.Project,
+        callable=api.varannoset_retrieve,
         key_name="varannoset_uuid",
         object_uuid=object_uuid,
-        callable=api.varannoset_retrieve,
-    )
-    return retriever.run(
         output_file=output_file,
     )
