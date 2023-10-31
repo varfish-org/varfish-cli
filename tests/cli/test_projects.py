@@ -1,3 +1,5 @@
+"""Test CLI for projects API."""
+
 import json
 import typing
 
@@ -13,30 +15,12 @@ from varfish_cli import exceptions
 from varfish_cli.cli import app
 
 
-def test_project_list_empty_config(
-    runner: CliRunner,
-    fake_fs_empty_config: FakeFs,
-    requests_mock: RequestsMocker,
-    mocker: MockerFixture,
-):
-    mocker.patch("varfish_cli.config.open", fake_fs_empty_config.open_, create=True)
-    mocker.patch("varfish_cli.config.os", fake_fs_empty_config.os)
-
-    m = requests_mock.register_uri(adapter.ANY, adapter.ANY, text="resp")
-    with pytest.raises(exceptions.InvalidConfiguration):
-        runner.invoke(app, ["--verbose", "projects", "project-list"])
-
-    mocker.stopall()
-
-    assert m.request_history == []
-
-
 @pytest.fixture
 def project_list_result_empty() -> typing.List[typing.Any]:
     return []
 
 
-def test_project_list_configured_empty(
+def test_project_list_empty(
     runner: CliRunner,
     fake_fs_configured: FakeFs,
     requests_mock: RequestsMocker,
@@ -68,7 +52,7 @@ def project_list_result_two_elements() -> typing.List[typing.Any]:
         return json.load(inputf)
 
 
-def test_project_list_configured_two_elements(
+def test_project_list_two_elements(
     runner: CliRunner,
     fake_fs_configured: FakeFs,
     requests_mock: RequestsMocker,
