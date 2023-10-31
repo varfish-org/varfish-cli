@@ -32,4 +32,4 @@ lint: flake8 isort-check black-check
 
 .PHONY: test
 test:
-	pytest .
+	TZ=UTC LC_ALL=C pytest .
