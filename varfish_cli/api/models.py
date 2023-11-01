@@ -1,6 +1,5 @@
 """Data models for supporting the VarFish CLI."""
 
-import datetime
 from enum import Enum, unique
 import typing
 import uuid
