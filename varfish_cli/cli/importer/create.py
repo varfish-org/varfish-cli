@@ -10,7 +10,6 @@ import sys
 import typing
 import uuid
 
-import attr
 from logzero import logger
 import polyleven
 import pydantic
@@ -169,9 +168,10 @@ EXPECTED_EFFECTS_SV = [
 EXPECTED_GENE_ANNOTATIONS = ["gene_symbol", "entrez_id", "ensembl_gene_id", "annotation"]
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class PathWithTimestamp:
+class PathWithTimestamp(pydantic.BaseModel):
     """Helper type for storing a path with a timestamp."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     #: The path that we have the timestamp for.
     path: str
@@ -181,7 +181,7 @@ class PathWithTimestamp:
     @classmethod
     def from_path(cls, path):
         """Construct from path."""
-        return PathWithTimestamp(path, os.stat(os.path.realpath(path)).st_mtime)
+        return cls(path=path, mtime=os.stat(os.path.realpath(path)).st_mtime)
 
     @property
     def basename(self):
@@ -529,7 +529,7 @@ class CaseImporter:
         logger.info(
             "Pedigree =\n%s",
             tabulate(
-                [list(map(str, attr.astuple(m))) for m in self.pedigree],
+                [list(map(str, dict(m).values())) for m in self.pedigree],
                 headers=["name", "father", "mother", "sex", "disease", "has_gts"],
                 tablefmt="grid",
             ),
@@ -544,17 +544,18 @@ class CaseImporter:
             if strip_suffix(case_info.name) == name:
                 logger.info("Found existing case info: %s", case_info)
                 # Make sure to update index and pedigree to current value.
-                case_info = attr.assoc(case_info, index=index, pedigree=self.pedigree)
+                case_info = case_info.model_copy(update={"index": index, "pedigree": self.pedigree})
                 if self.options.resubmit and case_info.state in (
                     CaseImportState.SUBMITTED,
                     CaseImportState.IMPORTED,
                     CaseImportState.FAILED,
                 ):
                     logger.info("Case is submitted and --resubmit given, marking as draft.")
-                    case_info = attr.assoc(
-                        case_info,
-                        release=GenomeBuild(self.options.genomebuild),
-                        state=CaseImportState.DRAFT,
+                    case_info = case_info.model_copy(
+                        update={
+                            "release": GenomeBuild(self.options.genomebuild),
+                            "state": CaseImportState.DRAFT,
+                        }
                     )
                     logger.info("Updating state existing case draft info: %s", case_info)
                     api.case_import_info_update(
@@ -767,7 +768,9 @@ class CaseImporter:
                 api_token=self.common_options.varfish_api_token.get_secret_value(),
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
-                data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+                data=variant_set_import_info.model_copy(
+                    update={"state": VariantSetImportState.UPLOADED}
+                ),
                 verify_ssl=self.common_options.verify_ssl,
             )
 
@@ -805,7 +808,9 @@ class CaseImporter:
                 api_token=self.common_options.varfish_api_token.get_secret_value(),
                 case_import_info_uuid=case_import_info.sodar_uuid,
                 variant_set_import_info_uuid=variant_set_import_info.sodar_uuid,
-                data=attr.assoc(variant_set_import_info, state=VariantSetImportState.UPLOADED),
+                data=variant_set_import_info.model_copy(
+                    update={"state": VariantSetImportState.UPLOADED}
+                ),
                 verify_ssl=self.common_options.verify_ssl,
             )
 
@@ -830,10 +835,11 @@ class CaseImporter:
                 VariantSetImportState.FAILED,
             ):
                 logger.info("Variant set is submitted and --resubmit given, marking as draft.")
-                variant_set_info = attr.assoc(
-                    variant_set_info,
-                    genomebuild=GenomeBuild(self.options.genomebuild),
-                    state=VariantSetImportState.DRAFT,
+                variant_set_info = variant_set_info.model_copy(
+                    update={
+                        "genomebuild": GenomeBuild(self.options.genomebuild),
+                        "state": VariantSetImportState.DRAFT,
+                    }
                 )
                 logger.info("Updating state existing variant set draft info: %s", variant_set_info)
                 api.variant_set_import_info_update(
@@ -870,6 +876,6 @@ class CaseImporter:
             api_token=self.common_options.varfish_api_token.get_secret_value(),
             project_uuid=self.options.project_uuid,
             case_import_info_uuid=case_import_info.sodar_uuid,
-            data=attr.assoc(case_import_info, state=CaseImportState.SUBMITTED),
+            data=case_import_info.model_copy(update={"state": CaseImportState.SUBMITTED}),
             verify_ssl=self.common_options.verify_ssl,
         )

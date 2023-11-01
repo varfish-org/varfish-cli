@@ -3,7 +3,7 @@
   "parent": null,
   "title": "Test Category",
   "type": "CATEGORY",
-  "description": "None",
+  "description": null,
   "readme": "",
   "public_guest_access": false,
   "archive": false

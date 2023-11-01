@@ -33,3 +33,7 @@ lint: flake8 isort-check black-check
 .PHONY: test
 test:
 	TZ=UTC LC_ALL=C pytest .
+
+.PHONY: test-update-snapshots
+test-update-snapshots:
+	TZ=UTC LC_ALL=C pytest --snapshot-update .

@@ -3,6 +3,7 @@
 import typing
 import uuid
 
+import pydantic
 import typer
 
 from varfish_cli import api, common
@@ -101,7 +102,9 @@ def cli_varannoset_create(
     """Create new Varannoset"""
     common_options: common.CommonOptions = ctx.obj
 
-    payload = common.load_json(payload_or_path)
+    payload = pydantic.TypeAdapter(api.VarAnnoSetV1).validate_python(
+        common.load_json(payload_or_path)
+    )
 
     create_object = CreateObject(api.VarAnnoSetV1)
     return create_object.run(
@@ -153,7 +156,9 @@ def cli_varannoset_update(
     """Create new Varannoset"""
     common_options: common.CommonOptions = ctx.obj
 
-    payload = common.load_json(payload_or_path)
+    payload = pydantic.TypeAdapter(api.VarAnnoSetV1).validate_python(
+        common.load_json(payload_or_path)
+    )
 
     update_object = UpdateObject(api.VarAnnoSetV1)
     return update_object.run(
@@ -237,9 +242,11 @@ def cli_varannosetentry_create(
     """Create new Varannoset"""
     common_options: common.CommonOptions = ctx.obj
 
-    payload = common.load_json(payload_or_path)
+    payload = pydantic.TypeAdapter(api.VarAnnoSetEntryV1).validate_python(
+        common.load_json(payload_or_path)
+    )
 
-    create_object = CreateObject(api.VarAnnoSetV1)
+    create_object = CreateObject(api.VarAnnoSetEntryV1)
     return create_object.run(
         common_options=common_options,
         callable=api.varannosetentry_create,
@@ -289,7 +296,9 @@ def cli_varannosetentry_update(
     """Create new Varannoset"""
     common_options: common.CommonOptions = ctx.obj
 
-    payload = common.load_json(payload_or_path)
+    payload = pydantic.TypeAdapter(api.VarAnnoSetEntryV1).validate_python(
+        common.load_json(payload_or_path)
+    )
 
     update_object = UpdateObject(api.VarAnnoSetEntryV1)
     return update_object.run(

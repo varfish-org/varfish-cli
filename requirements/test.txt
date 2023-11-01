@@ -1,7 +1,8 @@
 -r base.txt
 
-# Multi-environment testing
-tox ==4.11.3
+# While pydantic is great in the production code, for just bundling
+# things, attrs is still better.
+attrs >=23
 
 # Wonderful py.test for testing
 pytest >=3.6.0

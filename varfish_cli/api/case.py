@@ -5,13 +5,13 @@ import typing
 import uuid
 
 from logzero import logger
+import pydantic
 import requests
 from simplejson import JSONDecodeError as SimpleJSONDecodeError
 
 from varfish_cli.api import models
 from varfish_cli.api.common import raise_for_status
 from varfish_cli.api.models import (
-    CONVERTER,
     BamQcFile,
     Case,
     CaseGeneAnnotationFile,
@@ -158,7 +158,7 @@ def case_list(
     result = _paginated_request(
         endpoint, headers=headers, verify=verify_ssl, params={"page_size": 100}
     )
-    return CONVERTER.structure(result, typing.List[Case])
+    return pydantic.TypeAdapter(typing.List[Case]).validate_python(result)
 
 
 def case_retrieve(
@@ -173,7 +173,7 @@ def case_retrieve(
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    return CONVERTER.structure(result.json(), CaseImportInfo)
+    return pydantic.TypeAdapter(CaseImportInfo).validate_python(result.json())
 
 
 def case_import_info_list(
@@ -206,7 +206,7 @@ def case_import_info_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[CaseImportInfo])
+        return pydantic.TypeAdapter(typing.List[CaseImportInfo]).validate_python(result.json())
 
 
 def case_import_info_retrieve(
@@ -236,7 +236,7 @@ def case_import_info_retrieve(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), CaseImportInfo)
+        return pydantic.TypeAdapter(CaseImportInfo).validate_python(result.json())
 
 
 def case_import_info_create(
@@ -254,9 +254,9 @@ def case_import_info_create(
     )
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
-    logger.debug("json=%s", CONVERTER.unstructure(data))
+    logger.debug("json=%s", data.model_dump(mode="json"))
     result = requests.post(
-        endpoint, headers=headers, json=CONVERTER.unstructure(data), verify=verify_ssl
+        endpoint, headers=headers, json=data.model_dump(mode="json"), verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -268,7 +268,7 @@ def case_import_info_create(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), CaseImportInfo)
+        return pydantic.TypeAdapter(CaseImportInfo).validate_python(result.json())
 
 
 def case_import_info_update(
@@ -289,9 +289,9 @@ def case_import_info_update(
     )
     logger.debug("Sending PUT request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
-    logger.debug("json=%s", CONVERTER.unstructure(data))
+    logger.debug("json=%s", data.model_dump(mode="json"))
     result = requests.put(
-        endpoint, headers=headers, json=CONVERTER.unstructure(data), verify=verify_ssl
+        endpoint, headers=headers, json=data.model_dump(mode="json"), verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -303,7 +303,7 @@ def case_import_info_update(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), CaseImportInfo)
+        return pydantic.TypeAdapter(CaseImportInfo).validate_python(result.json())
 
 
 def variant_set_import_info_list(
@@ -331,7 +331,9 @@ def variant_set_import_info_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[VariantSetImportInfo])
+        return pydantic.TypeAdapter(typing.List[VariantSetImportInfo]).validate_python(
+            result.json()
+        )
 
 
 def variant_set_import_info_create(
@@ -350,7 +352,7 @@ def variant_set_import_info_create(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, json=CONVERTER.unstructure(data), verify=verify_ssl
+        endpoint, headers=headers, json=data.model_dump(mode="json"), verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -362,7 +364,7 @@ def variant_set_import_info_create(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), VariantSetImportInfo)
+        return pydantic.TypeAdapter(VariantSetImportInfo).validate_python(result.json())
 
 
 def variant_set_import_info_update(
@@ -384,9 +386,9 @@ def variant_set_import_info_update(
     )
     logger.debug("Sending PUT request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
-    logger.debug("json=%s", CONVERTER.unstructure(data))
+    logger.debug("json=%s", data.model_dump(mode="json"))
     result = requests.put(
-        endpoint, headers=headers, json=CONVERTER.unstructure(data), verify=verify_ssl
+        endpoint, headers=headers, json=data.model_dump(mode="json"), verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -398,7 +400,7 @@ def variant_set_import_info_update(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), VariantSetImportInfo)
+        return pydantic.TypeAdapter(VariantSetImportInfo).validate_python(result.json())
 
 
 def bam_qc_file_list(
@@ -425,7 +427,7 @@ def bam_qc_file_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[BamQcFile])
+        return pydantic.TypeAdapter(typing.List[BamQcFile]).validate_python(result.json())
 
 
 def bam_qc_file_upload(
@@ -444,7 +446,7 @@ def bam_qc_file_upload(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+        endpoint, headers=headers, data=data.model_dump(mode="json"), files=files, verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -456,7 +458,7 @@ def bam_qc_file_upload(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), BamQcFile)
+        return pydantic.TypeAdapter(BamQcFile).validate_python(result.json())
 
 
 def bam_qc_file_destroy(
@@ -511,7 +513,9 @@ def case_gene_annotation_file_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[CaseGeneAnnotationFile])
+        return pydantic.TypeAdapter(typing.List[CaseGeneAnnotationFile]).validate_python(
+            result.json()
+        )
 
 
 def case_gene_annotation_file_upload(
@@ -532,7 +536,7 @@ def case_gene_annotation_file_upload(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+        endpoint, headers=headers, data=data.model_dump(mode="json"), files=files, verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -544,7 +548,7 @@ def case_gene_annotation_file_upload(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), CaseGeneAnnotationFile)
+        return pydantic.TypeAdapter(CaseGeneAnnotationFile).validate_python(result.json())
 
 
 def case_gene_annotation_file_destroy(
@@ -602,7 +606,7 @@ def genotype_file_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[GenotypeFile])
+        return pydantic.TypeAdapter(typing.List[GenotypeFile]).validate_python(result.json())
 
 
 def genotype_file_upload(
@@ -623,7 +627,7 @@ def genotype_file_upload(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+        endpoint, headers=headers, data=data.model_dump(mode="json"), files=files, verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -635,7 +639,7 @@ def genotype_file_upload(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), GenotypeFile)
+        return pydantic.TypeAdapter(GenotypeFile).validate_python(result.json())
 
 
 def genotype_file_destroy(
@@ -693,7 +697,7 @@ def effects_file_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[EffectsFile])
+        return pydantic.TypeAdapter(typing.List[EffectsFile]).validate_python(result.json())
 
 
 def effects_file_upload(
@@ -714,7 +718,7 @@ def effects_file_upload(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+        endpoint, headers=headers, data=data.model_dump(mode="json"), files=files, verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -726,7 +730,7 @@ def effects_file_upload(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), EffectsFile)
+        return pydantic.TypeAdapter(EffectsFile).validate_python(result.json())
 
 
 def effects_file_destroy(
@@ -784,7 +788,7 @@ def db_info_file_list(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), typing.List[DatabaseInfoFile])
+        return pydantic.TypeAdapter(typing.List[DatabaseInfoFile]).validate_python(result.json())
 
 
 def db_info_file_upload(
@@ -805,7 +809,7 @@ def db_info_file_upload(
     logger.debug("Sending POST request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.post(
-        endpoint, headers=headers, data=CONVERTER.unstructure(data), files=files, verify=verify_ssl
+        endpoint, headers=headers, data=data.model_dump(mode="json"), files=files, verify=verify_ssl
     )
     if not result.ok:
         try:
@@ -817,7 +821,7 @@ def db_info_file_upload(
             msg = "REST API returned status code %d: %s" % (result.status_code, result.content)
         raise RestApiCallException(msg)
     else:
-        return CONVERTER.structure(result.json(), DatabaseInfoFile)
+        return pydantic.TypeAdapter(DatabaseInfoFile).validate_python(result.json())
 
 
 def db_info_file_destroy(

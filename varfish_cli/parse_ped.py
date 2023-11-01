@@ -3,7 +3,7 @@
 import re
 import typing
 
-import attr
+import pydantic
 
 #: Translation scheme for PED attribute sex to text.
 SEX_MAP = {"0": "unknown", "1": "male", "2": "female"}
@@ -12,9 +12,10 @@ SEX_MAP = {"0": "unknown", "1": "male", "2": "female"}
 DISEASE_MAP = {"0": "unknown", "1": "unaffected", "2": "affected"}
 
 
-@attr.s(frozen=True, auto_attribs=True)
-class Donor:
+class Donor(pydantic.BaseModel):
     """Represent donor from PED."""
+
+    model_config = pydantic.ConfigDict(frozen=True)
 
     family_id: str
     name: str

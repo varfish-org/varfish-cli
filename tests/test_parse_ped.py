@@ -17,4 +17,4 @@ def test_parse_ped():
         "Donor(family_id='FAM', name='mother', father_name='0', "
         "mother_name='0', sex='female', disease='unaffected')",
     ]
-    assert list(map(str, result)) == expected
+    assert list(map(repr, result)) == expected

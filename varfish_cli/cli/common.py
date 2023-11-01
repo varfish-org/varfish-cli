@@ -5,8 +5,8 @@ import sys
 import typing
 import uuid
 
-import attrs
 from logzero import logger
+import pydantic
 import typer
 
 from varfish_cli import api, common, config
@@ -14,7 +14,7 @@ from varfish_cli.common import OutputFormat
 from varfish_cli.exceptions import RestApiCallException
 
 #: Type to use for model in the helper classes below.
-ModelType = typing.TypeVar("ModelType", bound=object)
+ModelType = typing.TypeVar("ModelType", bound=pydantic.BaseModel)
 
 
 class ListObjects(typing.Generic[ModelType]):
@@ -35,7 +35,7 @@ class ListObjects(typing.Generic[ModelType]):
         parent_uuid: typing.Optional[uuid.UUID] = None,
         parent_key: str = "project_uuid",
     ):
-        all_fields = [f.name for f in attrs.fields(self.model)]
+        all_fields = [f for f in self.model.model_fields.keys()]
         output_fields: typing.List[str] = (
             output_fields or default_fields.get(output_format.value) or all_fields
         )
@@ -54,7 +54,9 @@ class ListObjects(typing.Generic[ModelType]):
 
             logger.info("Generating output")
             header = (
-                output_fields if output_fields else [f.name for f in attrs.fields(api.VarAnnoSetV1)]
+                output_fields
+                if output_fields
+                else [f for f in api.VarAnnoSetV1.model_fields.keys()]
             )
             output = common.tabular_output(values=res, header=header)
 
@@ -105,7 +107,7 @@ class RetrieveObject(typing.Generic[ModelType]):
                 verify_ssl=common_options.verify_ssl,
                 **kwargs,
             )
-            res_json = api.CONVERTER.unstructure(res)
+            res_json = res.model_dump(mode="json")
 
             logger.info(f"{self.model.__name__} Detail")
             logger.info("============" + "=" * len(str(self.model.__name__)))
@@ -149,7 +151,7 @@ class CreateObject(typing.Generic[ModelType]):
                 payload=payload,
                 **kwargs,
             )
-            res_json = api.CONVERTER.unstructure(res)
+            res_json = res.model_dump(mode="json")
 
             logger.info(f"{self.model.__name__} Detail")
             logger.info("============" + "=" * len(str(self.model.__name__)))
@@ -193,7 +195,7 @@ class UpdateObject(typing.Generic[ModelType]):
                 payload=payload,
                 **kwargs,
             )
-            res_json = api.CONVERTER.unstructure(res)
+            res_json = res.model_dump(mode="json")
 
             logger.info(f"{self.model.__name__} Detail")
             logger.info("============" + "=" * len(str(self.model.__name__)))

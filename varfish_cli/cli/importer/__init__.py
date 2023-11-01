@@ -7,9 +7,10 @@ import uuid
 from logzero import logger
 import typer
 
-from varfish_cli import api, common
+from varfish_cli import api
 from varfish_cli.api import GenomeBuild
 from varfish_cli.cli.importer.create import CaseImporter, CaseImportOptions
+from varfish_cli.config import CommonOptions
 
 #: The ``Typer`` instance to use for the ``cases`` sub command.
 app = typer.Typer(no_args_is_help=True)
@@ -30,7 +31,7 @@ def run(
     ] = "-",
 ):
     """List case import infos."""
-    common_options: common.CommonConfig = ctx.obj
+    common_options: CommonOptions = ctx.obj
     logger.info("Listing CaseImportInfo records")
     if owner:
         logger.info("- filter owner: %s" % owner)
@@ -134,7 +135,7 @@ def cli_caseimportinfo_create(
     ] = GenomeBuild.GRCH37.value,
 ):
     logger.info("Creating CaseImportInfo object...")
-    common_options: common.CommonConfig = ctx.obj
+    common_options: CommonOptions = ctx.obj
     case_importer = CaseImporter(
         options=CaseImportOptions(
             paths=paths,
