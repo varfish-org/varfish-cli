@@ -341,3 +341,22 @@ class VarAnnoSetEntryV1(pydantic.BaseModel):
     alternative: str
     #: Data, the set's fields are the keys.
     payload: typing.Dict[str, str]
+
+
+class SettingsEntry(pydantic.BaseModel):
+    """Configuration entry from server"""
+
+    #: Project UUID.
+    project: typing.Optional[uuid.UUID]
+    #: User UUID, if any.
+    user: typing.Optional[uuid.UUID]
+    #: Name of the app.
+    app_name: str
+    #: Name of the setting.
+    name: str
+    #: Type of the setting.
+    type: typing.Literal["STRING", "INTEGER", "BOOLEAN"]
+    #: Value of the setting.
+    value: typing.Any
+    #: Whether the user can modify the setting.
+    user_modifiable: bool

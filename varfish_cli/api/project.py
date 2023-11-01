@@ -8,7 +8,7 @@ import pydantic
 import requests
 
 from varfish_cli.api.common import raise_for_status
-from varfish_cli.api.models import Project
+from varfish_cli.api.models import Project, SettingsEntry
 from varfish_cli.common import strip_trailing_slash
 
 ACCEPT_API_VARFISH = ""
@@ -17,6 +17,8 @@ ACCEPT_API_VARFISH = ""
 ENDPOINT_PROJECT_LIST = "/project/api/list"
 #: End point for retrieving projects.
 ENDPOINT_PROJECT_RETRIEVE = "/project/api/retrieve/{project_uuid}"
+#: End point for retrieving projects settings.
+ENDPOINT_PROJECT_RETRIEVE = "/project/api/settings/retrieve/{project_uuid}"
 
 
 def project_list(
@@ -48,3 +50,29 @@ def project_retrieve(
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
     return pydantic.TypeAdapter(Project).validate_python(result.json())
+
+
+def project_settings_retrieve(
+    server_url: str,
+    api_token: str,
+    project_uuid: typing.Union[str, uuid.UUID],
+    app_name: typing.Optional[str],
+    setting_name: typing.Optional[str],
+    verify_ssl: bool = True,
+ ) -> SettingsEntry:
+    server_url = strip_trailing_slash(server_url)
+    queries = []
+    if app_name:
+        queries.append(f"app_name={app_name}")
+    if setting_name:
+        queries.append(f"setting_name={setting_name}")
+    query = "&".join(queries)
+    if query:
+        query = f"?{query}"
+    endpoint = f"{server_url}{ENDPOINT_PROJECT_RETRIEVE}{query}".format(project_uuid=project_uuid)
+    logger.debug("Sending GET request to end point %s", endpoint)
+    headers = {"Authorization": "Token %s" % api_token}
+    result = requests.get(endpoint, headers=headers, verify=verify_ssl)
+    raise_for_status(result)
+    print(result.json())
+    return pydantic.TypeAdapter(SettingsEntry).validate_python(result.json())

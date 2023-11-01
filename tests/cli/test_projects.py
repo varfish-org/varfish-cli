@@ -110,3 +110,61 @@ def test_project_retrieve(
 
     assert result.exit_code == 0, result.output
     snapshot.assert_match(result.output, "result_output")
+
+
+def test_project_load_config(
+    runner: CliRunner,
+    fake_fs_configured: FakeFs,
+    requests_mock: RequestsMocker,
+    fake_conn: typing.Tuple[str, str],
+    project_retrieve_result,
+    snapshot: Snapshot,
+    mocker: MockerFixture,
+):
+    mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
+    mocker.patch("varfish_cli.config.os", fake_fs_configured.os)
+
+    responses = {
+        "import_data_host": ("STRING", "http-host.example.com"),
+        "import_data_password": ("STRING", "http-password"),
+        "import_data_path": ("STRING", "http-prefix/"),
+        "import_data_port": ("INTEGER", 80),
+        "import_data_protocol": ("STRING", "http"),
+        "import_data_user": ("STRING", "http-user"),
+    }
+
+    project_uuid = str(uuid.uuid4())
+    host, token = fake_conn
+    req_mocks = []
+    for setting_name, (setting_type, setting_value) in responses.items():
+        req_mocks.append(
+            requests_mock.get(
+                (
+                    f"{host}/project/api/retrieve/{project_uuid}?app_name=cases_import"
+                    f"&setting_name={setting_name}"
+                ),
+                request_headers={"Authorization": f"Token {token}"},
+                json={
+                    "project": project_uuid,
+                    "user": None,
+                    "name": setting_name,
+                    "type": setting_type,
+                    "value": setting_value,
+                    "user_modifiable": True,
+                    "app_name": "cases_import",
+                },
+            )
+        )
+    result = runner.invoke(app, ["--verbose", "projects", "project-load-config", project_uuid])
+
+    rc_path = fake_fs_configured.os.path.expanduser("~/.varfishrc.toml")
+    with fake_fs_configured.open_(rc_path, "rt") as inputf:
+        fcontents = inputf.read()
+
+    mocker.stopall()
+
+    for req_mock in req_mocks:
+        assert req_mock.called_once, req_mock._netloc
+
+    assert result.exit_code == 0, result.output
+    snapshot.assert_match(fcontents, "result_output")
