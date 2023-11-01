@@ -181,7 +181,7 @@ class PathWithTimestamp(pydantic.BaseModel):
     @classmethod
     def from_path(cls, path):
         """Construct from path."""
-        return PathWithTimestamp(path, os.stat(os.path.realpath(path)).st_mtime)
+        return cls(path=path, mtime=os.stat(os.path.realpath(path)).st_mtime)
 
     @property
     def basename(self):
