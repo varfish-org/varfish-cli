@@ -4,39 +4,35 @@
 
 # VarFish CLI
 
-Command line interface for [VarFishServer](https://github.com/bihealth/varfish-server).
+Command line interface for [bihealth/varfish-server](https://github.com/bihealth/varfish-server).
 
-## Getting Started
-
-- [VarFish Homepage](https://www.cubi.bihealth.org/software/varfish/)
-- [Manual](https://varfish-server.readthedocs.io/en/latest/)
-    - [Installation Instructions](https://varfish-server.readthedocs.io/en/latest/admin_install.html)
-- [Docker Compose Installer](https://github.com/bihealth/varfish-docker-compose#run-varfish-server-using-docker-compose)
-
-## VarFish Repositories
-
-- [varfish-server](https://github.com/bihealth/varfish-server) --
-  The VarFish Server is the web frontend used by the end users / data analysts.
-- [varfish-annotator](https://github.com/bihealth/varfish-annotator) --
-  The VarFish Annotator is a command line utility used for annotating VCF files and converting them to files that can be imported into VarFish Server.
-- [varfish-cli](https://github.com/bihealth/varfish-cli) --
-  The VarFish Command Line Interface allows to import data through the VarFish REST API.
-- [varfish-db-downloader](https://github.com/bihealth/varfish-db-downloader) --
-  The VarFish DB Downloader is a command line tool for downloading the background database.
-- [varfish-docker-compose](https://github.com/bihealth/varfish-docker-compose) --
-  Quickly get started running a VarFish server by using Docker Compose.
-  We provide a prebuilt data set with some already imported data.
+> [!NOTE]
+> This repository focuses on the command line interface program `varfish-cli`.
+> If you are new to VarFish, you may want to start at the repository [bihealth/varfish-server](https://github.com/bihealth/varfish-server).
 
 ## Installation
 
-### From Source
+You can install `varfish-cli` from [bioconda](https://bioconda.github.io/):
 
-```bash
-$ git clone git@github.com:bihealth/varfish-cli.git
-$ cd varfish-cli
-$ conda create -n varfish-cli python=3.7
-$ conda activate varfish-cli
-$ pip install -e .
+To create a new conda environment named `varfish-cli` with the package:
+
+```
+mamba create -y -n varfish-cli -c bioconda varfish-cli
+conda activate varfish-cli
+varfish-cli --help
+```
+
+To get help with individual sub commands:
+
+```
+varfish-cli importer
+# OR
+varfish-cli importer --help
+```
+
+You will also need to create a configuration file in your home folder with the server address:
+
+```
 $ cat >~/.varfishrc.toml <<EOF
 [global]
 
@@ -47,14 +43,34 @@ varfish_api_token = "XXX"
 EOF
 ```
 
-### Using pip
+## Developer Information
 
+### Development Setup
 
-`varfish-cli` is also available as a pip-Package.
-Preferably install into a separate venv.
+Preqrequisites:
 
-```bash
-$ pip install varfish-cli
+- Python >=3.10
+
+Clone the repository:
+
+```
+git clone git@github.com:bihealth/varfish-cli.git
+cd varfish-cli-ng
+```
+
+Now, create a virtualenv and install the software and its development requirements:
+
+```
+virtualenv venv
+source venv/bin/activate
+
+pip install -r requirements/develop.txt
+pip install -e .
+```
+
+Finally, create the configuration file:
+
+```
 $ cat >~/.varfishrc.toml <<EOF
 [global]
 
@@ -63,4 +79,19 @@ varfish_server_url = "https://varfish.example.com/"
 # API token to use for VarFish API.
 varfish_api_token = "XXX"
 EOF
+```
+
+### GitHub Project Management with Terraform
+
+```
+export GITHUB_OWNER=bihealth
+export GITHUB_TOKEN=ghp_<thetoken>
+
+cd utils/terraform
+terraform init
+terraform import github_repository.varfish-cli varfish-cli
+terraform validate
+terraform fmt
+terraform plan
+terraform apply
 ```
