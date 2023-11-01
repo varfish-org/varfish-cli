@@ -1,14 +1,17 @@
 [![CI](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml/badge.svg)](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/bihealth/varfish-cli/branch/main/graph/badge.svg?token=9ZX53MPEJT)](https://codecov.io/gh/bihealth/varfish-cli)
+[![Documentation Status](https://readthedocs.org/projects/varfish-cli/badge/?version=latest)](https://varfish-cli.readthedocs.io/en/latest/?badge=latest)
 [![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
 
-# VarFish CLI
+# VarFish Command Line Interface
 
 Command line interface for [bihealth/varfish-server](https://github.com/bihealth/varfish-server).
 
 > [!NOTE]
 > This repository focuses on the command line interface program `varfish-cli`.
 > If you are new to VarFish, you may want to start at the repository [bihealth/varfish-server](https://github.com/bihealth/varfish-server).
+
+- **User Manual:** [varfish-cli user manual](https://varfish-cli.readthedocs.io/en/latest/)
 
 ## Installation
 
