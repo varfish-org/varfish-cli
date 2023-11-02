@@ -1,5 +1,14 @@
 """Implementation of varfish-cli subcommand "projects *"."""
 
+import os
+
+try:
+    import tomllib
+    from tomllib import TOMLDecodeError
+except ImportError:
+    import toml as tomllib
+    from toml import TomlDecodeError as TOMLDecodeError
+
 import typing
 import uuid
 
@@ -7,6 +16,7 @@ from logzero import logger
 import typer
 
 from varfish_cli import api, common
+from varfish_cli.cli import DEFAULT_PATH_VARFISHRC
 from varfish_cli.cli.common import ListObjects, RetrieveObject
 from varfish_cli.common import OutputFormat
 from varfish_cli.config import CommonOptions
@@ -86,6 +96,10 @@ def cli_project_load_config(
     project_uuid: typing.Annotated[
         uuid.UUID, typer.Argument(..., help="UUID of the object to retrieve")
     ],
+    config_path: typing.Annotated[
+        str,
+        typer.Option("--config-path", help="Path to configuration file", envvar="VARFISH_RC_PATH"),
+    ] = DEFAULT_PATH_VARFISHRC,
     output_file: typing.Annotated[
         str, typer.Option("--output-file", help="Path to file to write to")
     ] = "-",
@@ -120,5 +134,17 @@ def cli_project_load_config(
         print(kwargs)
 
     logger.info("... all data retrieved, updating config...")
+
+    if not os.path.exists(config_path):
+        with open(config_path, "rt") as tomlf:
+            try:
+                config_toml = tomllib.loads(tomlf.read())
+            except TOMLDecodeError as e:
+                logger.error("could not parse configuration file %s: %s", config_path, e)
+                raise typer.Exit(1)
+    else:
+        config_toml = {}
+
+    config_toml.setdefault("paths", [])
 
     print(kwargs)

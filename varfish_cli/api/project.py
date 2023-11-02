@@ -18,7 +18,7 @@ ENDPOINT_PROJECT_LIST = "/project/api/list"
 #: End point for retrieving projects.
 ENDPOINT_PROJECT_RETRIEVE = "/project/api/retrieve/{project_uuid}"
 #: End point for retrieving projects settings.
-ENDPOINT_PROJECT_RETRIEVE = "/project/api/settings/retrieve/{project_uuid}"
+ENDPOINT_PROJECT_SETTING_RETRIEVE = "/project/api/settings/retrieve/{project_uuid}"
 
 
 def project_list(
@@ -69,10 +69,9 @@ def project_settings_retrieve(
     query = "&".join(queries)
     if query:
         query = f"?{query}"
-    endpoint = f"{server_url}{ENDPOINT_PROJECT_RETRIEVE}{query}".format(project_uuid=project_uuid)
+    endpoint = f"{server_url}{ENDPOINT_PROJECT_SETTING_RETRIEVE}{query}".format(project_uuid=project_uuid)
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)
     raise_for_status(result)
-    print(result.json())
     return pydantic.TypeAdapter(SettingsEntry).validate_python(result.json())

@@ -60,7 +60,7 @@ def load_config(config_path: str) -> typing.Tuple[typing.Optional[str], typing.O
                 logger.debug("global/varfish_server_url not set in %s", config_path)
             toml_varfish_api_token = config_toml.get("global", {}).get("varfish_api_token")
             if toml_varfish_api_token:
-                logger.debug("using global/varfish_server_url from %s", config_path)
+                logger.debug("using global/varfish_api_token from %s", config_path)
             else:
                 logger.debug("global/varfish_api_token not set in %s", config_path)
 

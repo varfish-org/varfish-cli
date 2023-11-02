@@ -140,7 +140,7 @@ def test_project_load_config(
         req_mocks.append(
             requests_mock.get(
                 (
-                    f"{host}/project/api/retrieve/{project_uuid}?app_name=cases_import"
+                    f"{host}/project/api/settings/retrieve/{project_uuid}?app_name=cases_import"
                     f"&setting_name={setting_name}"
                 ),
                 request_headers={"Authorization": f"Token {token}"},
