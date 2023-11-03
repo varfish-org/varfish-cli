@@ -1,0 +1,11 @@
+[[projects]]
+uuid = "16251f30-1168-41c9-8af6-07c8f40f6860"
+import_data_protocol = "http"
+import_data_host = "http-host.example.com"
+import_data_path = "http-prefix/"
+import_data_user = "http-user"
+import_data_password = "http-password"
+
+[global]
+varfish_server_url = "http://varfish.example.com:8080"
+varfish_api_token = "faKeTOKeN"

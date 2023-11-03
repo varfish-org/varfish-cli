@@ -8,11 +8,9 @@ import typer
 
 from varfish_cli import __version__
 from varfish_cli.cli import cases, importer, projects, varannos
+from varfish_cli.cli.common import DEFAULT_PATH_VARFISHRC
 from varfish_cli.config import CommonOptions, load_config
 from varfish_cli.exceptions import InvalidConfiguration
-
-#: Paths to search the global configuration in.
-DEFAULT_PATH_VARFISHRC = "~/.varfishrc.toml"
 
 
 def version_callback(value: bool):

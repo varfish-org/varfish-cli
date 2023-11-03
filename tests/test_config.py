@@ -1,6 +1,5 @@
 import json
 
-import pydantic
 from pytest_snapshot.plugin import Snapshot
 
 from varfish_cli import config

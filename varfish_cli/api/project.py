@@ -59,7 +59,7 @@ def project_settings_retrieve(
     app_name: typing.Optional[str],
     setting_name: typing.Optional[str],
     verify_ssl: bool = True,
- ) -> SettingsEntry:
+) -> SettingsEntry:
     server_url = strip_trailing_slash(server_url)
     queries = []
     if app_name:
@@ -69,7 +69,9 @@ def project_settings_retrieve(
     query = "&".join(queries)
     if query:
         query = f"?{query}"
-    endpoint = f"{server_url}{ENDPOINT_PROJECT_SETTING_RETRIEVE}{query}".format(project_uuid=project_uuid)
+    endpoint = f"{server_url}{ENDPOINT_PROJECT_SETTING_RETRIEVE}{query}".format(
+        project_uuid=project_uuid
+    )
     logger.debug("Sending GET request to end point %s", endpoint)
     headers = {"Authorization": "Token %s" % api_token}
     result = requests.get(endpoint, headers=headers, verify=verify_ssl)

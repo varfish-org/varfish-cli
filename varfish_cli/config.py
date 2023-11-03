@@ -2,19 +2,12 @@
 
 import enum
 import os
-import uuid
-
-try:
-    import tomllib
-    from tomllib import TOMLDecodeError
-except ImportError:
-    import toml as tomllib
-    from toml import TomlDecodeError as TOMLDecodeError
-
 import typing
+import uuid
 
 from logzero import logger
 import pydantic
+import toml
 import typer
 
 
@@ -49,8 +42,8 @@ def load_config(config_path: str) -> typing.Tuple[typing.Optional[str], typing.O
         logger.debug("loading configuration from %s", config_path)
         with open(config_path, "rt") as tomlf:
             try:
-                config_toml = tomllib.loads(tomlf.read())
-            except TOMLDecodeError as e:
+                config_toml = toml.loads(tomlf.read())
+            except toml.TomlDecodeError as e:
                 logger.error("could not parse configuration file %s: %s", config_path, e)
                 raise typer.Exit(1)
             toml_varfish_server_url = config_toml.get("global", {}).get("varfish_server_url")
@@ -108,7 +101,7 @@ def load_projects(config_path: str) -> typing.Dict[uuid.UUID, ProjectConfig]:
 
     with open(config_path, "rt") as inputf:
         fcontents = inputf.read()
-    toml_dict = tomllib.loads(fcontents)
+    toml_dict = toml.loads(fcontents)
 
     projects = list(map(ProjectConfig.model_validate, toml_dict.get("projects", [])))
     return {p.uuid: p for p in projects}

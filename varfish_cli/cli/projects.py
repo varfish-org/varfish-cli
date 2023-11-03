@@ -1,25 +1,17 @@
 """Implementation of varfish-cli subcommand "projects *"."""
 
 import os
-
-try:
-    import tomllib
-    from tomllib import TOMLDecodeError
-except ImportError:
-    import toml as tomllib
-    from toml import TomlDecodeError as TOMLDecodeError
-
 import typing
 import uuid
 
 from logzero import logger
+import toml
 import typer
 
 from varfish_cli import api, common
-from varfish_cli.cli import DEFAULT_PATH_VARFISHRC
-from varfish_cli.cli.common import ListObjects, RetrieveObject
+from varfish_cli.cli.common import DEFAULT_PATH_VARFISHRC, ListObjects, RetrieveObject
 from varfish_cli.common import OutputFormat
-from varfish_cli.config import CommonOptions
+from varfish_cli.config import ProjectConfig
 
 #: Default fields for projects.
 DEFAULT_FIELDS_PROJECT: typing.Dict[OutputFormat, typing.Optional[typing.Tuple[str, ...]]] = {
@@ -100,9 +92,6 @@ def cli_project_load_config(
         str,
         typer.Option("--config-path", help="Path to configuration file", envvar="VARFISH_RC_PATH"),
     ] = DEFAULT_PATH_VARFISHRC,
-    output_file: typing.Annotated[
-        str, typer.Option("--output-file", help="Path to file to write to")
-    ] = "-",
 ):
     """Load project configuration for import and store in ~/.varfishrc.toml"""
     common_options: common.CommonOptions = ctx.obj
@@ -117,7 +106,7 @@ def cli_project_load_config(
         "import_data_user": str,
     }
 
-    kwargs = {}
+    kwargs = {"uuid": project_uuid}
     for field_name, field_type in fields_types.items():
         logger.debug(" - retrieving %s", field_name)
         setting_entry = api.project_settings_retrieve(
@@ -128,23 +117,33 @@ def cli_project_load_config(
             setting_name=field_name,
             verify_ssl=common_options.verify_ssl,
         )
-        print(setting_entry)
         if setting_entry.value:
             kwargs[field_name] = field_type(setting_entry.value)
-        print(kwargs)
+    project_config = ProjectConfig(**kwargs).model_dump(mode="json")
 
     logger.info("... all data retrieved, updating config...")
+    logger.debug("  - project_config: %s", project_config)
 
-    if not os.path.exists(config_path):
+    if os.path.exists(config_path):
         with open(config_path, "rt") as tomlf:
             try:
-                config_toml = tomllib.loads(tomlf.read())
-            except TOMLDecodeError as e:
+                config_toml = toml.loads(tomlf.read())
+            except toml.TomlDecodeError as e:
                 logger.error("could not parse configuration file %s: %s", config_path, e)
                 raise typer.Exit(1)
     else:
         config_toml = {}
 
-    config_toml.setdefault("paths", [])
+    config_toml.setdefault("projects", [])
+    match_idx = None
+    for idx, project in enumerate(config_toml["projects"]):
+        if project["project"] == str(project_config["uuid"]):
+            match_idx = idx
+            break
+    else:
+        config_toml["projects"].append(project_config)
+    if match_idx is not None:
+        config_toml["projects"][match_idx] = project_config
 
-    print(kwargs)
+    with open(config_path, "wt") as outputf:
+        outputf.write(toml.dumps(config_toml))
