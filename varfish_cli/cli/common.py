@@ -13,10 +13,6 @@ from varfish_cli import api, common, config
 from varfish_cli.common import OutputFormat
 from varfish_cli.exceptions import RestApiCallException
 
-#: Paths to search the global configuration in.
-DEFAULT_PATH_VARFISHRC = "~/.varfishrc.toml"
-
-
 #: Type to use for model in the helper classes below.
 ModelType = typing.TypeVar("ModelType", bound=pydantic.BaseModel)
 

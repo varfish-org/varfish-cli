@@ -20,6 +20,7 @@ This documentation will be expanded over time.
     :maxdepth: 1
 
     installation
+    cases_import
 
 .. toctree::
     :caption: Project Info

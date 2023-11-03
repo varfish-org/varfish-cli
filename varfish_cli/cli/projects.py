@@ -9,8 +9,8 @@ import toml
 import typer
 
 from varfish_cli import api, common
-from varfish_cli.cli.common import DEFAULT_PATH_VARFISHRC, ListObjects, RetrieveObject
-from varfish_cli.common import OutputFormat
+from varfish_cli.cli.common import ListObjects, RetrieveObject
+from varfish_cli.common import DEFAULT_PATH_VARFISHRC, OutputFormat
 from varfish_cli.config import ProjectConfig
 
 #: Default fields for projects.
@@ -124,6 +124,7 @@ def cli_project_load_config(
     logger.info("... all data retrieved, updating config...")
     logger.debug("  - project_config: %s", project_config)
 
+    config_path = os.path.expanduser(config_path)
     if os.path.exists(config_path):
         with open(config_path, "rt") as tomlf:
             try:
@@ -137,7 +138,7 @@ def cli_project_load_config(
     config_toml.setdefault("projects", [])
     match_idx = None
     for idx, project in enumerate(config_toml["projects"]):
-        if project["project"] == str(project_config["uuid"]):
+        if project["uuid"] == str(project_config["uuid"]):
             match_idx = idx
             break
     else:
@@ -147,3 +148,4 @@ def cli_project_load_config(
 
     with open(config_path, "wt") as outputf:
         outputf.write(toml.dumps(config_toml))
+    logger.info("All done. Have a nice day!")

@@ -38,3 +38,9 @@ jsonschema >=4.4.0,<4.20
 
 # Type checking
 typeguard >=2.13.3,<3.0
+
+# Phenopackets parsing
+phenopackets >=2.0,<3.0
+
+# Access to VCF files.
+vcfpy >=0.13.6,<0.14

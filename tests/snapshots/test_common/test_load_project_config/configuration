@@ -1,0 +1,9 @@
+{
+  "title": "S3 Example",
+  "uuid": "00000000-0000-0000-0000-000000000001",
+  "import_data_protocol": "s3",
+  "import_data_host": "s3-server.example.net",
+  "import_data_path": "bucket-name",
+  "import_data_user": "s3-user",
+  "import_data_password": "s3-key"
+}
