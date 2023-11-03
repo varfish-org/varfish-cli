@@ -42,5 +42,8 @@ typeguard >=2.13.3,<3.0
 # Phenopackets parsing
 phenopackets >=2.0,<3.0
 
+# Parsing of YAML files
+pyyaml >=6,<7
+
 # Access to VCF files.
 vcfpy >=0.13.6,<0.14
