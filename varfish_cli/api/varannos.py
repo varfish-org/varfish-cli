@@ -64,7 +64,6 @@ def varannoset_create(
         endpoint, headers=headers, data=payload.model_dump(mode="json"), verify=verify_ssl
     )
     raise_for_status(result)
-    print(result.json())
     return pydantic.TypeAdapter(VarAnnoSetV1).validate_python(result.json())
 
 

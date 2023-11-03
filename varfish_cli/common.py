@@ -5,10 +5,17 @@ import datetime
 from enum import Enum, unique
 import io
 import json
+import os
 import typing
 import uuid
 
 from tabulate import tabulate
+import toml
+
+from varfish_cli.config import ProjectConfig
+
+#: Paths to search the global configuration in.
+DEFAULT_PATH_VARFISHRC = "~/.varfishrc.toml"
 
 
 class CustomEncoder(json.JSONEncoder):
@@ -89,3 +96,16 @@ def load_json(path_or_payload: str) -> typing.Any:
             return json.load(inputf)
     else:
         return json.loads(path_or_payload)
+
+
+def load_project_config(
+    project_uuid: uuid.UUID, *, config_path: str = DEFAULT_PATH_VARFISHRC
+) -> typing.Optional[ProjectConfig]:
+    """Load project configuration from file."""
+    config_path = os.path.expanduser(config_path)
+    with open(config_path, "rt") as inputf:
+        config = toml.loads(inputf.read())
+    for project in config["projects"]:
+        if project["uuid"] == str(project_uuid):
+            return ProjectConfig(**project)
+    return None

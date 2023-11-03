@@ -6,7 +6,7 @@ python-dateutil >=2.8.1,<3.0
 # pydantic: typed models and validation
 pydantic >=2,<3
 
-# toml parsing if python <3.11
+# toml parsing and writing
 toml >=0.10.2,<0.11
 
 # typer: typed command line interfaces.
@@ -38,3 +38,12 @@ jsonschema >=4.4.0,<4.20
 
 # Type checking
 typeguard >=2.13.3,<3.0
+
+# Phenopackets parsing
+phenopackets >=2.0,<3.0
+
+# Parsing of YAML files
+pyyaml >=6,<7
+
+# Access to VCF files.
+vcfpy >=0.13.6,<0.14

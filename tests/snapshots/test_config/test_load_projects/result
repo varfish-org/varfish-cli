@@ -1,0 +1,38 @@
+[
+  {
+    "title": "S3 Example",
+    "uuid": "00000000-0000-0000-0000-000000000001",
+    "import_data_protocol": "s3",
+    "import_data_host": "s3-server.example.net",
+    "import_data_path": "bucket-name",
+    "import_data_user": "s3-user",
+    "import_data_password": "s3-key"
+  },
+  {
+    "title": "HTTP Example",
+    "uuid": "00000000-0000-0000-0000-000000000002",
+    "import_data_protocol": "http",
+    "import_data_host": "http-server.example.net",
+    "import_data_path": "/http-prefix",
+    "import_data_user": "http-user",
+    "import_data_password": "http-password"
+  },
+  {
+    "title": "HTTPS Example",
+    "uuid": "00000000-0000-0000-0000-000000000003",
+    "import_data_protocol": "https",
+    "import_data_host": "https-server.example.net",
+    "import_data_path": "/https-prefix",
+    "import_data_user": "https-user",
+    "import_data_password": "https-password"
+  },
+  {
+    "title": "File Example",
+    "uuid": "00000000-0000-0000-0000-000000000004",
+    "import_data_protocol": "file",
+    "import_data_host": null,
+    "import_data_path": "/path/prefix",
+    "import_data_user": null,
+    "import_data_password": null
+  }
+]
