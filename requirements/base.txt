@@ -34,7 +34,7 @@ tabulate >=0.8.9,<0.10
 polyleven >=0.8,<0.9
 
 # JSON schema.
-jsonschema >=4.4.0,<4.20
+jsonschema >=4.4.0,<4.21
 
 # Type checking
 typeguard >=2.13.3,<5.0
