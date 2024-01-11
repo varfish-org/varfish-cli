@@ -5,18 +5,32 @@ import os
 import typing
 import uuid
 
+#from google.protobuf import CopyFrom
 from google.protobuf.json_format import MessageToDict, ParseDict, ParseError
 from logzero import logger
 from phenopackets import Family
 import typer
 import yaml
 
-from varfish_cli import api, common
+from varfish_cli import api, common, ftypes
 from varfish_cli.cli.common import ListObjects, RetrieveObject
 from varfish_cli.common import DEFAULT_PATH_VARFISHRC, OutputFormat
+from varfish_cli.parse_ped import Donor, parse_ped
 
 #: The ``Typer`` instance to use for the ``cases-import`` sub command.
 app = typer.Typer(no_args_is_help=True)
+
+
+def sync_family_with_donors(family: Family, donors: typing.Dict[str, Donor]) -> Family:
+    """Sync the given family with the given donors.
+
+    The first donor is assumed to be the index.
+    """
+    family.proband
+
+    # make a copy of the family
+    result = Family()
+    result.CopyFrom(family)
 
 
 @app.command("bootstrap-phenopackets")
@@ -46,10 +60,29 @@ def cli_bootstrap_phenopackets(
         raise typer.Exit(1)
 
     # split files by file type
-    assert False
+    files_by_type = {}
+    for other_file in other_files:
+        file_type = ftypes.guess_by_path(other_file)
+        if file_type not in files_by_type:
+            files_by_type[file_type] = [other_file]
+        else:
+            files_by_type[file_type].append(other_file)
+    for file_type, files in sorted(files_by_type.items()):
+        if file_type is ftypes.FileType.UNKNOWN:
+            logger.warn("could not determine file type for %d files", len(files))
+        else:
+            logger.info("%d files of type %s", len(files), file_type.value)
+            for file_ in files:
+                logger.info("  - %s", file_)
 
     # if we do not have a phenopacket file, ensure that we have a PED file
-    assert False
+    num_peds = len(files_by_type.get(ftypes.FileType.PED, []))
+    if not os.path.exists(phenopacket_file) and num_peds == 0:
+        logger.error("No PED file given and no phenopacket file given")
+        raise typer.Exit(1)
+    if num_peds > 1:
+        logger.error("More than one PED file given")
+        raise typer.Exit(1)
 
     # load phenopacket file or create new one
     family: Family
@@ -74,8 +107,17 @@ def cli_bootstrap_phenopackets(
         create_output = True
         family = Family()
 
-    # sync members in PED and phenopackets file
-    assert False
+    # load pedigree and sync members in PED and phenopackets file
+    if num_peds == 1:
+        path_ped = files_by_type[ftypes.FileType.PED][0]
+        if not os.path.exists(path_ped):
+            logger.error("PED file %s does not exist", path_ped)
+            raise typer.Exit(1)
+        with open(path_ped, "rt") as inputf:
+            donors = parse_ped(inputf)
+        donors_by_ped = {donor.name: donor for donor in donors}
+        family = sync_family_with_donors(family, donors_by_ped)
+
 
     # write out phenopackets file
     if create_output:

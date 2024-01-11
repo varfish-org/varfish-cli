@@ -25,7 +25,7 @@ class Donor(pydantic.BaseModel):
     disease: str
 
 
-def parse_ped(ped_file) -> typing.List[Donor]:
+def parse_ped(ped_file: typing.TextIO) -> typing.List[Donor]:
     """Parse a given PED file and return ``Donor`` objects."""
     lines = []
     for line in ped_file.readlines():

@@ -1,4 +1,4 @@
-from varfish_cli.ftypes import FileType, guess_by_path
+from varfish_cli.ftypes.ftypes import FileType, guess_by_path
 
 
 def test_guess_by_path():
