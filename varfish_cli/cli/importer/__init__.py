@@ -12,7 +12,7 @@ from varfish_cli.api import GenomeBuild
 from varfish_cli.cli.importer.create import CaseImporter, CaseImportOptions
 from varfish_cli.config import CommonOptions
 
-#: The ``Typer`` instance to use for the ``cases`` sub command.
+#: The ``Typer`` instance to use for the ``importer`` sub command.
 app = typer.Typer(no_args_is_help=True)
 
 

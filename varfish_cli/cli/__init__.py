@@ -7,7 +7,7 @@ import logzero
 import typer
 
 from varfish_cli import __version__
-from varfish_cli.cli import cases, importer, projects, varannos
+from varfish_cli.cli import cases, importer, projects, tools, varannos
 from varfish_cli.config import CommonOptions, load_config
 from varfish_cli.exceptions import InvalidConfiguration
 
@@ -30,6 +30,7 @@ app.add_typer(varannos.app, name="varannos", help="Subcommands for 'varannos' AP
 app.add_typer(projects.app, name="projects", help="Subcommands for 'project' API")
 app.add_typer(cases.app, name="cases", help="Subcommands for 'cases' API")
 app.add_typer(importer.app, name="importer", help="Subcommands for 'importer' API")
+app.add_typer(tools.app, name="tools", help="Subcommands for 'tools' API")
 
 
 @app.command("version")
