@@ -1,6 +1,6 @@
 [![CI](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml/badge.svg)](https://github.com/bihealth/varfish-cli/actions/workflows/main.yml)
 [![codecov](https://codecov.io/gh/bihealth/varfish-cli/branch/main/graph/badge.svg?token=9ZX53MPEJT)](https://codecov.io/gh/bihealth/varfish-cli)
-[![Pypi](https://img.shields.io/pypi/pyversions/clinvar-this.svg)](https://pypi.org/project/clinvar-this)
+[![Pypi](https://img.shields.io/pypi/pyversions/varfish-cli.svg)](https://pypi.org/project/varfish-cli)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/varfish-cli/README.html)
 [![Documentation Status](https://readthedocs.org/projects/varfish-cli/badge/?version=latest)](https://varfish-cli.readthedocs.io/en/latest/?badge=latest)
 [![MIT license](https://img.shields.io/badge/License-MIT-green.svg)](https://opensource.org/licenses/MIT)
