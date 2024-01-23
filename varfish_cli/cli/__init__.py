@@ -1,6 +1,7 @@
 """Code for main entry point."""
 
 import logging
+import os
 import typing
 
 import logzero
@@ -23,7 +24,7 @@ def version_callback(value: bool):
 
 
 #: Main CLI ``Typer`` object.
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(no_args_is_help=True, pretty_exceptions_enable=False)
 
 # Register all sub commands.
 app.add_typer(varannos.app, name="varannos", help="Subcommands for 'varannos' API")

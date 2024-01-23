@@ -1,0 +1,43 @@
+# serializer version: 1
+# name: test_project_list_two_elements
+  '''
+  [
+    {
+      "sodar_uuid": "4071c7f5769447f69dd9d2834d4b0164",
+      "parent": null,
+      "title": "Test Category",
+      "type": "CATEGORY",
+      "description": null,
+      "readme": "",
+      "public_guest_access": false,
+      "archive": false
+    },
+    {
+      "sodar_uuid": "25cd0ca405bd41dc930dbef805e92d0f",
+      "parent": "4071c7f5769447f69dd9d2834d4b0164",
+      "title": "Test Project",
+      "type": "PROJECT",
+      "description": null,
+      "readme": "",
+      "public_guest_access": false,
+      "archive": false
+    }
+  ]
+  
+  '''
+# ---
+# name: test_project_retrieve
+  '''
+  {
+    "sodar_uuid": "4071c7f5-7694-47f6-9dd9-d2834d4b0164",
+    "parent": null,
+    "title": "Test Category",
+    "type": "CATEGORY",
+    "description": null,
+    "readme": "",
+    "public_guest_access": false,
+    "archive": false
+  }
+  
+  '''
+# ---

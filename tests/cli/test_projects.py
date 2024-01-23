@@ -6,8 +6,8 @@ import uuid
 
 import pytest
 from pytest_mock import MockerFixture
-from pytest_snapshot.plugin import Snapshot
 from requests_mock.mocker import Mocker as RequestsMocker
+from syrupy import SnapshotAssertion
 from typer.testing import CliRunner
 
 from tests.conftest import FakeFs
@@ -57,7 +57,7 @@ def test_project_list_two_elements(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     project_list_result_two_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -75,7 +75,7 @@ def test_project_list_two_elements(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 @pytest.fixture
@@ -90,7 +90,7 @@ def test_project_retrieve(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     project_retrieve_result,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -109,4 +109,4 @@ def test_project_retrieve(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot

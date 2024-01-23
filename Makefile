@@ -24,11 +24,11 @@ format: format-isort format-black
 lint: lint-flake8 lint-isort lint-black
 
 .PHONY: format-black
-black:
+format-black:
 	black -l 100 .
 
 .PHONY: lint-black
-black-check:
+lint-black:
 	black -l 100 --check .
 
 .PHONY: format-isort
