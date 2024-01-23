@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.1](https://github.com/bihealth/varfish-cli/compare/v0.6.0...v0.6.1) (2024-01-23)
+
+
+### Continuous Integration
+
+* install setuptools to fix "python sdist" in release-please ([#87](https://github.com/bihealth/varfish-cli/issues/87)) ([9b03c68](https://github.com/bihealth/varfish-cli/commit/9b03c687e34f9e94533fbd04f02b2d4baa65e759))
+
 ## [0.6.0](https://github.com/bihealth/varfish-cli/compare/v0.5.3...v0.6.0) (2024-01-23)
 
 
