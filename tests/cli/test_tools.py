@@ -1,8 +1,5 @@
 """Tests for the varfish_cli.tools module."""
 
-from pytest import TempdirFactory
-from pytest_mock import MockerFixture
-from requests_mock.mocker import Mocker as RequestsMocker
 from syrupy import SnapshotAssertion
 from typer.testing import CliRunner
 

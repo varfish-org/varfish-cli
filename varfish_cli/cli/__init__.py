@@ -1,7 +1,6 @@
 """Code for main entry point."""
 
 import logging
-import os
 import typing
 
 import logzero
