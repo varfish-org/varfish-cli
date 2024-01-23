@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.6.0](https://github.com/bihealth/varfish-cli/compare/v0.5.3...v0.6.0) (2024-01-23)
+
+
+### Features
+
+* add "projects project-list" command ([#50](https://github.com/bihealth/varfish-cli/issues/50)) ([057abd5](https://github.com/bihealth/varfish-cli/commit/057abd56667e2b089ee2d30a4c761fd4b67a7278))
+* conversion from DRAGEN QC to legacy varfish format ([#85](https://github.com/bihealth/varfish-cli/issues/85)) ([#86](https://github.com/bihealth/varfish-cli/issues/86)) ([043dbc3](https://github.com/bihealth/varfish-cli/commit/043dbc3437dfc2d938a3ba5a4a4ea91ffa12be4f))
+* migrate argparse code to typer ([#48](https://github.com/bihealth/varfish-cli/issues/48)) ([#61](https://github.com/bihealth/varfish-cli/issues/61)) ([d1c86d4](https://github.com/bihealth/varfish-cli/commit/d1c86d43be19b66c5f3429c62772e2febadf119c))
+* migration from attrs to pydantic ([#49](https://github.com/bihealth/varfish-cli/issues/49)) ([#65](https://github.com/bihealth/varfish-cli/issues/65)) ([2c9e402](https://github.com/bihealth/varfish-cli/commit/2c9e402b66731e35f2214eaca52d3ae49069613b))
+
+
+### Documentation
+
+* installation instructions in manual ([#69](https://github.com/bihealth/varfish-cli/issues/69)) ([0afb87c](https://github.com/bihealth/varfish-cli/commit/0afb87c377ebda2f50892afff4ab857bce34e4a9))
+* updating README, adding terraform docs ([#68](https://github.com/bihealth/varfish-cli/issues/68)) ([f6dd1bf](https://github.com/bihealth/varfish-cli/commit/f6dd1bf850d3f1ac8637f15d165ac262d1f93b2b))
+
 ## [0.5.3](https://github.com/bihealth/varfish-cli/compare/v0.5.2...v0.5.3) (2023-07-17)
 
 
