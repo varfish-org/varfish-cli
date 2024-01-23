@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.6.2](https://github.com/bihealth/varfish-cli/compare/v0.6.1...v0.6.2) (2024-01-23)
+
+
+### Bug Fixes
+
+* properly assign version in release-please ([#91](https://github.com/bihealth/varfish-cli/issues/91)) ([3037f7a](https://github.com/bihealth/varfish-cli/commit/3037f7a44ec4a6a1be641d4ee8c327c11bfacaa2))
+* version for release-please in CI ([#89](https://github.com/bihealth/varfish-cli/issues/89)) ([2aedb64](https://github.com/bihealth/varfish-cli/commit/2aedb6465237211133625ef19be601e43d47be9b))
+
+
+### Documentation
+
+* add pypi and bioconda badges ([#96](https://github.com/bihealth/varfish-cli/issues/96)) ([88c7f79](https://github.com/bihealth/varfish-cli/commit/88c7f79150ca921fe21116fa4c8523840c8d22b2))
+
 ## [0.6.1](https://github.com/bihealth/varfish-cli/compare/v0.6.0...v0.6.1) (2024-01-23)
 
 
