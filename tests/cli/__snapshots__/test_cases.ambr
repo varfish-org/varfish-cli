@@ -1,0 +1,56 @@
+# serializer version: 1
+# name: test_case_list_one_element
+  '''
+  +--------------------------------------+--------------+---------------------------+-------------------------------------------------------------------------------------------+
+  | sodar_uuid                           | name         | index                     | members                                                                                   |
+  +======================================+==============+===========================+===========================================================================================+
+  | 0b96111f-00c9-4ed2-a4a2-ec2ec3322066 | Case_3_index | Case_3_index-N1-DNA1-WGS1 | ['Case_3_index-N1-DNA1-WGS1', 'Case_3_father-N1-DNA1-WGS1', 'Case_3_mother-N1-DNA1-WGS1'] |
+  +--------------------------------------+--------------+---------------------------+-------------------------------------------------------------------------------------------+
+  
+  '''
+# ---
+# name: test_case_retrieve
+  '''
+  {
+    "release": "GRCh37",
+    "name": "Case_3_index",
+    "index": "Case_3_index-N1-DNA1-WGS1",
+    "pedigree": [
+      {
+        "name": "Case_3_index-N1-DNA1-WGS1",
+        "father": "Case_3_father-N1-DNA1-WGS1",
+        "mother": "Case_3_mother-N1-DNA1-WGS1",
+        "sex": 2,
+        "affected": 2,
+        "has_gt_entries": true
+      },
+      {
+        "name": "Case_3_father-N1-DNA1-WGS1",
+        "father": "0",
+        "mother": "0",
+        "sex": 1,
+        "affected": 1,
+        "has_gt_entries": true
+      },
+      {
+        "name": "Case_3_mother-N1-DNA1-WGS1",
+        "father": "0",
+        "mother": "0",
+        "sex": 2,
+        "affected": 1,
+        "has_gt_entries": true
+      }
+    ],
+    "sodar_uuid": "0b96111f-00c9-4ed2-a4a2-ec2ec3322066",
+    "owner": null,
+    "date_created": "2023-06-26T17:15:13+02:00",
+    "date_modified": "2023-08-02T14:34:05+02:00",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "case": null,
+    "state": "draft",
+    "notes": "asdf",
+    "tags": []
+  }
+  
+  '''
+# ---

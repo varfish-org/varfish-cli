@@ -6,8 +6,8 @@ import uuid
 
 import pytest
 from pytest_mock import MockerFixture
-from pytest_snapshot.plugin import Snapshot
 from requests_mock.mocker import Mocker as RequestsMocker
+from syrupy import SnapshotAssertion
 from typer.testing import CliRunner
 
 from tests.conftest import FakeFs
@@ -60,7 +60,7 @@ def test_varannoset_list_one_element(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannoset_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -81,7 +81,7 @@ def test_varannoset_list_one_element(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannoset_create(
@@ -90,7 +90,7 @@ def test_varannoset_create(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannoset_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -112,7 +112,7 @@ def test_varannoset_create(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannoset_retrieve(
@@ -121,7 +121,7 @@ def test_varannoset_retrieve(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannoset_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -142,7 +142,7 @@ def test_varannoset_retrieve(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannoset_update(
@@ -151,7 +151,7 @@ def test_varannoset_update(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannoset_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -179,7 +179,7 @@ def test_varannoset_update(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannoset_destroy(
@@ -250,7 +250,7 @@ def test_varannosetentry_create(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannosetentry_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -278,7 +278,7 @@ def test_varannosetentry_create(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 @pytest.fixture
@@ -293,7 +293,7 @@ def test_varannosetentry_list_one_element(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannosetentry_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -314,7 +314,7 @@ def test_varannosetentry_list_one_element(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannosetentry_retrieve(
@@ -323,7 +323,7 @@ def test_varannosetentry_retrieve(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannosetentry_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -344,7 +344,7 @@ def test_varannosetentry_retrieve(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannosetentry_update(
@@ -353,7 +353,7 @@ def test_varannosetentry_update(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     varannosetentry_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -381,7 +381,7 @@ def test_varannosetentry_update(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_varannosetentry_destroy(

@@ -6,8 +6,8 @@ import uuid
 
 import pytest
 from pytest_mock import MockerFixture
-from pytest_snapshot.plugin import Snapshot
 from requests_mock.mocker import Mocker as RequestsMocker
+from syrupy import SnapshotAssertion
 from typer.testing import CliRunner
 
 from tests.conftest import FakeFs
@@ -60,7 +60,7 @@ def test_case_list_one_element(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     case_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -79,7 +79,7 @@ def test_case_list_one_element(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot
 
 
 def test_case_retrieve(
@@ -88,7 +88,7 @@ def test_case_retrieve(
     requests_mock: RequestsMocker,
     fake_conn: typing.Tuple[str, str],
     case_list_result_one_elements,
-    snapshot: Snapshot,
+    snapshot: SnapshotAssertion,
     mocker: MockerFixture,
 ):
     mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
@@ -107,4 +107,4 @@ def test_case_retrieve(
     mocker.stopall()
 
     assert result.exit_code == 0, result.output
-    snapshot.assert_match(result.output, "result_output")
+    assert result.output == snapshot

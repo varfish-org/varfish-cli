@@ -1,0 +1,162 @@
+# serializer version: 1
+# name: test_varannoset_create
+  '''
+  {'sodar_uuid': 'e211747f-2a50-4a65-b192-c96bc2e111fa', 'date_created': '2023-10-31T08:15:15+01:00', 'date_modified': '2023-10-31T08:15:15+01:00', 'project': '062b8838-453f-4cf3-817d-a5ec76546462', 'title': 'my title', 'description': 'None', 'release': 'GRCh37', 'fields': ['pathogenicity', 'notes']}
+  {
+    "sodar_uuid": "e211747f-2a50-4a65-b192-c96bc2e111fa",
+    "date_created": "2023-10-31T08:15:15+01:00",
+    "date_modified": "2023-10-31T08:15:15+01:00",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "title": "my title",
+    "description": "None",
+    "release": "GRCh37",
+    "fields": [
+      "pathogenicity",
+      "notes"
+    ]
+  }
+  
+  '''
+# ---
+# name: test_varannoset_list_one_element
+  '''
+  [
+    {
+      "sodar_uuid": "e211747f2a504a65b192c96bc2e111fa",
+      "date_created": "2023-10-31T08:15:15.000000+0100",
+      "date_modified": "2023-10-31T08:15:15.000000+0100",
+      "project": "062b8838453f4cf3817da5ec76546462",
+      "title": "my title",
+      "description": "None",
+      "release": "GRCh37",
+      "fields": [
+        "pathogenicity",
+        "notes"
+      ]
+    }
+  ]
+  
+  '''
+# ---
+# name: test_varannoset_retrieve
+  '''
+  {
+    "sodar_uuid": "e211747f-2a50-4a65-b192-c96bc2e111fa",
+    "date_created": "2023-10-31T08:15:15+01:00",
+    "date_modified": "2023-10-31T08:15:15+01:00",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "title": "my title",
+    "description": "None",
+    "release": "GRCh37",
+    "fields": [
+      "pathogenicity",
+      "notes"
+    ]
+  }
+  
+  '''
+# ---
+# name: test_varannoset_update
+  '''
+  {
+    "sodar_uuid": "e211747f-2a50-4a65-b192-c96bc2e111fa",
+    "date_created": "2023-10-31T08:15:15+01:00",
+    "date_modified": "2023-10-31T08:15:15+01:00",
+    "project": "062b8838-453f-4cf3-817d-a5ec76546462",
+    "title": "my title",
+    "description": "None",
+    "release": "GRCh37",
+    "fields": [
+      "pathogenicity",
+      "notes"
+    ]
+  }
+  
+  '''
+# ---
+# name: test_varannosetentry_create
+  '''
+  {
+    "sodar_uuid": "4a3a96ae-ddd8-4e9f-897f-5fbbadfedad5",
+    "date_created": "2023-10-31T09:02:26+01:00",
+    "date_modified": "2023-10-31T09:02:26+01:00",
+    "varannoset": "0a30d59b-7257-43d1-8964-2a2ac50af7f2",
+    "release": "GRCh37",
+    "chromosome": "1",
+    "start": 100,
+    "end": 100,
+    "reference": "A",
+    "alternative": "T",
+    "payload": {
+      "pathogenic": "likely-pathogenic",
+      "notes": "TEST"
+    }
+  }
+  
+  '''
+# ---
+# name: test_varannosetentry_list_one_element
+  '''
+  [
+    {
+      "sodar_uuid": "4a3a96aeddd84e9f897f5fbbadfedad5",
+      "date_created": "2023-10-31T09:02:26.000000+0100",
+      "date_modified": "2023-10-31T09:02:26.000000+0100",
+      "varannoset": "0a30d59b725743d189642a2ac50af7f2",
+      "release": "GRCh37",
+      "chromosome": "1",
+      "start": 100,
+      "end": 100,
+      "reference": "A",
+      "alternative": "T",
+      "payload": {
+        "pathogenic": "likely-pathogenic",
+        "notes": "TEST"
+      }
+    }
+  ]
+  
+  '''
+# ---
+# name: test_varannosetentry_retrieve
+  '''
+  {
+    "sodar_uuid": "4a3a96ae-ddd8-4e9f-897f-5fbbadfedad5",
+    "date_created": "2023-10-31T09:02:26+01:00",
+    "date_modified": "2023-10-31T09:02:26+01:00",
+    "varannoset": "0a30d59b-7257-43d1-8964-2a2ac50af7f2",
+    "release": "GRCh37",
+    "chromosome": "1",
+    "start": 100,
+    "end": 100,
+    "reference": "A",
+    "alternative": "T",
+    "payload": {
+      "pathogenic": "likely-pathogenic",
+      "notes": "TEST"
+    }
+  }
+  
+  '''
+# ---
+# name: test_varannosetentry_update
+  '''
+  {
+    "sodar_uuid": "4a3a96ae-ddd8-4e9f-897f-5fbbadfedad5",
+    "date_created": "2023-10-31T09:02:26+01:00",
+    "date_modified": "2023-10-31T09:02:26+01:00",
+    "varannoset": "0a30d59b-7257-43d1-8964-2a2ac50af7f2",
+    "release": "GRCh37",
+    "chromosome": "1",
+    "start": 100,
+    "end": 100,
+    "reference": "A",
+    "alternative": "T",
+    "payload": {
+      "pathogenic": "likely-pathogenic",
+      "notes": "TEST"
+    }
+  }
+  
+  '''
+# ---
