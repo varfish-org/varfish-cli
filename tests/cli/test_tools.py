@@ -1,8 +1,10 @@
 """Tests for the varfish_cli.tools module."""
 
+from pytest_mock import MockerFixture
 from syrupy import SnapshotAssertion
 from typer.testing import CliRunner
 
+from tests.conftest import FakeFs
 from varfish_cli.cli import app
 from varfish_cli.cli.tools import load_bam_qc
 
@@ -25,9 +27,14 @@ def test_load_bam_qc(
 
 def test_dragen_to_bam_qc(
     runner: CliRunner,
+    fake_fs_configured: FakeFs,
     snapshot: SnapshotAssertion,
     tmpdir: str,
+    mocker: MockerFixture,
 ):
+    mocker.patch("varfish_cli.config.open", fake_fs_configured.open_, create=True)
+    mocker.patch("varfish_cli.config.os", fake_fs_configured.os)
+
     result = runner.invoke(
         app,
         [
