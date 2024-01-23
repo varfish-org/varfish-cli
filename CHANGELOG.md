@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.6.2](https://github.com/bihealth/varfish-cli/compare/v0.6.1...v0.6.2) (2024-01-23)
+
+
+### Bug Fixes
+
+* properly assign version in release-please ([#91](https://github.com/bihealth/varfish-cli/issues/91)) ([1f3c7e1](https://github.com/bihealth/varfish-cli/commit/1f3c7e1044205d0dfafa3d6b57dccafbd1d7cdad))
+* version for release-please in CI ([#89](https://github.com/bihealth/varfish-cli/issues/89)) ([2aedb64](https://github.com/bihealth/varfish-cli/commit/2aedb6465237211133625ef19be601e43d47be9b))
+
 ## [0.6.1](https://github.com/bihealth/varfish-cli/compare/v0.6.0...v0.6.1) (2024-01-23)
 
 
