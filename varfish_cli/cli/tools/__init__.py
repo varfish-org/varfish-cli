@@ -3,6 +3,7 @@
 import csv
 import fnmatch
 import gzip
+import json
 from typing import Annotated, Dict, List
 
 from logzero import logger
@@ -211,7 +212,7 @@ def dragen_to_bam_qc(
     else:
         output_file = open(output_file, "wt")
     with output_file:
-        json_str = bam_qc.model_dump_json().replace('"', '"""')
+        json_str = json.dumps(bam_qc.model_dump(mode="json")["sample_data"]).replace('"', '"""')
         print(f"case_id\tset_id\tbam_stats\n.\t.\t{json_str}", file=output_file)
     logger.debug("... done writing output file.")
 
