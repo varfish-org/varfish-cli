@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.6.3](https://github.com/varfish-org/varfish-cli/compare/v0.6.2...v0.6.3) (2024-01-24)
+
+
+### Bug Fixes
+
+* write out .sample_data in dragen-to-bam-qc ([#101](https://github.com/varfish-org/varfish-cli/issues/101)) ([#102](https://github.com/varfish-org/varfish-cli/issues/102)) ([638c294](https://github.com/varfish-org/varfish-cli/commit/638c2945d1ea8c4951c5d235f3aef231dcc604c6))
+
+
+### Documentation
+
+* fix link to pypi in README ([#97](https://github.com/varfish-org/varfish-cli/issues/97)) ([8f25193](https://github.com/varfish-org/varfish-cli/commit/8f25193f5fd313def2457f03e338992aa04eaf9f))
+
 ## [0.6.2](https://github.com/bihealth/varfish-cli/compare/v0.6.1...v0.6.2) (2024-01-23)
 
 
