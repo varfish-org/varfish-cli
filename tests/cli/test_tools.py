@@ -52,3 +52,6 @@ def test_dragen_to_bam_qc(
 
     assert result.exit_code == 0, result.output
     assert result.output == snapshot
+
+    with open(f"{tmpdir}/OUT.tsv", "rt") as f:
+        assert f.read() == snapshot

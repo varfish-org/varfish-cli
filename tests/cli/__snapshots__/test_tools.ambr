@@ -5,6 +5,13 @@
   
   '''
 # ---
+# name: test_dragen_to_bam_qc.1
+  '''
+  case_id	set_id	bam_stats
+  .	.	{"""sample""": {"""summary""": {"""mean coverage""": 35.44, """total target size""": 39036020}, """min_cov_target""": {"""0""": 100.0, """1""": 99.0, """3""": 98.77, """10""": 98.18, """15""": 97.59, """20""": 95.41, """50""": 0.88, """100""": 0.05, """500""": 0.03, """1000""": 0.03, """1500""": 0.03}, """bamstats""": {"""sequences""": 1055691016, """reads duplicated""": 65335430, """insert size average""": 488.03, """insert size standard deviation""": 115.27}}, """sample2""": {"""summary""": {"""mean coverage""": 35.44, """total target size""": 39036020}, """min_cov_target""": {"""0""": 100.0, """1""": 99.0, """3""": 98.77, """10""": 98.18, """15""": 97.59, """20""": 95.41, """50""": 0.88, """100""": 0.05, """500""": 0.03, """1000""": 0.03, """1500""": 0.03}, """bamstats""": {"""sequences""": 1055691016, """reads duplicated""": 65335430, """insert size average""": 488.03, """insert size standard deviation""": 115.27}}}
+  
+  '''
+# ---
 # name: test_load_bam_qc
   BamQc(sample_data={'sample': BamQcData(summary={'mean coverage': 35.44, 'total target size': 39036020}, min_cov_target={0: 100.0, 1: 99.0, 3: 98.77, 10: 98.18, 15: 97.59, 20: 95.41, 50: 0.88, 100: 0.05, 500: 0.03, 1000: 0.03, 1500: 0.03}, bamstats={'sequences': 1055691016, 'reads duplicated': 65335430, 'insert size average': 488.03, 'insert size standard deviation': 115.27}), 'sample2': BamQcData(summary={'mean coverage': 35.44, 'total target size': 39036020}, min_cov_target={0: 100.0, 1: 99.0, 3: 98.77, 10: 98.18, 15: 97.59, 20: 95.41, 50: 0.88, 100: 0.05, 500: 0.03, 1000: 0.03, 1500: 0.03}, bamstats={'sequences': 1055691016, 'reads duplicated': 65335430, 'insert size average': 488.03, 'insert size standard deviation': 115.27})})
 # ---
