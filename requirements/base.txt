@@ -10,7 +10,7 @@ pydantic >=2,<3
 toml >=0.10.2,<0.11
 
 # typer: typed command line interfaces.
-typer >=0.9,<0.11
+typer >=0.9,<0.13
 
 # JSON Schema
 jsonschema >=4.4,<4.22
