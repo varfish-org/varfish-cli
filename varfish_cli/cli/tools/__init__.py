@@ -39,7 +39,7 @@ def load_sample_data(qc_coverage_region_path: str, mapping_metrics_path: str) ->
         mapping_metrics = {
             row["label"]: row["value"]
             for row in reader
-            if row["_summary"] == "MAPPING/ALIGNING SUMMARY"
+            if row["_summary"] == "MAPPING/ALIGNING SUMMARY" and row["_empty"] == ""
         }
 
     key_aligned_in_region = "Aligned bases in QC coverage region"
