@@ -24,7 +24,7 @@ def load_sample_data(qc_coverage_region_path: str, mapping_metrics_path: str) ->
     :param mapping_metrics: Path to coverage metrics file
     :raises typer.Exit: If there is a problem with reading the input files.
     """
-    fieldnames = ["_coverage_summary", "_empty", "label", "value"]
+    fieldnames = ["_summary", "_empty", "label", "value"]
     qc_coverage_region: Dict[str, str] = {}
     with open(qc_coverage_region_path, "rt") as qc_coverage_file:
         reader = csv.DictReader(
@@ -36,7 +36,11 @@ def load_sample_data(qc_coverage_region_path: str, mapping_metrics_path: str) ->
     mapping_metrics: Dict[str, str] = {}
     with open(mapping_metrics_path, "rt") as coverage_metrics_file:
         reader = csv.DictReader(coverage_metrics_file, fieldnames=fieldnames, delimiter=",")
-        mapping_metrics = {row["label"]: row["value"] for row in reader}
+        mapping_metrics = {
+            row["label"]: row["value"]
+            for row in reader
+            if row["_summary"] == "MAPPING/ALIGNING SUMMARY" and row["_empty"] == ""
+        }
 
     key_aligned_in_region = "Aligned bases in QC coverage region"
     try:
