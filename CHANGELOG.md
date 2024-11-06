@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.6.4](https://github.com/varfish-org/varfish-cli/compare/v0.6.3...v0.6.4) (2024-11-06)
+
+
+### Bug Fixes
+
+* only consider MAPPING/ALIGNING SUMMARY entries from dragen qc summary file ([#134](https://github.com/varfish-org/varfish-cli/issues/134)) ([c4b8dd1](https://github.com/varfish-org/varfish-cli/commit/c4b8dd1a86669a4022c3259d1848680dccff9296))
+
 ## [0.6.3](https://github.com/varfish-org/varfish-cli/compare/v0.6.2...v0.6.3) (2024-01-24)
 
 
