@@ -279,6 +279,7 @@ class CaseImportOptions(pydantic.BaseModel):
     resubmit: bool
     force_fresh: bool
     case_name_suffix: str
+    index: typing.Union[str, None]
 
 
 class CaseImporter:
@@ -315,6 +316,7 @@ class CaseImporter:
 
         #: The pedigree members.
         self.pedigree: typing.List[PedigreeMember] = None
+        self.index: typing.Union[str, None] = None
 
     def _log_exception(self, e):
         logger.exception(e, exc_info=self.common_options.verbose)
@@ -519,7 +521,7 @@ class CaseImporter:
             return x
 
         name, self.pedigree = self._load_pedigree()
-        index = self.pedigree[0].name
+        index = self.index or self.pedigree[0].name
         name = strip_suffix(name)
 
         self._check_genotypes()
