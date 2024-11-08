@@ -138,7 +138,7 @@ def cli_caseimportinfo_create(
         typer.Option(
             "--index",
             help="Name of the index case in the pedigree, "
-            "defaults to the first member of the pedigree file.",
+            "defaults to the first affected member of the pedigree file.",
         ),
     ] = None,
 ):
