@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.7.0](https://github.com/varfish-org/varfish-cli/compare/v0.6.4...v0.7.0) (2024-11-08)
+
+
+### Features
+
+* add index option to case import ([#136](https://github.com/varfish-org/varfish-cli/issues/136)) ([e418c74](https://github.com/varfish-org/varfish-cli/commit/e418c740155f0bbd81c3137fc4db910c9794c636))
+
 ## [0.6.4](https://github.com/varfish-org/varfish-cli/compare/v0.6.3...v0.6.4) (2024-11-06)
 
 
