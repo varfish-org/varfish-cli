@@ -133,6 +133,14 @@ def cli_caseimportinfo_create(
             help="The genome build (GRCh37/GRCh38) of this case, defaults to GRCh37.",
         ),
     ] = GenomeBuild.GRCH37.value,
+    index: typing.Annotated[
+        str,
+        typer.Option(
+            "--index",
+            help="Name of the index case in the pedigree, "
+            "defaults to the first affected member of the pedigree file.",
+        ),
+    ] = None,
 ):
     logger.info("Creating CaseImportInfo object...")
     common_options: CommonOptions = ctx.obj
@@ -145,6 +153,7 @@ def cli_caseimportinfo_create(
             force_fresh=force_fresh,
             resubmit=resubmit,
             project_uuid=project_uuid,
+            index=index,
         ),
         common_options=common_options,
     )
