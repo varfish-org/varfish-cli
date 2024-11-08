@@ -523,7 +523,11 @@ class CaseImporter:
         name, self.pedigree = self._load_pedigree()
         if self.index and self.index not in {member.name for member in self.pedigree}:
             raise ValueError(f"Specified index case '{self.index}' not found in pedigree")
-        index = self.index or self.pedigree[0].name
+        # use provided index member, first affected member or first general member as index
+        index = (
+            self.index
+            or next(filter(lambda m: m.affected == 2, self.pedigree), self.pedigree[0]).name
+        )
         name = strip_suffix(name)
 
         self._check_genotypes()
