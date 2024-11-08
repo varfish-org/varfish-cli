@@ -316,7 +316,7 @@ class CaseImporter:
 
         #: The pedigree members.
         self.pedigree: typing.List[PedigreeMember] = None
-        self.index: typing.Union[str, None] = None
+        self.index: typing.Union[str, None] = options.index
 
     def _log_exception(self, e):
         logger.exception(e, exc_info=self.common_options.verbose)
