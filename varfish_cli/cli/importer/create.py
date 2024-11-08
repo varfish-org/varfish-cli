@@ -521,6 +521,8 @@ class CaseImporter:
             return x
 
         name, self.pedigree = self._load_pedigree()
+        if self.index and self.index not in {member.name for member in self.pedigree}:
+            raise ValueError(f"Specified index case '{self.index}' not found in pedigree")
         index = self.index or self.pedigree[0].name
         name = strip_suffix(name)
 
